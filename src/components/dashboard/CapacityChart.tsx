@@ -48,7 +48,8 @@ const getStageCapacity = (pumps: Pump[]) => {
 };
 
 const getStageColor = (stage: Stage) => {
-  const colors = {
+  const colors: Record<Stage, string> = {
+    "UNSCHEDULED": "hsl(var(--muted))",
     "NOT STARTED": "hsl(var(--muted-foreground))",
     "FABRICATION": "hsl(var(--chart-1))",
     "POWDER COAT": "hsl(var(--chart-2))",

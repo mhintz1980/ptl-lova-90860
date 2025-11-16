@@ -30,6 +30,7 @@ const basePump: Pump = {
 const resetStore = () => {
   useApp.setState((state) => ({
     collapsedStages: {
+      "UNSCHEDULED": false,
       "NOT STARTED": false,
       FABRICATION: false,
       "POWDER COAT": false,

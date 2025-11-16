@@ -33,7 +33,6 @@ interface KanbanBoardProps {
 
 export function KanbanBoard({ pumps, collapsed, onCardClick }: KanbanBoardProps) {
   const moveStage = useApp((state) => state.moveStage);
-  const wipLimits = useApp((state) => state.wipLimits);
   const [activePump, setActivePump] = useState<Pump | null>(null);
 
   const sensors = useSensors(

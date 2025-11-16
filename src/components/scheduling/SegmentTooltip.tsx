@@ -16,7 +16,6 @@ interface SegmentTooltipProps {
 interface StageSegmentTooltipProps {
   segment: StageSegment;
   pumpSerial?: string;
-  startDate: Date;
   children: React.ReactNode;
   className?: string;
 }
@@ -96,16 +95,13 @@ export function SegmentTooltip({ event, children, className }: SegmentTooltipPro
 export function StageSegmentTooltip({
   segment,
   pumpSerial,
-  startDate,
   children,
   className
 }: StageSegmentTooltipProps) {
   const colorClass = STAGE_COLORS[segment.stage];
   const label = STAGE_LABELS[segment.stage];
-  const segmentStartDate = new Date(startDate);
-  segmentStartDate.setDate(startDate.getDate() + segment.startOffset);
-  const segmentEndDate = new Date(segmentStartDate);
-  segmentEndDate.setDate(segmentStartDate.getDate() + segment.duration - 1);
+  const segmentStartDate = segment.startDate;
+  const segmentEndDate = segment.endDate;
 
   return (
     <Tooltip
@@ -125,10 +121,7 @@ export function StageSegmentTooltip({
           {/* Segment information */}
           <div>
             <div className="text-xs text-gray-300 mb-1">
-              Stage Duration: {segment.duration} {segment.duration === 1 ? 'day' : 'days'}
-            </div>
-            <div className="text-xs text-gray-300 mb-1">
-              Percentage of Timeline: {(segment.percentage * 100).toFixed(1)}%
+              Stage Duration: {segment.durationDays} {segment.durationDays === 1 ? 'day' : 'days'}
             </div>
             {pumpSerial && (
               <div className="text-xs text-gray-400">
@@ -141,9 +134,6 @@ export function StageSegmentTooltip({
           <div className="border-t border-gray-700 pt-2">
             <div className="text-xs font-mono text-gray-200">
               {formatRange(segmentStartDate, segmentEndDate)}
-            </div>
-            <div className="text-xs text-gray-400 mt-1">
-              Offset: {segment.startOffset} days from start
             </div>
           </div>
         </div>
