@@ -7,6 +7,17 @@ A modern, responsive production management system for tracking pump manufacturin
 
 PumpTracker Lite is a lightweight yet powerful web application designed to help manufacturing teams manage pump production orders efficiently. It provides real-time visibility into production status, KPI tracking, and intuitive drag-and-drop Kanban board management.
 
+## 📚 Documentation
+
+All project documents now live under [`docs/`](docs/README.md). Key starting points:
+
+- [`docs/architecture.md`](docs/architecture.md) – UI surfaces, data flow, and state responsibilities.
+- [`docs/development-guide.md`](docs/development-guide.md) – setup, workflow, and coding conventions.
+- [`docs/testing.md`](docs/testing.md) – Vitest/Playwright instructions, including how to verify the scheduling legend filters.
+- [`docs/deployment.md`](docs/deployment.md) – updated hosting guidance.
+
+Historical context and older migration notes were moved to [`docs/archive/`](docs/archive/).
+
 ## ✨ Features
 
 ### Dashboard View

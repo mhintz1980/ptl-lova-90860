@@ -7,40 +7,8 @@ import { LocalAdapter } from "./adapters/local";
 import { getModelLeadTimes as getCatalogLeadTimes } from "./lib/seed";
 import { addDays, startOfDay } from "date-fns";
 import type { StageDurations } from "./lib/schedule";
-
-// --- Utils ---
-
-function genSerial(existing: Pump[]): number {
-  const used = new Set(existing.map(p => p.serial));
-  for (let s = 1000; s <= 9999; s++) {
-    if (!used.has(s)) return s;
-  }
-  // Fallback: use a random serial if 1000-9999 are all used (unlikely for Lite)
-  return Math.floor(1000 + Math.random() * 9000);
-}
-
-function applyFilters(rows: Pump[], f: Filters): Pump[] {
-  const q = f.q?.toLowerCase();
-  return rows.filter(r => {
-    if (f.po && r.po !== f.po) return false;
-    if (f.customer && r.customer !== f.customer) return false;
-    if (f.model && r.model !== f.model) return false;
-    if (f.priority && r.priority !== f.priority) return false;
-    if (f.stage && r.stage !== f.stage) return false;
-    
-    // Simple global search
-    if (q) {
-      const searchable = [r.po, r.customer, r.model, r.serial.toString(), r.powder_color].join(' ').toLowerCase();
-      if (!searchable.includes(q)) return false;
-    }
-    
-    // Date filters (optional for trend, but apply here for consistency)
-    // if (f.dateFrom && r.scheduledEnd && new Date(r.scheduledEnd) < new Date(f.dateFrom)) return false;
-    // if (f.dateTo && r.scheduledEnd && new Date(r.scheduledEnd) > new Date(f.dateTo)) return false;
-
-    return true;
-  });
-}
+import { applyFilters, genSerial } from "./lib/utils";
+import { sortPumps, SortDirection, SortField } from "./lib/sort";
 
 // --- Store Definition ---
 
@@ -52,7 +20,10 @@ interface AppState {
   wipLimits: Record<Stage, number | null>;
   adapter: DataAdapter;
   loading: boolean;
-  
+  sortField: SortField;
+  sortDirection: SortDirection;
+  schedulingStageFilters: Stage[];
+
   // actions
   setAdapter: (a: DataAdapter) => void;
   load: () => Promise<void>;
@@ -69,6 +40,9 @@ interface AppState {
   toggleStageCollapse: (stage: Stage) => void;
   toggleCollapsedCards: () => void;
   setWipLimit: (stage: Stage, limit: number | null) => void;
+  setSort: (field: SortField, direction: SortDirection) => void;
+  toggleSchedulingStageFilter: (stage: Stage) => void;
+  clearSchedulingStageFilters: () => void;
 
   // selectors
   filtered: () => Pump[];
@@ -98,6 +72,9 @@ export const useApp = create<AppState>()(
       },
       adapter: LocalAdapter, // Default to LocalAdapter
       loading: true,
+      sortField: "default",
+      sortDirection: "desc",
+      schedulingStageFilters: [],
       
       setAdapter: (a) => set({ adapter: a }),
 
@@ -141,13 +118,18 @@ export const useApp = create<AppState>()(
         get().adapter.update(id, { stage: to, last_update: now });
       },
 
-      updatePump: (id, patch) => {
+      updatePump: async (id, patch) => {
         const now = new Date().toISOString();
         const next = get().pumps.map(p =>
           p.id === id ? { ...p, ...patch, last_update: now } : p
         );
         set({ pumps: next });
-        get().adapter.update(id, { ...patch, last_update: now });
+        try {
+          await get().adapter.update(id, { ...patch, last_update: now });
+        } catch (error) {
+          console.error(`[store] Failed to update pump ${id}:`, error);
+          // Here you could add logic to revert the state change or show a UI notification
+        }
       },
 
       replaceDataset: (rows) => {
@@ -176,6 +158,21 @@ export const useApp = create<AppState>()(
           }
         }));
       },
+      setSort: (field, direction) => set({ sortField: field, sortDirection: direction }),
+
+      toggleSchedulingStageFilter: (stage) => {
+        set((state) => {
+          const active = new Set(state.schedulingStageFilters);
+          if (active.has(stage)) {
+            active.delete(stage);
+          } else {
+            active.add(stage);
+          }
+          return { schedulingStageFilters: Array.from(active) };
+        });
+      },
+
+      clearSchedulingStageFilters: () => set({ schedulingStageFilters: [] }),
 
       schedulePump: (id: string, dropDate: string) => {
         const { pumps, getModelLeadTimes } = get();
@@ -241,27 +238,32 @@ export const useApp = create<AppState>()(
       },
       levelNotStartedSchedules: () => {
         const state = get();
-        const limitSetting = state.wipLimits?.FABRICATION;
-        const capacity = typeof limitSetting === "number" && limitSetting > 0 ? limitSetting : Infinity;
         const notStarted = state.pumps.filter(
           (pump) => pump.stage === "NOT STARTED" && pump.scheduledStart
         );
+
         if (!notStarted.length) {
-          return;
+          return 0;
         }
 
+        // --- 1. Setup: Configuration and Date Helpers ---
+        const limitSetting = state.wipLimits?.FABRICATION;
+        const capacity = typeof limitSetting === "number" && limitSetting > 0 ? limitSetting : Infinity;
         const toISO = (date: Date) => date.toISOString().split("T")[0];
         const fromISO = (iso: string) => new Date(`${iso}T00:00:00`);
         const addDaysISO = (iso: string, delta: number) => toISO(addDays(fromISO(iso), delta));
         const minDateISO = toISO(startOfDay(new Date()));
 
+        // --- 2. Resource Usage Calculation ---
         const usage = new Map<string, number>();
+
         const reserveDays = (startISO: string, days: number) => {
           for (let i = 0; i < days; i++) {
             const dayISO = addDaysISO(startISO, i);
             usage.set(dayISO, (usage.get(dayISO) ?? 0) + 1);
           }
         };
+
         const canPlace = (startISO: string, days: number) => {
           if (!Number.isFinite(capacity)) return true;
           for (let i = 0; i < days; i++) {
@@ -284,6 +286,7 @@ export const useApp = create<AppState>()(
           reserveDays(pump.scheduledStart, fabDays);
         });
 
+        // --- 3. Sort Jobs and Determine New Schedules ---
         const sorted = [...notStarted].sort((a, b) => {
           const aTime = new Date(`${a.scheduledStart}T00:00:00`).getTime();
           const bTime = new Date(`${b.scheduledStart}T00:00:00`).getTime();
@@ -302,6 +305,7 @@ export const useApp = create<AppState>()(
             targetStart = minDateISO;
           }
 
+          // Pull the start date as early as possible without violating capacity
           while (true) {
             const candidate = addDaysISO(targetStart, -1);
             if (candidate < minDateISO) {
@@ -315,6 +319,7 @@ export const useApp = create<AppState>()(
 
           reserveDays(targetStart, fabDays);
           const targetEnd = addDaysISO(targetStart, totalDays);
+
           if (targetStart !== pump.scheduledStart || targetEnd !== pump.scheduledEnd) {
             patches.push({
               id: pump.id,
@@ -326,29 +331,34 @@ export const useApp = create<AppState>()(
 
         if (!patches.length) return 0;
 
+        // --- 4. Apply Patches to State ---
         const now = new Date().toISOString();
         const next = state.pumps.map((pump) => {
           const patch = patches.find((p) => p.id === pump.id);
           if (!patch) return pump;
           return {
             ...pump,
-            scheduledStart: patch.scheduledStart,
-            scheduledEnd: patch.scheduledEnd,
+            ...patch,
             last_update: now,
           };
         });
         set({ pumps: next });
+
+        // --- 5. Persist Changes via Adapter ---
         patches.forEach((patch) => {
           state.adapter.update(patch.id, {
-            scheduledStart: patch.scheduledStart,
-            scheduledEnd: patch.scheduledEnd,
+            ...patch,
             last_update: now,
           });
         });
+
         return patches.length;
       },
 
-      filtered: () => applyFilters(get().pumps, get().filters),
+      filtered: () => {
+        const rows = applyFilters(get().pumps, get().filters);
+        return sortPumps(rows, get().sortField, get().sortDirection);
+      },
 
       getModelLeadTimes: (model: string) => {
         // Use real catalog data instead of hardcoded values
@@ -364,6 +374,9 @@ export const useApp = create<AppState>()(
         collapsedStages: state.collapsedStages,
         collapsedCards: state.collapsedCards,
         wipLimits: state.wipLimits,
+        sortField: state.sortField,
+        sortDirection: state.sortDirection,
+        schedulingStageFilters: state.schedulingStageFilters,
       }),
     }
   )

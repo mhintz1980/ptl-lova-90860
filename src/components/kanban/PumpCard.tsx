@@ -7,17 +7,37 @@ import { GripVertical } from "lucide-react";
 import { PRIORITY_DOT } from "./constants";
 import { useApp } from "../../store";
 import { useMemo } from "react";
+import { cn } from "../../lib/utils";
+
+interface DraggableConfig {
+  id?: string;
+  data?: Record<string, unknown>;
+  disabled?: boolean;
+}
 
 interface PumpCardProps {
   pump: Pump;
   collapsed?: boolean;
   isDragging?: boolean;
   onClick?: () => void;
+  draggableConfig?: DraggableConfig;
 }
 
-export function PumpCard({ pump, collapsed = false, isDragging = false, onClick }: PumpCardProps) {
+export function PumpCard({
+  pump,
+  collapsed = false,
+  isDragging = false,
+  onClick,
+  draggableConfig,
+}: PumpCardProps) {
+  const draggableId = draggableConfig?.id ?? pump.id;
+  const draggableData = draggableConfig?.data ?? { pump };
+  const disabled = draggableConfig?.disabled ?? false;
+
   const { attributes, listeners, setNodeRef, transform, isDragging: coreDragging } = useDraggable({
-    id: pump.id,
+    id: draggableId,
+    data: draggableData,
+    disabled,
   });
   const leadTimes = useMemo(
     () => useApp.getState().getModelLeadTimes(pump.model),
@@ -39,7 +59,11 @@ export function PumpCard({ pump, collapsed = false, isDragging = false, onClick 
       style={style}
       {...attributes}
       {...listeners}
-      className="group relative overflow-hidden rounded-xl border border-border bg-card/90 px-4 py-4 shadow-layer-md transition-all duration-200 hover:-translate-y-[2px] hover:shadow-layer-lg cursor-grab active:cursor-grabbing"
+      className={cn(
+        "group relative overflow-hidden rounded-xl border border-border bg-card/90 px-4 py-4 shadow-layer-md transition-all duration-200",
+        disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing",
+        !disabled && "hover:-translate-y-[2px] hover:shadow-layer-lg"
+      )}
       onClick={onClick}
     >
       <div className="flex items-start justify-between gap-3">

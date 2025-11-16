@@ -48,7 +48,7 @@ describe("KanbanBoard", () => {
     expect(scrollArea?.className).toContain("scrollbar-themed");
   });
 
-  it("bubbles overloaded stages to the front", () => {
+  it("flags overloaded stages via header attribute", () => {
     useApp.setState((state) => ({
       wipLimits: {
         ...state.wipLimits,
@@ -79,8 +79,8 @@ describe("KanbanBoard", () => {
       <KanbanBoard pumps={pumps} collapsed={false} />
     );
 
-    const headers = container.querySelectorAll("[data-stage-header]");
-    expect(headers.length).toBeGreaterThan(0);
-    expect(headers[0].getAttribute("data-stage-header")).toBe("FABRICATION");
+    const fabricationHeader = container.querySelector('[data-stage-header="FABRICATION"]');
+    expect(fabricationHeader).not.toBeNull();
+    expect(fabricationHeader?.getAttribute("data-over-limit")).toBe("true");
   });
 });

@@ -2,18 +2,18 @@
 import { DndContext, DragEndEvent, DragOverlay, UniqueIdentifier, Active, DragStartEvent } from "@dnd-kit/core";
 import { useState } from "react";
 import { useApp } from "../../store";
-import { UnscheduledJobCard } from "./UnscheduledJobCard";
+import { PumpCard } from "../kanban/PumpCard";
 import { Pump } from "../../types";
-import { deriveScheduleWindow, isValidScheduleDate } from "../../lib/schedule";
+import { isValidScheduleDate } from "../../lib/schedule";
 import { toast } from "sonner";
 import { startOfDay, format, parse } from "date-fns";
 
 interface DragAndDropContextProps {
   children: React.ReactNode;
+  pumps: Pump[];
 }
 
-export function DragAndDropContext({ children }: DragAndDropContextProps) {
-  const pumps = useApp((state) => state.pumps);
+export function DragAndDropContext({ children, pumps }: DragAndDropContextProps) {
   const schedulePump = useApp((state) => state.schedulePump);
   const collapsedCards = useApp((state) => state.collapsedCards);
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -79,11 +79,14 @@ export function DragAndDropContext({ children }: DragAndDropContextProps) {
   const renderDragOverlay = () => {
     if (!activePump) return null;
 
-    // Render a simplified, transparent version of the job card for the drag overlay
     return (
       <DragOverlay>
-        <div className="w-[268px] opacity-70">
-          <UnscheduledJobCard pump={activePump} collapsed={collapsedCards} />
+        <div className="w-[268px] opacity-80">
+          <PumpCard
+            pump={activePump}
+            collapsed={collapsedCards}
+            draggableConfig={{ id: `overlay-${activePump.id}`, disabled: true }}
+          />
         </div>
       </DragOverlay>
     );

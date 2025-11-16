@@ -3,9 +3,36 @@ import { Assertions } from './helpers/test-utils';
 
 test.describe('Scheduling Enhanced Tests', () => {
   test.beforeEach(async ({ page }) => {
+    // Ensure persisted state from previous runs doesn't leak in
+    await page.addInitScript(() => {
+      window.localStorage.clear();
+      window.sessionStorage?.clear();
+    });
+
     // Navigate to the application and wait for it to load
     await page.goto('/');
     await page.waitForLoadState('networkidle');
+
+    // Wait until the Zustand store is available so we can seed deterministically
+    await page.waitForFunction(
+      () => Boolean((window as any).useApp?.getState),
+      undefined,
+      { timeout: 10000 }
+    );
+
+    // If the store hasn't loaded any pumps yet, seed it with deterministic data
+    await page.evaluate(async () => {
+      const globalApp: any = (window as any).useApp;
+      if (!globalApp?.getState) {
+        return;
+      }
+      const state = globalApp.getState();
+      if (state.pumps.length === 0) {
+        const { seed } = await import('../../src/lib/seed');
+        const seeded = seed(40);
+        state.replaceDataset(seeded);
+      }
+    });
   });
 
   test('complete scheduling workflow', async ({ page, schedulingPage }) => {
@@ -195,6 +222,53 @@ test.describe('Scheduling Enhanced Tests', () => {
       // Should have some transition defined (even if empty string is valid)
       expect(transition).toBeDefined();
     }
+  });
+
+  test('stage legend filters calendar events', async ({ page, schedulingPage }) => {
+    await schedulingPage.navigateToScheduling();
+    await schedulingPage.waitForJobsToLoad();
+    await schedulingPage.waitForCalendarToLoad();
+
+    let eventCount = await schedulingPage.getEventCount();
+
+    if (eventCount === 0) {
+      const jobCount = await schedulingPage.getJobCount();
+      if (jobCount === 0) {
+        test.skip(true, 'No jobs available to create calendar events');
+      }
+
+      await schedulingPage.dragJobToCalendar(0, 0);
+      await schedulingPage.waitForCalendarToLoad();
+      eventCount = await schedulingPage.getEventCount();
+
+      if (eventCount === 0) {
+        test.skip(true, 'Unable to render calendar events for filtering test');
+      }
+    }
+
+    const firstEvent = schedulingPage.getCalendarEvents().first();
+    await expect(firstEvent).toBeVisible();
+    const stage = (await firstEvent.getAttribute('data-stage')) ?? '';
+    if (!stage) {
+      test.skip(true, 'Calendar events did not expose stage metadata');
+    }
+
+    const stageButton = page.locator(`[data-stage-filter="${stage}"]`).first();
+    await stageButton.scrollIntoViewIfNeeded();
+    await stageButton.click();
+    await schedulingPage.waitForCalendarToLoad();
+
+    const nonMatchingCount = await schedulingPage.getCalendarEvents().evaluateAll(
+      (nodes, expectedStage) =>
+        nodes.filter((node) => node.getAttribute('data-stage') !== expectedStage).length,
+      stage
+    );
+
+    expect(nonMatchingCount).toBe(0);
+
+    await stageButton.click();
+    await schedulingPage.waitForCalendarToLoad();
+    expect(await schedulingPage.getEventCount()).toBeGreaterThan(0);
   });
 
   test('error recovery and retry mechanisms', async ({ page, schedulingPage }) => {

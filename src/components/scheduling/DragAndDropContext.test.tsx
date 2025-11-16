@@ -43,7 +43,7 @@ describe("DragAndDropContext", () => {
     const schedulePumpSpy = vi.spyOn(useApp.getState(), "schedulePump");
 
     render(
-      <DragAndDropContext>
+      <DragAndDropContext pumps={[pump]}>
         <div>content</div>
       </DragAndDropContext>
     );

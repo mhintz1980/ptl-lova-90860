@@ -15,9 +15,10 @@ import { useApp } from "../../store";
 interface MainCalendarGridProps {
   pumps: Pump[];
   onEventClick: (event: CalendarStageEvent) => void;
+  visibleStages?: Stage[];
 }
 
-const weeks = 4;
+const weeks = 6;
 const daysInView = weeks * 7;
 
 interface WeekSegment {
@@ -54,7 +55,7 @@ function projectSegmentsToWeek(blocks: StageBlock[], weekStart: Date, daysInWeek
   }, []);
 }
 
-export function MainCalendarGrid({ pumps, onEventClick }: MainCalendarGridProps) {
+export function MainCalendarGrid({ pumps, onEventClick, visibleStages }: MainCalendarGridProps) {
   const { getModelLeadTimes } = useApp.getState();
 
   const today = useMemo(() => startOfDay(new Date()), []);
@@ -67,6 +68,8 @@ export function MainCalendarGrid({ pumps, onEventClick }: MainCalendarGridProps)
     () => Array.from({ length: daysInView }, (_, index) => addDays(viewStart, index)),
     [viewStart]
   );
+
+  const stageFilter = useMemo(() => new Set(visibleStages ?? []), [visibleStages]);
 
   const pumpTimelines = useMemo(() => {
     return pumps
@@ -98,10 +101,11 @@ export function MainCalendarGrid({ pumps, onEventClick }: MainCalendarGridProps)
         return { pump, timeline };
       })
       .filter((entry): entry is { pump: typeof pumps[number]; timeline: StageBlock[] } => Boolean(entry));
-  }, [pumps, getModelLeadTimes]);
+  }, [pumps, getModelLeadTimes, stageFilter]);
 
   const DroppableCell = ({ date }: { date: Date }) => {
     const dateId = format(date, "yyyy-MM-dd");
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     const { isOver, setNodeRef } = useDroppable({
       id: dateId,
       data: { date: dateId },
@@ -112,9 +116,10 @@ export function MainCalendarGrid({ pumps, onEventClick }: MainCalendarGridProps)
         ref={setNodeRef}
         className={cn(
           "calendar-cell border-r border-border/40 transition-all duration-150",
-          isOver && "bg-primary/15 shadow-inner shadow-[0_0_15px_rgba(37,99,235,0.35)]"
+          isWeekend && "calendar-weekend",
+          isOver && "bg-primary/20 shadow-inner shadow-[0_0_15px_rgba(37,99,235,0.35)]"
         )}
-        style={{ minHeight: 28 }}
+        style={{ minHeight: 24 }}
         data-testid={`calendar-cell-${dateId}`}
       />
     );
@@ -134,28 +139,26 @@ export function MainCalendarGrid({ pumps, onEventClick }: MainCalendarGridProps)
             <div key={weekIndex} className="border-b border-border/50">
               {/* Week Header */}
               <div className="sticky top-0 z-10 grid grid-cols-7 border-b border-border/60 bg-background/70 backdrop-blur">
-                {weekDates.map((date, dayIndex) => (
-                  <div
-                    key={dayIndex}
-                    className={cn(
-                      "border-r border-border/40 p-3 text-center transition-all duration-150",
-                      date.toDateString() === today.toDateString() &&
-                        "bg-primary/10 text-primary"
-                    )}
-                  >
-                    <div className="text-xs uppercase tracking-[0.2em] text-foreground/60">
-                      {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                    </div>
+                {weekDates.map((date, dayIndex) => {
+                  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                  const label = date.toLocaleDateString("en-US", { weekday: "short" });
+                  return (
                     <div
+                      key={dayIndex}
                       className={cn(
-                        "text-lg font-semibold text-foreground",
-                        date.toDateString() === today.toDateString() && "text-primary"
+                        "border-r border-border/40 px-2 py-2 text-center text-foreground transition-all duration-150",
+                        isWeekend && "calendar-weekend-header",
+                        date.toDateString() === today.toDateString() &&
+                          "bg-primary/10 text-primary"
                       )}
                     >
-                      {date.getDate()}
+                      <div className="flex items-center justify-center gap-1 text-[11px] font-semibold uppercase tracking-[0.15em]">
+                        <span>{label}</span>
+                        <span className="text-sm tracking-normal">{date.getDate()}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div className="relative min-h-[180px]">
@@ -166,13 +169,16 @@ export function MainCalendarGrid({ pumps, onEventClick }: MainCalendarGridProps)
                 </div>
 
                 <div
-                  className="relative grid grid-cols-7 gap-y-2 p-3"
-                  style={{ gridAutoRows: "38px" }}
+                  className="relative grid grid-cols-7 gap-y-2 p-2"
+                  style={{ gridAutoRows: "30px" }}
                 >
                   {pumpTimelines
                     .map(({ pump, timeline }) => {
                       const weekStartDate = addDays(viewStart, weekIndex * 7);
-                      const segments = projectSegmentsToWeek(timeline, weekStartDate);
+                      let segments = projectSegmentsToWeek(timeline, weekStartDate);
+                      if (stageFilter.size) {
+                        segments = segments.filter((segment) => stageFilter.has(segment.stage));
+                      }
                       if (!segments.length) {
                         return null;
                       }

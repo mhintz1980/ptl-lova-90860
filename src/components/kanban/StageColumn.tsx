@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { useApp } from "../../store";
 import { cn } from "../../lib/utils";
 import { useMemo } from "react";
+import { sortPumps } from "../../lib/sort";
 
 interface StageColumnProps {
   stage: Stage;
@@ -16,22 +17,26 @@ interface StageColumnProps {
 }
 
 export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: StageColumnProps) {
-  const { collapsedStages, toggleStageCollapse, wipLimits } = useApp();
+  const { collapsedStages, toggleStageCollapse, wipLimits, sortField, sortDirection } = useApp();
   const isCollapsed = collapsedStages[stage];
   const wipLimit = wipLimits?.[stage] ?? null;
-  const isOverLimit = typeof wipLimit === "number" ? pumps.length > wipLimit : false;
-  const countLabel = wipLimit != null ? `${pumps.length} / ${wipLimit}` : `${pumps.length}`;
+  const sortedPumps = useMemo(
+    () => sortPumps(pumps, sortField, sortDirection),
+    [pumps, sortField, sortDirection]
+  );
+  const isOverLimit = typeof wipLimit === "number" ? sortedPumps.length > wipLimit : false;
+  const countLabel = wipLimit != null ? `${sortedPumps.length} / ${wipLimit}` : `${sortedPumps.length}`;
 
   const averageDwell = useMemo(() => {
-    if (!pumps.length) return null;
+    if (!sortedPumps.length) return null;
     const now = Date.now();
-    const samples = pumps
+    const samples = sortedPumps
       .map((pump) => pump.last_update ? Math.max(0, (now - new Date(pump.last_update).getTime()) / (1000 * 60 * 60 * 24)) : null)
       .filter((value): value is number => value !== null);
     if (!samples.length) return null;
     const avg = samples.reduce((sum, value) => sum + value, 0) / samples.length;
     return `${avg.toFixed(1)}d`;
-  }, [pumps]);
+  }, [sortedPumps]);
   
   const { setNodeRef, isOver } = useDroppable({
     id: stage,
@@ -49,7 +54,7 @@ export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: 
   };
 
   return (
-    <div className="flex min-w-[260px] max-w-[260px] flex-shrink-0 flex-col">
+    <div className="flex w-[260px] flex-shrink-0 flex-col">
       <div
         className={cn(
           "layer-l2 overflow-hidden transition-shadow",
@@ -91,7 +96,7 @@ export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: 
             className="flex-1 space-y-3 overflow-y-auto overflow-x-hidden px-3 py-4 scrollbar-themed"
             style={{ maxHeight: "calc(100vh - 230px)" }}
           >
-            {pumps.map((pump) => (
+            {sortedPumps.map((pump) => (
               activeId === pump.id ? null : (
                 <PumpCard
                   key={pump.id}

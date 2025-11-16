@@ -7,6 +7,7 @@ import { Button } from "../ui/Button";
 import { Badge } from "../ui/Badge";
 import type { Priority, Stage } from "../../types";
 import { cn } from "../../lib/utils";
+import type { SortField, SortDirection } from "../../lib/sort";
 
 interface FilterBarProps {
   className?: string;
@@ -14,7 +15,15 @@ interface FilterBarProps {
 }
 
 export function FilterBar({ className, layout = "inline" }: FilterBarProps) {
-  const { filters, setFilters, clearFilters, pumps } = useApp();
+  const {
+    filters,
+    setFilters,
+    clearFilters,
+    pumps,
+    sortField,
+    sortDirection,
+    setSort,
+  } = useApp();
 
   const uniquePOs = useMemo(
     () => [...new Set(pumps.map((p) => p.po))].sort(),
@@ -62,6 +71,24 @@ export function FilterBar({ className, layout = "inline" }: FilterBarProps) {
     "h-9 rounded-full border border-border bg-muted/60 px-3 text-xs font-medium text-muted-foreground transition-colors shadow-layer-sm hover:bg-muted/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary/40",
     isStacked ? "w-full" : "min-w-[140px]"
   );
+
+  const sortOptions: Array<{ value: SortField; label: string }> = [
+    { value: "default", label: "Default (Priority → Promise → Created)" },
+    { value: "priority", label: "Priority" },
+    { value: "promiseDate", label: "Promise Date" },
+    { value: "stage", label: "Stage" },
+    { value: "customer", label: "Customer" },
+    { value: "model", label: "Model" },
+    { value: "po", label: "PO" },
+    { value: "value", label: "Value" },
+    { value: "serial", label: "Serial" },
+    { value: "last_update", label: "Last Update" },
+  ];
+
+  const directionOptions: Array<{ value: SortDirection; label: string }> = [
+    { value: "asc", label: "Ascending" },
+    { value: "desc", label: "Descending" },
+  ];
 
   return (
     <div className={containerClasses}>
@@ -157,6 +184,35 @@ export function FilterBar({ className, layout = "inline" }: FilterBarProps) {
         {stages.map((stage) => (
           <option key={stage} value={stage}>
             {stage}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={sortField}
+        onChange={(event) =>
+          setSort(event.target.value as SortField, sortDirection)
+        }
+        className={selectClasses}
+      >
+        {sortOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+
+      <select
+        value={sortDirection}
+        onChange={(event) =>
+          setSort(sortField, event.target.value as SortDirection)
+        }
+        className={selectClasses}
+        disabled={sortField === "default"}
+      >
+        {directionOptions.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
           </option>
         ))}
       </select>

@@ -1,5 +1,5 @@
 // src/App.tsx
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useApp } from "./store";
 import { AddPoModal } from "./components/toolbar/AddPoModal";
 import { Dashboard } from "./pages/Dashboard";
@@ -9,11 +9,13 @@ import { Toaster } from "sonner";
 import { Pump } from "./types";
 import { AppShell } from "./components/layout/AppShell";
 import type { AppView } from "./components/layout/navigation";
+import { applyFilters } from "./lib/utils";
+import { sortPumps } from "./lib/sort";
 // Debug import for development
 import "./debug-seed";
 
 function App() {
-  const { load, filtered, loading } = useApp();
+  const { load, pumps, filters, sortField, sortDirection, loading } = useApp();
   const [isAddPoModalOpen, setIsAddPoModalOpen] = useState(false);
   const [currentView, setCurrentView] = useState<AppView>("dashboard");
   const [selectedPump, setSelectedPump] = useState<Pump | null>(null);
@@ -22,7 +24,10 @@ function App() {
     load();
   }, [load]);
 
-  const filteredPumps = filtered();
+  const filteredPumps = useMemo(() => {
+    const filtered = applyFilters(pumps, filters);
+    return sortPumps(filtered, sortField, sortDirection);
+  }, [pumps, filters, sortField, sortDirection]);
 
   return (
     <>

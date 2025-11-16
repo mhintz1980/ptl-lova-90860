@@ -25,7 +25,7 @@ export function CalendarEvent({ event, onClick, isDragging = false }: CalendarEv
   return (
     <div
       className={cn(
-        "group flex h-full cursor-pointer flex-col justify-between rounded-2xl border px-3 py-2 text-xs shadow-layer-sm transition-all duration-150",
+        "group flex h-full cursor-pointer flex-col justify-between rounded-xl border px-2.5 py-1.5 text-[11px] shadow-layer-sm transition-all duration-150",
         stageColorClass,
         isDragging && "opacity-50 border-dashed"
       )}
@@ -48,24 +48,19 @@ export function CalendarEvent({ event, onClick, isDragging = false }: CalendarEv
       }}
       aria-label={`${event.title} - ${stageLabel} - PO ${event.subtitle}`}
     >
-      <div className="flex items-center justify-between text-[11px] font-semibold">
-        <span className="truncate">{event.title}</span>
-        <span className="text-[10px] uppercase tracking-[0.2em] opacity-80">
+      <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-wide">
+        <span className="truncate" title={stageLabel}>
           {stageLabel}
+        </span>
+        <span className="truncate text-[10px] normal-case text-foreground/75">
+          {event.title}
         </span>
       </div>
 
-      <div className="mt-1 flex items-center justify-between text-[10px] opacity-85">
-        <span className="truncate">PO {event.subtitle}</span>
-        {event.customer && <span className="truncate">{event.customer}</span>}
-      </div>
-
-      <div className="mt-2 flex items-center gap-2 text-[10px]">
-        {event.priority && (
-          <span className="rounded-full border border-border/60 px-2 py-0.5 text-[9px] uppercase tracking-widest">
-            {event.priority}
-          </span>
-        )}
+      <div className="mt-1 flex items-center justify-between text-[10px]">
+        <span className="truncate">
+          {event.customer ?? `PO ${event.subtitle}`}
+        </span>
         <span
           className={cn(
             "rounded-full px-2 py-0.5 text-[9px] font-semibold uppercase tracking-widest",
@@ -79,6 +74,13 @@ export function CalendarEvent({ event, onClick, isDragging = false }: CalendarEv
             : "On Track"}
         </span>
       </div>
+
+      {event.priority && (
+        <div className="mt-1 flex items-center gap-1 text-[9px] text-foreground/80">
+          <span className="font-semibold">Priority:</span>
+          <span className="uppercase tracking-wide">{event.priority}</span>
+        </div>
+      )}
     </div>
   );
 }
