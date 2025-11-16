@@ -145,6 +145,20 @@ pnpm build
 
 The production-ready files will be in the `dist/` directory.
 
+#### Bundle chunking strategy
+
+To keep Rollup from emitting a single ~800kB vendor bundle (which triggered the default 500kB chunk-size warning), the Vite config now defines `build.rollupOptions.output.manualChunks`. During `pnpm build` or `pnpm run build:dev`, dependencies in `node_modules` are routed into purpose-specific chunks:
+
+- `react` – React runtime, React DOM, and JSX helpers
+- `charts` – Recharts + date-fns formatting helpers
+- `dnd` – all `@dnd-kit/*` drag-and-drop packages
+- `ui` – Lucide icons, Sonner toasts, and Radix primitives
+- `table` – TanStack table utilities
+- `supabase` – Supabase client (tree-shaken when unused)
+- `vendor` – fallback for any other third-party modules
+
+This keeps the largest chunk under ~275 kB in development builds and removes the chunk-size warning without changing application code-splitting behavior. Adjust or extend the groups in `vite.config.ts` if new dependency clusters grow too large.
+
 ## 📊 Key Metrics Explained
 
 ### Average Build Time
