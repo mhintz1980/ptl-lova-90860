@@ -2,7 +2,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useApp } from "./store";
 import { AddPoModal } from "./components/toolbar/AddPoModal";
-import { Dashboard } from "./pages/Dashboard";
+import { DashboardEngine } from "./pages/DashboardEngine";
 import { Kanban } from "./pages/Kanban";
 import { SchedulingView } from "./components/scheduling/SchedulingView";
 import { Toaster } from "sonner";
@@ -39,7 +39,7 @@ function App() {
       >
         <div className="w-full px-6 py-6">
           {currentView === "dashboard" ? (
-            <Dashboard pumps={filteredPumps} onSelectPump={setSelectedPump} />
+            <DashboardEngine pumps={filteredPumps} />
           ) : currentView === "kanban" ? (
             <Kanban pumps={filteredPumps} onSelectPump={setSelectedPump} />
           ) : loading ? (
