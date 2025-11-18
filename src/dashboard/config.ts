@@ -1,5 +1,8 @@
 import type { ComponentType, ReactNode } from "react";
 import type { Pump, Stage, Department } from "../types";
+import { WipByStageChart } from "../components/dashboard/charts/WipByStageChart";
+import { PumpsByCustomerChart } from "../components/dashboard/charts/PumpsByCustomerChart";
+import { PumpsByModelChart } from "../components/dashboard/charts/PumpsByModelChart";
 
 export type DashboardTopicId =
   | "production"
@@ -57,7 +60,7 @@ export const CHART_REGISTRY: Record<ChartId, ChartConfig> = {
     id: "wipByStage",
     title: "WIP by Stage",
     description: "Current pump distribution by production stage.",
-    component: PlaceholderChart,
+    component: WipByStageChart,
     defaultSize: "md",
   },
   capacityByDept: {
@@ -85,14 +88,14 @@ export const CHART_REGISTRY: Record<ChartId, ChartConfig> = {
     id: "pumpsByCustomer",
     title: "Pumps by Customer",
     description: "Mix of orders by customer.",
-    component: PlaceholderChart,
+    component: PumpsByCustomerChart,
     defaultSize: "md",
   },
   pumpsByModel: {
     id: "pumpsByModel",
     title: "Pumps by Model",
     description: "Mix of orders by pump model.",
-    component: PlaceholderChart,
+    component: PumpsByModelChart,
     defaultSize: "md",
   },
   reworkRate: {
