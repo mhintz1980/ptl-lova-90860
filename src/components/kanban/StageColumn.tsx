@@ -44,6 +44,7 @@ export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: 
   });
 
   const stageAccent: Record<Stage, string> = {
+    "UNSCHEDULED": "bg-slate-300",
     "NOT STARTED": "bg-slate-400",
     "FABRICATION": "bg-blue-500",
     "POWDER COAT": "bg-purple-500",

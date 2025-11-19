@@ -7,6 +7,7 @@ import {
   Cell,
   Sector,
 } from "recharts";
+import type { PieProps } from "recharts";
 import type { PieSectorDataItem } from "recharts/types/polar/Pie";
 
 type DataPoint = Record<string, string | number>;
@@ -181,18 +182,24 @@ export function HoverAnimatedPieChart<T extends DataPoint>({
                 </filter>
               </defs>
               <Pie
-                data={data}
-                dataKey={dataKey as string}
-                nameKey={nameKey as string}
-                cx="50%"
-                cy="50%"
-                innerRadius="56%"
-                outerRadius="72%"
-                paddingAngle={5}
-                cornerRadius={999}
-                activeIndex={activeSlice}
-                activeShape={renderActiveShape}
-                onMouseEnter={(_, index) => setActiveSlice(index)}
+                {...({
+                  data,
+                  dataKey: dataKey as string,
+                  nameKey: nameKey as string,
+                  cx: "50%",
+                  cy: "50%",
+                  innerRadius: "56%",
+                  outerRadius: "72%",
+                  paddingAngle: 5,
+                  cornerRadius: 999,
+                  activeIndex: activeSlice,
+                  activeShape: renderActiveShape,
+                  onMouseEnter: (_: any, index: number) => setActiveSlice(index),
+                } satisfies PieProps & {
+                  activeIndex: number;
+                  activeShape: typeof renderActiveShape;
+                  onMouseEnter: (_: any, index: number) => void;
+                })}
               >
                 {data.map((item, index) => (
                   <Cell

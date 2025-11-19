@@ -48,14 +48,15 @@ const getStageCapacity = (pumps: Pump[]) => {
 };
 
 const getStageColor = (stage: Stage) => {
-  const colors = {
+  const colors: Record<Stage, string> = {
+    "UNSCHEDULED": "hsl(var(--muted-foreground))",
     "NOT STARTED": "hsl(var(--muted-foreground))",
     "FABRICATION": "hsl(var(--chart-1))",
     "POWDER COAT": "hsl(var(--chart-2))",
     "ASSEMBLY": "hsl(var(--chart-3))",
     "TESTING": "hsl(var(--chart-4))",
     "SHIPPING": "hsl(var(--chart-5))",
-    "CLOSED": "hsl(var(--primary))"
+    "CLOSED": "hsl(var(--primary))",
   };
   return colors[stage];
 };

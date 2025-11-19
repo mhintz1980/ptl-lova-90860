@@ -46,7 +46,7 @@ interface AppState {
 
   // selectors
   filtered: () => Pump[];
-  getModelLeadTimes: (model: string) => Record<string, number> | undefined;
+  getModelLeadTimes: (model: string) => StageDurations | undefined;
 }
 
 export const useApp = create<AppState>()(
@@ -184,7 +184,7 @@ export const useApp = create<AppState>()(
         const leadTimes = getModelLeadTimes(pump.model);
         if (!leadTimes) return;
 
-        const { totalDays } = computeDurationSummary(leadTimes as StageDurations);
+        const { totalDays } = computeDurationSummary(leadTimes);
         const startDate = new Date(dropDate);
         const endDate = new Date(startDate);
         endDate.setDate(startDate.getDate() + totalDays);
@@ -282,7 +282,7 @@ export const useApp = create<AppState>()(
           }
           const leadTimes = state.getModelLeadTimes(pump.model);
           if (!leadTimes) return;
-          const { fabricationDays: fabDays } = computeDurationSummary(leadTimes as StageDurations);
+          const { fabricationDays: fabDays } = computeDurationSummary(leadTimes);
           reserveDays(pump.scheduledStart, fabDays);
         });
 
@@ -298,7 +298,7 @@ export const useApp = create<AppState>()(
         sorted.forEach((pump) => {
           const leadTimes = state.getModelLeadTimes(pump.model);
           if (!leadTimes) return;
-          const { fabricationDays: fabDays, totalDays } = computeDurationSummary(leadTimes as StageDurations);
+          const { fabricationDays: fabDays, totalDays } = computeDurationSummary(leadTimes);
 
           let targetStart = pump.scheduledStart!;
           if (!targetStart || targetStart < minDateISO) {
@@ -361,7 +361,6 @@ export const useApp = create<AppState>()(
       },
 
       getModelLeadTimes: (model: string) => {
-        // Use real catalog data instead of hardcoded values
         return getCatalogLeadTimes(model);
       },
     }),

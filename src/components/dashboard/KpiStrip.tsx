@@ -18,8 +18,8 @@ function diffDays(pump: Pump): number {
 }
 
 export function KpiStrip({ pumps, compact = false }: KpiStripProps) {
-  const { theme } = useTheme();
-  const isLight = theme === "light";
+  const { mode } = useTheme();
+  const isLight = mode === "light";
 
   const closed = pumps.filter(p => p.stage === "CLOSED");
   const onTime = closed.filter(p => !p.scheduledEnd || new Date(p.last_update) <= new Date(p.scheduledEnd));
