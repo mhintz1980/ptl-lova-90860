@@ -6,6 +6,10 @@ import { WorkloadChart } from "../components/dashboard/WorkloadChart";
 import { ValueChart } from "../components/dashboard/ValueChart";
 import { CapacityChart } from "../components/dashboard/CapacityChart";
 import { PumpTable } from "../components/dashboard/PumpTable";
+import { ColumnChart } from "../components/charts/column-charts/ColumnChart";
+import { LineAreaChart } from "../components/charts/line-charts/LineAreaChart";
+import { RadialProgressChart } from "../components/charts/radial-chart-1/RadialProgressChart";
+import { RadialMultiChart } from "../components/charts/radial-chart-multi/RadialMultiChart";
 import { useApp } from "../store";
 
 interface DashboardProps {
@@ -40,6 +44,41 @@ export const Dashboard: React.FC<DashboardProps> = ({
       )}
 
       <PumpTable pumps={pumps} onSelectPump={onSelectPump} />
+
+      <FlowbiteChartGallery />
     </div>
   );
 };
+
+function FlowbiteChartGallery() {
+  return (
+    <section className="space-y-4 rounded-3xl border border-border/60 bg-card/80 p-6 shadow-inner">
+      <div>
+        <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
+          Flowbite Demos
+        </p>
+        <h3 className="text-xl font-semibold text-foreground">
+          Sample Chart Gallery
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          These charts mirror the Flowbite/Flowbite-React examples so you can
+          preview them locally.
+        </p>
+      </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+          <ColumnChart />
+        </div>
+        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+          <LineAreaChart />
+        </div>
+        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+          <RadialProgressChart value={84} label="Utilization" />
+        </div>
+        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+          <RadialMultiChart />
+        </div>
+      </div>
+    </section>
+  );
+}
