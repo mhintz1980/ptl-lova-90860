@@ -11,3 +11,20 @@ This directory gathers every document a new contributor needs. Start here, then 
 | [archive/](archive/) | Historical context, migration logs, and older plans that are no longer part of the active process. Browse only if you need background information. |
 
 If you add a new guide, link it in this table so the next developer can find it quickly.
+
+## Current Work (Dashboard & Scheduling)
+
+We are actively making the Dashboard customizable via topic/category pills near the header. Clicking a category will populate the page with charts for that topic:
+
+- **Financials**: Value of open orders; value of scheduled shipments by week/month/quarter; value of completed orders by week/month/quarter.
+- **Production Management**: Build-time stats; ahead/behind-schedule jobs; bottleneck and capacity visuals; goal tracking (hit/miss).
+- Additional categories will be added as the chart library expands; the goal is a config-driven dashboard that swaps chart sets per topic.
+
+Scheduling is also being revamped to improve interaction and respect constraints:
+
+- Drag jobs after they’re placed on the calendar, with capacity/manhour limits enforced per stage.
+- Resize jobs directly on the calendar by dragging the end of a bar to change build time.
+- Toggle to auto-level after each edit and an option to lock specific jobs to specific dates.
+- Rule-based scheduling (e.g., “must start by this date”) that influences leveling and auto-scheduling.
+
+If you are contributing during this phase, keep new charts/config in the dashboard engine patterns (config-first chart registry + topic definitions) and note any scheduling changes that affect leveling rules.

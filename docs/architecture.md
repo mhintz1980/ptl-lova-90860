@@ -9,6 +9,20 @@
   - `MainCalendarGrid` builds stage timelines from `buildStageTimeline` and trims them according to the legend filters.
   - `DragAndDropContext` coordinates dnd-kit operations for dropping backlog pumps on the calendar grid.
 
+### In-Flight: Dashboard Engine & Custom Topics
+
+- The dashboard is moving to a topic/category model (pills near the header). Clicking a topic swaps in a chart set from a config-driven registry (e.g., Financials, Production Management).
+- Financials will cover value of open orders, scheduled shipments by week/month/quarter, and completed order value over the same periods.
+- Production Management will focus on build-time stats, ahead/behind-schedule jobs, bottlenecks/capacity, and goal tracking.
+- New charts should follow the shared `ChartProps` contract and be added to the registry to stay pluggable.
+
+### In-Flight: Scheduling Improvements
+
+- Allow dragging scheduled jobs already on the calendar while enforcing capacity/man-hour limits per stage.
+- Resize a job’s duration by dragging its bar end to change build time directly on the calendar.
+- Provide a toggle to auto-level after each edit and the ability to lock specific jobs to specific dates.
+- Introduce rule-based scheduling (e.g., “must start by this date”) that influences leveling and auto-scheduling.
+
 ## State and Data Flow
 
 - **Zustand Store** (`src/store.ts`)
