@@ -51,6 +51,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
 };
 
 function FlowbiteChartGallery() {
+  const cardClass =
+    "group relative rounded-2xl border border-border/50 bg-background/80 p-4 shadow-lg transition-all duration-150 ease-out hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_16px_50px_rgba(59,130,246,0.35)] hover:border-primary/50";
   return (
     <section className="space-y-4 rounded-3xl border border-border/60 bg-card/80 p-6 shadow-inner">
       <div>
@@ -66,16 +68,16 @@ function FlowbiteChartGallery() {
         </p>
       </div>
       <div className="grid gap-6 lg:grid-cols-2">
-        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+        <div className={cardClass}>
           <ColumnChart />
         </div>
-        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+        <div className={cardClass}>
           <LineAreaChart />
         </div>
-        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+        <div className={cardClass}>
           <RadialProgressChart value={84} label="Utilization" />
         </div>
-        <div className="rounded-2xl border border-border/50 bg-background/80 p-4">
+        <div className={cardClass}>
           <RadialMultiChart />
         </div>
       </div>
