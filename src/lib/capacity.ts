@@ -61,39 +61,48 @@ export function calculateWeeklyHours(staffing: DepartmentStaffing): number {
 }
 
 /**
- * Calculate weekly capacity for a stage based on employee hours and typical pump hours
+ * Calculate weekly capacity based on how many pumps can START per week
+ * This accounts for the fact that each pump occupies an employee for multiple DAYS
  * @param staffing Department staffing configuration
- * @param hoursPerPump Typical hours needed per pump for this stage (from model lead times)
- * @returns Number of pumps that can be processed per week
+ * @param daysPerPump How many days each pump occupies an employee (e.g., 3-5 days for fabrication)
+ * @returns Number of pumps that can START per week
  */
 export function calculateWeeklyCapacity(
     staffing: DepartmentStaffing,
-    hoursPerPump: number = 8 // Default assumption: 1 day per pump
+    daysPerPump: number = 4 // Default: ~4 days per pump per stage
 ): number {
-    const availableHours = calculateWeeklyHours(staffing);
-    if (hoursPerPump <= 0) return 0;
-    return Math.floor(availableHours / hoursPerPump);
+    // Each employee can handle roughly 5 work days / daysPerPump pumps per week
+    // For example: if a pump takes 4 days, each employee can start ~1.25 pumps/week
+    const pumpsPerEmployeePerWeek = 5 / daysPerPump;
+    return Math.floor(staffing.employeeCount * pumpsPerEmployeePerWeek);
 }
 
 /**
  * Get stage-specific capacity from config
+ * @param stage Production stage
+ * @param config Capacity configuration
+ * @param daysPerPump Days each pump occupies resources (default 4 days)
  */
 export function getStageCapacity(
     stage: Stage,
     config: CapacityConfig,
-    hoursPerPump: number = 8
+    daysPerPump: number = 4
 ): number {
     switch (stage) {
         case "FABRICATION":
-            return calculateWeeklyCapacity(config.fabrication, hoursPerPump);
+            // Fabrication typically takes 3-5 days per pump
+            return calculateWeeklyCapacity(config.fabrication, daysPerPump);
         case "ASSEMBLY":
-            return calculateWeeklyCapacity(config.assembly, hoursPerPump);
+            // Assembly typically takes 2-4 days per pump
+            return calculateWeeklyCapacity(config.assembly, daysPerPump);
         case "TESTING":
-            return calculateWeeklyCapacity(config.testing, hoursPerPump);
+            // Testing typically takes 1-2 days per pump
+            return calculateWeeklyCapacity(config.testing, daysPerPump);
         case "SHIPPING":
-            return calculateWeeklyCapacity(config.shipping, hoursPerPump);
+            // Shipping typically takes 1 day per pump
+            return calculateWeeklyCapacity(config.shipping, daysPerPump);
         case "POWDER COAT":
-            // Sum all vendor capacities
+            // Sum all vendor capacities (outsourced, simple weekly limit)
             return config.powderCoat.vendors.reduce(
                 (sum, vendor) => sum + vendor.maxPumpsPerWeek,
                 0

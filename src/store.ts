@@ -240,10 +240,11 @@ export const useApp = create<AppState>()(
 
         // 3. Build capacity map using employee-based capacity
         // Calculate weekly capacity for fabrication (start stage)
-        // Default to 8 hours per pump for fabrication
-        const fabWeeklyCapacity = getStageCapacity("FABRICATION", capacityConfig, 8);
+        // Fabrication typically takes ~4 days per pump (3-5 days range)
+        // With 4 employees, this gives ~4-5 pumps/week capacity
+        const fabWeeklyCapacity = getStageCapacity("FABRICATION", capacityConfig, 4);
         // Daily capacity is roughly weekly / 5 work days (excluding weekends)
-        const fabDailyCapacity = Math.ceil(fabWeeklyCapacity / 5);
+        const fabDailyCapacity = Math.max(1, Math.ceil(fabWeeklyCapacity / 5));
 
         // Seed capacity with existing scheduled jobs
         // We need to know how many jobs are starting on each day
