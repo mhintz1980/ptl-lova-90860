@@ -9,6 +9,8 @@ import { addDays, startOfDay, isAfter, parseISO } from "date-fns";
 import type { StageDurations } from "./lib/schedule";
 import { applyFilters, genSerial } from "./lib/utils";
 import { sortPumps, SortDirection, SortField } from "./lib/sort";
+import type { CapacityConfig, DepartmentStaffing, PowderCoatVendor } from "./types";
+import { DEFAULT_CAPACITY_CONFIG, getStageCapacity } from "./lib/capacity";
 
 // --- Store Definition ---
 
@@ -24,6 +26,7 @@ interface AppState {
   sortDirection: SortDirection;
   schedulingStageFilters: Stage[];
   lockDate: string | null; // ISO date string
+  capacityConfig: CapacityConfig;
 
   // actions
   setAdapter: (a: DataAdapter) => void;
@@ -46,6 +49,9 @@ interface AppState {
   toggleSchedulingStageFilter: (stage: Stage) => void;
   clearSchedulingStageFilters: () => void;
   setLockDate: (date: string | null) => void;
+  updateDepartmentStaffing: (stage: "fabrication" | "assembly" | "testing" | "shipping", config: DepartmentStaffing) => void;
+  updatePowderCoatVendor: (vendorId: string, config: Partial<PowderCoatVendor>) => void;
+  resetCapacityDefaults: () => void;
 
   // selectors
   filtered: () => Pump[];
@@ -78,6 +84,7 @@ export const useApp = create<AppState>()(
       sortDirection: "desc",
       schedulingStageFilters: [],
       lockDate: null,
+      capacityConfig: DEFAULT_CAPACITY_CONFIG,
 
       setAdapter: (a) => set({ adapter: a }),
 
@@ -210,11 +217,10 @@ export const useApp = create<AppState>()(
       },
 
       autoSchedule: () => {
-        const { pumps, wipLimits, getModelLeadTimes, updatePump, lockDate } = get();
+        const { pumps, updatePump, getModelLeadTimes, lockDate, capacityConfig } = get();
 
-        // 1. Filter for UNSCHEDULED pumps in QUEUE (no scheduledStart)
+        // 1. Get un-scheduled pumps
         const unscheduled = pumps.filter(p => p.stage === "QUEUE" && !p.scheduledStart);
-
         if (unscheduled.length === 0) return 0;
 
         // 2. Sort by Priority then Due Date
@@ -232,9 +238,12 @@ export const useApp = create<AppState>()(
           return 0;
         });
 
-        // 3. Build capacity map
-        // We only care about FABRICATION limit for the start date
-        const fabLimit = wipLimits["FABRICATION"] || 999;
+        // 3. Build capacity map using employee-based capacity
+        // Calculate weekly capacity for fabrication (start stage)
+        // Default to 8 hours per pump for fabrication
+        const fabWeeklyCapacity = getStageCapacity("FABRICATION", capacityConfig, 8);
+        // Daily capacity is roughly weekly / 5 work days (excluding weekends)
+        const fabDailyCapacity = Math.ceil(fabWeeklyCapacity / 5);
 
         // Seed capacity with existing scheduled jobs
         // We need to know how many jobs are starting on each day
@@ -261,7 +270,7 @@ export const useApp = create<AppState>()(
 
         // 4. Assign dates
         sorted.forEach(pump => {
-          // Find first day with capacity < fabLimit
+          // Find first day with capacity < fabDailyCapacity
           let dayOffset = 0;
           let foundDate = false;
           let targetDateStr = "";
@@ -271,7 +280,7 @@ export const useApp = create<AppState>()(
             const dateKey = targetDate.toISOString().split('T')[0];
             const currentLoad = dailyStarts[dateKey] || 0;
 
-            if (currentLoad < fabLimit) {
+            if (currentLoad < fabDailyCapacity) {
               foundDate = true;
               targetDateStr = dateKey;
               dailyStarts[dateKey] = currentLoad + 1;
@@ -337,6 +346,31 @@ export const useApp = create<AppState>()(
 
       setLockDate: (date) => set({ lockDate: date }),
 
+      // Capacity management actions
+      updateDepartmentStaffing: (stage, config) =>
+        set((state) => ({
+          capacityConfig: {
+            ...state.capacityConfig,
+            [stage]: config,
+          },
+        })),
+
+      updatePowderCoatVendor: (vendorId, config) =>
+        set((state) => ({
+          capacityConfig: {
+            ...state.capacityConfig,
+            powderCoat: {
+              vendors: state.capacityConfig.powderCoat.vendors.map((vendor) =>
+                vendor.id === vendorId ? { ...vendor, ...config } : vendor
+              ),
+            },
+          },
+        })),
+
+      resetCapacityDefaults: () =>
+        set({ capacityConfig: DEFAULT_CAPACITY_CONFIG }),
+
+      // Selectors
       filtered: () => {
         const { pumps, filters, sortField, sortDirection } = get();
         const filtered = applyFilters(pumps, filters);
@@ -355,6 +389,7 @@ export const useApp = create<AppState>()(
         sortField: state.sortField,
         sortDirection: state.sortDirection,
         lockDate: state.lockDate,
+        capacityConfig: state.capacityConfig,
       }),
     }
   )

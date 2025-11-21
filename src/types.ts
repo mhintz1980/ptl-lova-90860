@@ -62,3 +62,36 @@ export type DataAdapter = {
   upsertMany: (rows: Pump[]) => Promise<void>;
   update: (id: string, patch: Partial<Pump>) => Promise<void>;
 };
+
+// Capacity Configuration Types
+export interface WorkDayHours {
+  monday: number;
+  tuesday: number;
+  wednesday: number;
+  thursday: number;
+  friday: number;
+  saturday: number;
+  sunday: number;
+}
+
+export interface DepartmentStaffing {
+  employeeCount: number;
+  workDayHours: WorkDayHours;
+}
+
+export interface PowderCoatVendor {
+  id: string;
+  name: string;
+  maxPumpsPerWeek: number;
+}
+
+export interface CapacityConfig {
+  fabrication: DepartmentStaffing;
+  assembly: DepartmentStaffing;
+  testing: DepartmentStaffing;
+  shipping: DepartmentStaffing;
+  powderCoat: {
+    vendors: PowderCoatVendor[];
+  };
+}
+
