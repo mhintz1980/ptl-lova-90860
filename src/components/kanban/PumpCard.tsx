@@ -44,14 +44,21 @@ export function PumpCard({
     [pump.model]
   );
 
+  const { isSandbox, originalSnapshot } = useApp();
+
+  const isGhost = useMemo(() => {
+    if (!isSandbox || !originalSnapshot) return false;
+    return !originalSnapshot.some(p => p.id === pump.id);
+  }, [isSandbox, originalSnapshot, pump.id]);
+
   const style = transform
     ? {
-        transform: CSS.Transform.toString(transform),
-        opacity: isDragging || coreDragging ? 0.5 : 1,
-      }
+      transform: CSS.Transform.toString(transform),
+      opacity: isDragging || coreDragging ? 0.5 : 1,
+    }
     : {
-        opacity: isDragging || coreDragging ? 0.5 : 1,
-      };
+      opacity: isDragging || coreDragging ? 0.5 : 1,
+    };
 
   return (
     <div
@@ -60,12 +67,18 @@ export function PumpCard({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-border bg-card/90 px-4 py-4 shadow-layer-md transition-all duration-200",
+        "group relative overflow-hidden rounded-xl border bg-card/90 px-4 py-4 shadow-layer-md transition-all duration-200",
+        isGhost ? "border-dashed border-yellow-500 bg-yellow-50/50" : "border-border",
         disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing",
         !disabled && "hover:-translate-y-[2px] hover:shadow-layer-lg"
       )}
       onClick={onClick}
     >
+      {isGhost && (
+        <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-bl">
+          GHOST
+        </div>
+      )}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-1">
           <div className="flex items-center text-sm font-semibold text-foreground">

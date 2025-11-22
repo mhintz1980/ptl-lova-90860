@@ -1,4 +1,3 @@
-```javascript
 import { useApp } from "../../store";
 import { useMemo } from "react";
 import { STAGES } from "../../types";
@@ -14,7 +13,7 @@ export function CapacityForecast() {
       return {
         start: weekStart,
         end: endOfWeek(weekStart, { weekStartsOn: 1 }),
-        label: `Week of ${ format(weekStart, "MMM d") } `,
+        label: `Week of ${format(weekStart, "MMM d")}`,
       };
     });
   }, []);
@@ -29,7 +28,7 @@ export function CapacityForecast() {
     pumps.forEach(pump => {
       if (!pump.promiseDate) return;
       const date = new Date(pump.promiseDate);
-      
+
       weeks.forEach((week, index) => {
         if (isSameWeek(date, week.start, { weekStartsOn: 1 })) {
           if (data[pump.stage]) {
@@ -48,7 +47,7 @@ export function CapacityForecast() {
     <div className="capacity-forecast font-sans">
       <div className="flex justify-between items-center mb-6 no-print">
         <h1 className="text-2xl font-bold">Capacity Forecast</h1>
-        <button 
+        <button
           onClick={() => window.print()}
           className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
         >
@@ -78,18 +77,18 @@ export function CapacityForecast() {
           <tbody>
             {STAGES.map((stage) => {
               if (stage === "CLOSED" || stage === "QUEUE") return null; // Skip non-production stages? Or keep them? PRD says "Stage vs Week". I'll keep them but maybe Queue is less relevant for "Capacity". Let's keep all for now.
-              
+
               return (
                 <tr key={stage}>
                   <td className="border border-black p-3 font-bold">{stage}</td>
                   {weeks.map((_, index) => {
                     const count = matrix[stage][index];
                     const isOverCapacity = count > CAPACITY_LIMIT;
-                    
+
                     return (
-                      <td 
-                        key={index} 
-                        className={`border border - black p - 3 text - center ${ isOverCapacity ? "bg-black text-white font-bold" : "" } `}
+                      <td
+                        key={index}
+                        className={`border border-black p-3 text-center ${isOverCapacity ? "bg-black text-white font-bold" : ""}`}
                       >
                         {count}
                         {isOverCapacity && <span className="block text-xs font-normal text-red-300">OVER CAP</span>}
@@ -110,4 +109,3 @@ export function CapacityForecast() {
     </div>
   );
 }
-```

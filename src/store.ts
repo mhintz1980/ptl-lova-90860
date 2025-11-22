@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Pump, Filters, AddPoPayload, Stage, DataAdapter } from "./types";
+import { Pump, Filters, AddPoPayload, Stage, DataAdapter, Milestone, MicroTask } from "./types";
 import { nanoid } from "nanoid";
 import { LocalAdapter } from "./adapters/local";
 import { SandboxAdapter } from "./adapters/sandbox";
@@ -32,6 +32,10 @@ interface AppState {
   isSandbox: boolean;
   originalSnapshot: Pump[] | null;
 
+  // Progress Engine State
+  milestones: Milestone[];
+  microTasks: MicroTask[];
+
   // actions
   setAdapter: (a: DataAdapter) => void;
   load: () => Promise<void>;
@@ -61,6 +65,14 @@ interface AppState {
   enterSandbox: () => void;
   commitSandbox: () => void;
   exitSandbox: () => void;
+
+  // Progress Engine Actions
+  addMilestone: (m: Milestone) => void;
+  updateMilestone: (id: string, patch: Partial<Milestone>) => void;
+  deleteMilestone: (id: string) => void;
+  addMicroTask: (t: MicroTask) => void;
+  toggleMicroTask: (id: string) => void;
+  deleteMicroTask: (id: string) => void;
 
   // selectors
   filtered: () => Pump[];
@@ -97,6 +109,9 @@ export const useApp = create<AppState>()(
 
       isSandbox: false,
       originalSnapshot: null,
+
+      milestones: [],
+      microTasks: [],
 
       setAdapter: (a) => set({ adapter: a }),
 
@@ -423,6 +438,44 @@ export const useApp = create<AppState>()(
         });
       },
 
+      // Progress Engine Actions
+      addMilestone: (m) =>
+        set((state) => ({ milestones: [...state.milestones, m] })),
+
+      updateMilestone: (id, patch) =>
+        set((state) => ({
+          milestones: state.milestones.map((m) =>
+            m.id === id ? { ...m, ...patch } : m
+          ),
+        })),
+
+      deleteMilestone: (id) =>
+        set((state) => ({
+          milestones: state.milestones.filter((m) => m.id !== id),
+          microTasks: state.microTasks.filter((t) => t.milestoneId !== id),
+        })),
+
+      addMicroTask: (t) =>
+        set((state) => ({ microTasks: [...state.microTasks, t] })),
+
+      toggleMicroTask: (id) =>
+        set((state) => ({
+          microTasks: state.microTasks.map((t) =>
+            t.id === id
+              ? {
+                ...t,
+                isComplete: !t.isComplete,
+                completedAt: !t.isComplete ? new Date().toISOString() : undefined,
+              }
+              : t
+          ),
+        })),
+
+      deleteMicroTask: (id) =>
+        set((state) => ({
+          microTasks: state.microTasks.filter((t) => t.id !== id),
+        })),
+
       // Selectors
       filtered: () => {
         const { pumps, filters, sortField, sortDirection } = get();
@@ -443,6 +496,8 @@ export const useApp = create<AppState>()(
         sortDirection: state.sortDirection,
         lockDate: state.lockDate,
         capacityConfig: state.capacityConfig,
+        milestones: state.milestones,
+        microTasks: state.microTasks,
         // Do NOT persist isSandbox or originalSnapshot
       }),
     }

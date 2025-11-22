@@ -98,3 +98,21 @@ export interface CapacityConfig {
   };
 }
 
+export interface Milestone {
+  id: string;
+  title: string;
+  department: Stage;
+  deadline: string; // ISO
+  createdAt: string; // ISO
+  org_id?: string;
+}
+
+export interface MicroTask {
+  id: string;
+  milestoneId: string;
+  description: string;
+  isComplete: boolean;
+  completedAt?: string; // ISO
+  weight: number;
+}
+

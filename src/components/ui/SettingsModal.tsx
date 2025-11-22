@@ -1,9 +1,8 @@
-import { useState } from "react";
 import { X, Settings, RotateCcw, Save } from "lucide-react";
 import { Button } from "./Button";
 import { useApp } from "../../store";
-import { DEFAULT_CAPACITY_CONFIG } from "../../lib/capacity";
 import { toast } from "sonner";
+import { MilestoneManager } from "./MilestoneManager";
 
 interface SettingsModalProps {
     isOpen: boolean;
@@ -12,16 +11,6 @@ interface SettingsModalProps {
 
 export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
     const { capacityConfig, updateDepartmentStaffing, updatePowderCoatVendor, resetCapacityDefaults } = useApp();
-
-    // Local state for editing to avoid constant store updates
-    // Actually, since we have a save button, we can just edit directly or use local state.
-    // For simplicity and responsiveness, let's edit directly but maybe add a reset button.
-    // Wait, direct editing might be jittery if it triggers re-renders of the whole app.
-    // Let's use local state and save on close or have a save button?
-    // The user asked for a "Settings Modal". Usually implies "Save" action.
-    // But for "live" feel, direct update is cool.
-    // Given the complexity of the object, let's just read from store and update store.
-    // The store updates are fast.
 
     if (!isOpen) return null;
 
@@ -218,6 +207,49 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                 </div>
                             ))}
                         </div>
+                    </section>
+
+                    {/* Sandbox Section */}
+                    <section>
+                        <div className="mb-4 flex items-center justify-between">
+                            <h3 className="text-lg font-medium text-foreground">
+                                Production Sandbox
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
+                                Simulate schedule changes safely
+                            </p>
+                        </div>
+                        <div className="rounded-xl border border-yellow-500/50 bg-yellow-500/10 p-4 flex items-center justify-between">
+                            <div>
+                                <h4 className="font-bold text-yellow-700 dark:text-yellow-400">Enter Simulation Mode</h4>
+                                <p className="text-sm text-muted-foreground">
+                                    Create "Ghost" cards and test capacity without affecting live data.
+                                </p>
+                            </div>
+                            <Button
+                                onClick={() => {
+                                    useApp.getState().enterSandbox();
+                                    onClose();
+                                    toast.success("Entered Sandbox Mode");
+                                }}
+                                className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
+                            >
+                                Start Simulation
+                            </Button>
+                        </div>
+                    </section>
+
+                    {/* Milestone Management Section */}
+                    <section>
+                        <div className="mb-4 flex items-center justify-between">
+                            <h3 className="text-lg font-medium text-foreground">
+                                Milestone Management
+                            </h3>
+                            <p className="text-xs text-muted-foreground">
+                                Track major goals and micro-tasks
+                            </p>
+                        </div>
+                        <MilestoneManager />
                     </section>
 
                     {/* Actions */}
