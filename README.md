@@ -1,5 +1,18 @@
+---
+title: "PumpTracker Lite"
+doc_type: "project_readme"
+app_name: "PumpTracker Lite"
+version: "1.0.0"
+status: "active"
+entrypoint: true
+related_docs:
+  - "Architecture Overview"
+  - "PumpTracker Lite – Development Guide"
+  - "PumpTracker Lite – Testing Guide"
+  - "PumpTracker Lite – Deployment Guide"
+---
 
-# PumpTracker Lite  with more tests
+# PumpTracker Lite
  
 A modern, responsive production management system for tracking pump manufacturing orders through their complete lifecycle. Built with React, TypeScript, Tailwind CSS, and Recharts for data visualization.
 
@@ -9,7 +22,9 @@ PumpTracker Lite is a lightweight yet powerful web application designed to help 
 
 ## 📚 Documentation
 
-All project documents now live under [`docs/`](docs/README.md). Key starting points:
+All project documents now live under [`docs/`](docs/README.md). Most docs include **YAML front matter** so both humans and coding agents can understand their type and relationships.
+
+Key starting points:
 
 - [`docs/architecture.md`](docs/architecture.md) – UI surfaces, data flow, and state responsibilities.
 - [`docs/development-guide.md`](docs/development-guide.md) – setup, workflow, and coding conventions.
@@ -72,7 +87,7 @@ Historical context and older migration notes were moved to [`docs/archive/`](doc
 - **CSV Parsing**: PapaParse
 
 ### Project Structure
-```
+```text
 src/
 ├── components/
 │   ├── dashboard/          # Dashboard-specific components
@@ -157,7 +172,7 @@ To keep Rollup from emitting a single ~800kB vendor bundle (which triggered the 
 - `supabase` – Supabase client (tree-shaken when unused)
 - `vendor` – fallback for any other third-party modules
 
-This keeps the largest chunk under ~275 kB in development builds and removes the chunk-size warning without changing application code-splitting behavior. Adjust or extend the groups in `vite.config.ts` if new dependency clusters grow too large.
+This keeps the largest chunk under ~275 kB in development builds and removes the chunk-size warning without changing application code-splitting behavior. Adjust or extend the groups in `vite.config.ts` if new dependency clusters grow too large.
 
 ## 📊 Key Metrics Explained
 
@@ -240,7 +255,6 @@ The application is fully responsive and tested on:
 This project is proprietary software. All rights reserved.
 
 ---
-
 
 **Version**: 1.0.0  
 **Last Updated**: October 24, 2025  

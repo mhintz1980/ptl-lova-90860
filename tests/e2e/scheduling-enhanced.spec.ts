@@ -1,5 +1,11 @@
 import { test, expect, TestConfig } from './fixtures/test-fixtures';
 import { Assertions } from './helpers/test-utils';
+import { type StoreApi, type UseBoundStore } from 'zustand';
+import { type AppState } from '../../src/store';
+
+type WindowWithStore = Window & {
+  useApp?: UseBoundStore<StoreApi<AppState>>;
+};
 
 test.describe('Scheduling Enhanced Tests', () => {
   test.beforeEach(async ({ page }) => {
@@ -15,14 +21,14 @@ test.describe('Scheduling Enhanced Tests', () => {
 
     // Wait until the Zustand store is available so we can seed deterministically
     await page.waitForFunction(
-      () => Boolean((window as any).useApp?.getState),
+      () => Boolean((window as unknown as WindowWithStore).useApp?.getState),
       undefined,
       { timeout: 10000 }
     );
 
     // If the store hasn't loaded any pumps yet, seed it with deterministic data
     await page.evaluate(async () => {
-      const globalApp: any = (window as any).useApp;
+      const globalApp = (window as unknown as WindowWithStore).useApp;
       if (!globalApp?.getState) {
         return;
       }

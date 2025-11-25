@@ -16,7 +16,7 @@ const pump: Pump = {
   po: "PO2025-0001-01",
   customer: "United Rentals",
   model: "DD-6",
-  stage: "NOT STARTED",
+  stage: "QUEUE",
   priority: "Normal",
   last_update: "2025-11-01T00:00:00.000Z",
   value: 28000,

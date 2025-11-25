@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useApp } from "../../store";
-import { Milestone, MicroTask, STAGES } from "../../types";
+import { Milestone, MicroTask, STAGES, Stage } from "../../types";
 import { nanoid } from "nanoid";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -10,7 +10,7 @@ import { Trash2, Plus, CheckCircle2, Circle } from "lucide-react";
 export function MilestoneManager() {
     const { milestones, microTasks, addMilestone, deleteMilestone, addMicroTask, deleteMicroTask, toggleMicroTask } = useApp();
     const [newMilestoneTitle, setNewMilestoneTitle] = useState("");
-    const [newMilestoneDept, setNewMilestoneDept] = useState(STAGES[0]);
+    const [newMilestoneDept, setNewMilestoneDept] = useState<Stage>(STAGES[0]);
     const [newMilestoneDate, setNewMilestoneDate] = useState("");
 
     const [newTaskDesc, setNewTaskDesc] = useState("");
@@ -64,7 +64,7 @@ export function MilestoneManager() {
                         <select
                             className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                             value={newMilestoneDept}
-                            onChange={(e) => setNewMilestoneDept(e.target.value as any)}
+                            onChange={(e) => setNewMilestoneDept(e.target.value as Stage)}
                         >
                             {STAGES.map(s => <option key={s} value={s}>{s}</option>)}
                         </select>

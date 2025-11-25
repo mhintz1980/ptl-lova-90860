@@ -28,7 +28,9 @@ const mockGetModelLeadTimes = vi.fn().mockReturnValue({
 });
 
 vi.mock("../../src/store", () => {
-  const mockUseApp: any = () => ({ filters: {} });
+  const mockUseApp = (() => ({ filters: {} })) as (() => { filters: Record<string, unknown> }) & {
+    getState: () => { getModelLeadTimes: typeof mockGetModelLeadTimes };
+  };
   mockUseApp.getState = () => ({ getModelLeadTimes: mockGetModelLeadTimes });
   return { useApp: mockUseApp };
 });

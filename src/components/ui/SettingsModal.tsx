@@ -62,106 +62,86 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                                 Department Staffing
                             </h3>
                             <p className="text-xs text-muted-foreground">
-                                Staff count affects weekly capacity
+                                Adjust Employees, Efficiency, or Man-Hours
                             </p>
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2">
-                            {/* Fabrication */}
-                            <div className="rounded-xl border border-border/40 bg-card/50 p-4">
-                                <div className="mb-3 flex items-center justify-between">
-                                    <span className="font-medium text-foreground">Fabrication</span>
-                                    <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-xs font-medium text-blue-500">
-                                        ~4 days/pump
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <label className="text-sm text-muted-foreground">Employees</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        className="h-8 w-20 rounded-md border border-border bg-background px-2 text-center text-sm"
-                                        value={capacityConfig.fabrication.employeeCount}
-                                        onChange={(e) => updateDepartmentStaffing("fabrication", {
-                                            ...capacityConfig.fabrication,
-                                            employeeCount: parseInt(e.target.value) || 1
-                                        })}
-                                    />
-                                </div>
-                            </div>
+                            {/* Helper to render a department card */}
+                            {(["fabrication", "assembly", "testing", "shipping"] as const).map((stage) => {
+                                const config = capacityConfig[stage];
+                                const colorMap = {
+                                    fabrication: "blue",
+                                    assembly: "purple",
+                                    testing: "amber",
+                                    shipping: "emerald",
+                                };
+                                const color = colorMap[stage];
+                                const label = stage.charAt(0).toUpperCase() + stage.slice(1);
 
-                            {/* Assembly */}
-                            <div className="rounded-xl border border-border/40 bg-card/50 p-4">
-                                <div className="mb-3 flex items-center justify-between">
-                                    <span className="font-medium text-foreground">Assembly</span>
-                                    <span className="rounded-full bg-purple-500/10 px-2 py-0.5 text-xs font-medium text-purple-500">
-                                        ~2 days/pump
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <label className="text-sm text-muted-foreground">Employees</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        className="h-8 w-20 rounded-md border border-border bg-background px-2 text-center text-sm"
-                                        value={capacityConfig.assembly.employeeCount}
-                                        onChange={(e) => updateDepartmentStaffing("assembly", {
-                                            ...capacityConfig.assembly,
-                                            employeeCount: parseInt(e.target.value) || 1
-                                        })}
-                                    />
-                                </div>
-                            </div>
+                                return (
+                                    <div key={stage} className="rounded-xl border border-border/40 bg-card/50 p-4 space-y-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-medium text-foreground">{label}</span>
+                                            <span className={`rounded-full bg-${color}-500/10 px-2 py-0.5 text-xs font-medium text-${color}-500`}>
+                                                {stage === "fabrication" ? "~4" : stage === "assembly" ? "~2" : "~1"} days/pump
+                                            </span>
+                                        </div>
 
-                            {/* Testing */}
-                            <div className="rounded-xl border border-border/40 bg-card/50 p-4">
-                                <div className="mb-3 flex items-center justify-between">
-                                    <span className="font-medium text-foreground">Testing</span>
-                                    <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-500">
-                                        ~1 day/pump
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <label className="text-sm text-muted-foreground">Employees</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        className="h-8 w-20 rounded-md border border-border bg-background px-2 text-center text-sm"
-                                        value={capacityConfig.testing.employeeCount}
-                                        onChange={(e) => updateDepartmentStaffing("testing", {
-                                            ...capacityConfig.testing,
-                                            employeeCount: parseInt(e.target.value) || 1
-                                        })}
-                                    />
-                                </div>
-                            </div>
+                                        {/* Employees */}
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs text-muted-foreground">Employees</label>
+                                            <input
+                                                type="number"
+                                                min="0.1"
+                                                max="50"
+                                                step="0.1"
+                                                className="h-7 w-20 rounded-md border border-border bg-background px-2 text-right text-sm"
+                                                value={config.employeeCount}
+                                                onChange={(e) => updateDepartmentStaffing(stage, {
+                                                    ...config,
+                                                    employeeCount: parseFloat(e.target.value) || 0
+                                                })}
+                                            />
+                                        </div>
 
-                            {/* Shipping */}
-                            <div className="rounded-xl border border-border/40 bg-card/50 p-4">
-                                <div className="mb-3 flex items-center justify-between">
-                                    <span className="font-medium text-foreground">Shipping</span>
-                                    <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-medium text-emerald-500">
-                                        ~1 day/pump
-                                    </span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <label className="text-sm text-muted-foreground">Employees</label>
-                                    <input
-                                        type="number"
-                                        min="1"
-                                        max="20"
-                                        className="h-8 w-20 rounded-md border border-border bg-background px-2 text-center text-sm"
-                                        value={capacityConfig.shipping.employeeCount}
-                                        onChange={(e) => updateDepartmentStaffing("shipping", {
-                                            ...capacityConfig.shipping,
-                                            employeeCount: parseInt(e.target.value) || 1
-                                        })}
-                                    />
-                                </div>
-                            </div>
+                                        {/* Efficiency */}
+                                        <div className="flex items-center justify-between">
+                                            <label className="text-xs text-muted-foreground">Efficiency</label>
+                                            <div className="relative w-20">
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    max="200"
+                                                    step="0.1"
+                                                    className="h-7 w-full rounded-md border border-border bg-background px-2 text-right text-sm pr-6"
+                                                    value={Math.round(config.efficiency * 1000) / 10}
+                                                    onChange={(e) => updateDepartmentStaffing(stage, {
+                                                        ...config,
+                                                        efficiency: (parseFloat(e.target.value) || 0) / 100
+                                                    })}
+                                                />
+                                                <span className="absolute right-2 top-1.5 text-xs text-muted-foreground">%</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Daily Man-Hours */}
+                                        <div className="flex items-center justify-between pt-2 border-t border-border/20">
+                                            <label className="text-xs font-medium text-foreground">Daily Man-Hours</label>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                className="h-7 w-20 rounded-md border border-border bg-background px-2 text-right text-sm font-medium"
+                                                value={Math.round(config.dailyManHours * 10) / 10}
+                                                onChange={(e) => updateDepartmentStaffing(stage, {
+                                                    ...config,
+                                                    dailyManHours: parseFloat(e.target.value) || 0
+                                                })}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </section>
 

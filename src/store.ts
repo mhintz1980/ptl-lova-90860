@@ -6,7 +6,7 @@ import { LocalAdapter } from "./adapters/local";
 import { SandboxAdapter } from "./adapters/sandbox";
 import { getModelLeadTimes as getCatalogLeadTimes } from "./lib/seed";
 import { addDays, startOfDay, isAfter, parseISO } from "date-fns";
-import type { StageDurations } from "./lib/schedule";
+import { buildStageTimeline, type StageDurations, type StageBlock } from "./lib/schedule";
 import { applyFilters, genSerial } from "./lib/utils";
 import { sortPumps, SortDirection, SortField } from "./lib/sort";
 import type { CapacityConfig, DepartmentStaffing, PowderCoatVendor } from "./types";
@@ -14,7 +14,7 @@ import { DEFAULT_CAPACITY_CONFIG, getStageCapacity } from "./lib/capacity";
 
 // --- Store Definition ---
 
-interface AppState {
+export interface AppState {
   pumps: Pump[];
   filters: Filters;
   collapsedStages: Record<Stage, boolean>;
@@ -57,7 +57,7 @@ interface AppState {
   toggleSchedulingStageFilter: (stage: Stage) => void;
   clearSchedulingStageFilters: () => void;
   setLockDate: (date: string | null) => void;
-  updateDepartmentStaffing: (stage: "fabrication" | "assembly" | "testing" | "shipping", config: DepartmentStaffing) => void;
+  updateDepartmentStaffing: (stage: "fabrication" | "assembly" | "testing" | "shipping", config: Partial<DepartmentStaffing>) => void;
   updatePowderCoatVendor: (vendorId: string, config: Partial<PowderCoatVendor>) => void;
   resetCapacityDefaults: () => void;
 
@@ -77,6 +77,7 @@ interface AppState {
   // selectors
   filtered: () => Pump[];
   getModelLeadTimes: (model: string) => StageDurations | undefined;
+  getStageSegments: (id: string) => StageBlock[] | undefined;
 }
 
 export const useApp = create<AppState>()(
@@ -376,12 +377,35 @@ export const useApp = create<AppState>()(
 
       // Capacity management actions
       updateDepartmentStaffing: (stage, config) =>
-        set((state) => ({
-          capacityConfig: {
-            ...state.capacityConfig,
-            [stage]: config,
-          },
-        })),
+        set((state) => {
+          const current = state.capacityConfig[stage];
+          const newConfig = { ...current, ...config };
+
+          // Reactive Logic:
+          // 1. If Employee Count changed -> Recalc Daily Man-Hours
+          if (config.employeeCount !== undefined && config.employeeCount !== current.employeeCount) {
+            newConfig.dailyManHours = newConfig.employeeCount * 8 * newConfig.efficiency;
+          }
+          // 2. If Efficiency changed -> Recalc Daily Man-Hours
+          else if (config.efficiency !== undefined && config.efficiency !== current.efficiency) {
+            newConfig.dailyManHours = newConfig.employeeCount * 8 * newConfig.efficiency;
+          }
+          // 3. If Daily Man-Hours changed -> Recalc Efficiency (keep employees constant)
+          else if (config.dailyManHours !== undefined && config.dailyManHours !== current.dailyManHours) {
+            // efficiency = dailyManHours / (employees * 8)
+            const denom = newConfig.employeeCount * 8;
+            if (denom > 0) {
+              newConfig.efficiency = newConfig.dailyManHours / denom;
+            }
+          }
+
+          return {
+            capacityConfig: {
+              ...state.capacityConfig,
+              [stage]: newConfig,
+            },
+          };
+        }),
 
       updatePowderCoatVendor: (vendorId, config) =>
         set((state) => ({
@@ -484,6 +508,16 @@ export const useApp = create<AppState>()(
       },
 
       getModelLeadTimes: (model) => getCatalogLeadTimes(model),
+
+      getStageSegments: (id) => {
+        const pump = get().pumps.find((p) => p.id === id);
+        if (!pump || !pump.scheduledStart) return undefined;
+
+        const leadTimes = get().getModelLeadTimes(pump.model);
+        if (!leadTimes) return undefined;
+
+        return buildStageTimeline(pump, leadTimes);
+      },
     }),
     {
       name: "pumptracker-storage",

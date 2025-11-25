@@ -1,0 +1,361 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - heading "PumpTracker Lite" [level=1] [ref=e8]
+          - generic [ref=e9]:
+            - button "Dashboard" [ref=e10] [cursor=pointer]
+            - button "Kanban Board" [ref=e11] [cursor=pointer]
+        - generic [ref=e12]:
+          - generic [ref=e13]: Manufacturing Management System
+          - button "Settings" [active] [ref=e14] [cursor=pointer]:
+            - img [ref=e15]
+            - generic [ref=e18]: Settings
+    - generic [ref=e20]:
+      - generic [ref=e21]:
+        - generic [ref=e22]:
+          - img [ref=e23]
+          - generic [ref=e26]:
+            - heading "Department Settings" [level=3] [ref=e27]
+            - paragraph [ref=e28]: Configure employee counts and efficiency rates for man-hours calculations
+        - button [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - heading "Fabrication" [level=3] [ref=e39]
+            - generic [ref=e40]:
+              - generic [ref=e41]:
+                - generic [ref=e42]:
+                  - generic [ref=e43]:
+                    - img [ref=e44]
+                    - text: Employees
+                  - spinbutton [ref=e49]: "8"
+                - generic [ref=e50]:
+                  - generic [ref=e51]:
+                    - img [ref=e52]
+                    - text: Efficiency (%)
+                  - spinbutton [ref=e55]: "85"
+              - generic [ref=e56]:
+                - generic [ref=e57]:
+                  - generic [ref=e58]:
+                    - img [ref=e59]
+                    - text: Daily Man-Hours
+                  - generic [ref=e62]: "54"
+                - generic [ref=e63]: 8 employees × 8 hours × 85% efficiency
+          - generic [ref=e64]:
+            - heading "Powder Coat" [level=3] [ref=e68]
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]:
+                  - generic [ref=e72]:
+                    - img [ref=e73]
+                    - text: Employees
+                  - spinbutton [ref=e78]: "6"
+                - generic [ref=e79]:
+                  - generic [ref=e80]:
+                    - img [ref=e81]
+                    - text: Efficiency (%)
+                  - spinbutton [ref=e84]: "85"
+              - generic [ref=e85]:
+                - generic [ref=e86]:
+                  - generic [ref=e87]:
+                    - img [ref=e88]
+                    - text: Daily Man-Hours
+                  - generic [ref=e91]: "41"
+                - generic [ref=e92]: 6 employees × 8 hours × 85% efficiency
+          - generic [ref=e93]:
+            - heading "Assembly" [level=3] [ref=e97]
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - generic [ref=e100]:
+                  - generic [ref=e101]:
+                    - img [ref=e102]
+                    - text: Employees
+                  - spinbutton [ref=e107]: "4"
+                - generic [ref=e108]:
+                  - generic [ref=e109]:
+                    - img [ref=e110]
+                    - text: Efficiency (%)
+                  - spinbutton [ref=e113]: "85"
+              - generic [ref=e114]:
+                - generic [ref=e115]:
+                  - generic [ref=e116]:
+                    - img [ref=e117]
+                    - text: Daily Man-Hours
+                  - generic [ref=e120]: "27"
+                - generic [ref=e121]: 4 employees × 8 hours × 85% efficiency
+          - generic [ref=e122]:
+            - heading "Testing" [level=3] [ref=e126]
+            - generic [ref=e127]:
+              - generic [ref=e128]:
+                - generic [ref=e129]:
+                  - generic [ref=e130]:
+                    - img [ref=e131]
+                    - text: Employees
+                  - spinbutton [ref=e136]: "2"
+                - generic [ref=e137]:
+                  - generic [ref=e138]:
+                    - img [ref=e139]
+                    - text: Efficiency (%)
+                  - spinbutton [ref=e142]: "85"
+              - generic [ref=e143]:
+                - generic [ref=e144]:
+                  - generic [ref=e145]:
+                    - img [ref=e146]
+                    - text: Daily Man-Hours
+                  - generic [ref=e149]: "14"
+                - generic [ref=e150]: 2 employees × 8 hours × 85% efficiency
+        - generic [ref=e153]:
+          - generic [ref=e154]:
+            - generic [ref=e155]: "20"
+            - generic [ref=e156]: Total Employees
+          - generic [ref=e157]:
+            - generic [ref=e158]: 85%
+            - generic [ref=e159]: Average Efficiency
+          - generic [ref=e160]:
+            - generic [ref=e161]: "136"
+            - generic [ref=e162]: Total Daily Man-Hours
+        - generic [ref=e163]:
+          - button "Reset to Defaults" [ref=e165] [cursor=pointer]
+          - generic [ref=e166]:
+            - button "Cancel" [ref=e167] [cursor=pointer]
+            - button "Save Settings" [ref=e168] [cursor=pointer]
+    - main [ref=e169]:
+      - generic [ref=e170]:
+        - generic [ref=e175]:
+          - generic [ref=e176]:
+            - generic [ref=e177]:
+              - img [ref=e178]
+              - textbox "Search customers, models..." [ref=e181]
+            - combobox [ref=e182]:
+              - option "All Customers" [selected]
+              - option "Water Corporation"
+              - option "Mining Co Ltd"
+              - option "Civic Municipal"
+              - option "Industrial Plant"
+            - combobox [ref=e183]:
+              - option "All Stages" [selected]
+              - option "Fabrication"
+              - option "Powder Coat"
+              - option "Assembly"
+              - option "Testing"
+              - option "Shipping"
+            - combobox [ref=e184]:
+              - option "All Models" [selected]
+              - option "SAFE-RL-1000"
+              - option "SAFE-HC-500"
+              - option "STANDARD-RL-800"
+              - option "SAFE-RL-1200"
+            - combobox [ref=e185]:
+              - option "All Priorities" [selected]
+              - option "High"
+              - option "Medium"
+              - option "Low"
+            - generic [ref=e186]:
+              - textbox [ref=e187]
+              - textbox [ref=e188]
+          - generic [ref=e189]:
+            - button "Reset" [ref=e190] [cursor=pointer]:
+              - img [ref=e191]
+              - text: Reset
+            - button "Add PO" [ref=e193] [cursor=pointer]:
+              - img [ref=e194]
+              - text: Add PO
+        - generic [ref=e195]:
+          - generic [ref=e196]:
+            - generic [ref=e199]:
+              - generic [ref=e200]:
+                - paragraph [ref=e201]: Total Orders
+                - paragraph [ref=e202]: "4"
+                - generic [ref=e203]:
+                  - img [ref=e204]
+                  - generic [ref=e208]: +12%
+              - img [ref=e210]
+            - generic [ref=e216]:
+              - generic [ref=e217]:
+                - paragraph [ref=e218]: On-Time Delivery
+                - paragraph [ref=e219]: 2225.0%
+                - generic [ref=e220]:
+                  - img [ref=e221]
+                  - generic [ref=e224]: +3%
+              - img [ref=e226]
+            - generic [ref=e231]:
+              - generic [ref=e232]:
+                - paragraph [ref=e233]: Avg Build Time
+                - paragraph [ref=e234]: 14 days
+                - generic [ref=e235]:
+                  - img [ref=e236]
+                  - generic [ref=e239]: "-2 days"
+              - img [ref=e241]
+            - generic [ref=e246]:
+              - generic [ref=e247]:
+                - paragraph [ref=e248]: Active Jobs
+                - paragraph [ref=e249]: "4"
+                - generic [ref=e250]:
+                  - img [ref=e251]
+                  - generic [ref=e254]: +8%
+              - img [ref=e256]
+          - generic [ref=e259]:
+            - generic [ref=e261]:
+              - button "Pie Charts" [ref=e262] [cursor=pointer]
+              - button "Bar Charts" [ref=e263] [cursor=pointer]
+            - generic [ref=e264]:
+              - generic [ref=e265]:
+                - heading "Late Orders" [level=3] [ref=e267]
+                - generic [ref=e270]:
+                  - list [ref=e272]:
+                    - listitem [ref=e273]:
+                      - img "Late legend icon" [ref=e274]
+                      - text: Late
+                    - listitem [ref=e276]:
+                      - img "On Time legend icon" [ref=e277]
+                      - text: On Time
+                  - application [ref=e279]:
+                    - generic [ref=e287]:
+                      - generic [ref=e289]: 79%
+                      - generic [ref=e291]: 21%
+              - generic [ref=e292]:
+                - heading "Order Status" [level=3] [ref=e294]
+                - generic [ref=e297]:
+                  - list [ref=e299]:
+                    - listitem [ref=e300]:
+                      - img "Late legend icon" [ref=e301]
+                      - text: Late
+                    - listitem [ref=e303]:
+                      - img "On Time legend icon" [ref=e304]
+                      - text: On Time
+                  - application [ref=e306]:
+                    - generic [ref=e314]:
+                      - generic [ref=e316]: 79%
+                      - generic [ref=e318]: 21%
+              - generic [ref=e319] [cursor=pointer]:
+                - heading "Value By Customer" [level=3] [ref=e321]
+                - generic [ref=e324]:
+                  - list [ref=e326]:
+                    - listitem [ref=e327]:
+                      - img "Civic Municipal legend icon" [ref=e328]
+                      - text: Civic Municipal
+                    - listitem [ref=e330]:
+                      - img "Industrial Plant legend icon" [ref=e331]
+                      - text: Industrial Plant
+                    - listitem [ref=e333]:
+                      - img "Mining Co Ltd legend icon" [ref=e334]
+                      - text: Mining Co Ltd
+                    - listitem [ref=e336]:
+                      - img "Water Corporation legend icon" [ref=e337]
+                      - text: Water Corporation
+                  - application [ref=e339]:
+                    - generic [ref=e351]:
+                      - generic [ref=e353]: 29%
+                      - generic [ref=e355]: 20%
+                      - generic [ref=e357]: 18%
+                      - generic [ref=e359]: 33%
+              - generic [ref=e360]:
+                - heading "Priority Distribution" [level=3] [ref=e362]
+                - generic [ref=e365]:
+                  - list [ref=e367]:
+                    - listitem [ref=e368]:
+                      - img "HIGH legend icon" [ref=e369]
+                      - text: HIGH
+                    - listitem [ref=e371]:
+                      - img "LOW legend icon" [ref=e372]
+                      - text: LOW
+                    - listitem [ref=e374]:
+                      - img "MEDIUM legend icon" [ref=e375]
+                      - text: MEDIUM
+                  - application [ref=e377]:
+                    - generic [ref=e387]:
+                      - generic [ref=e389]: 50%
+                      - generic [ref=e391]: 25%
+                      - generic [ref=e393]: 25%
+            - generic [ref=e394]:
+              - generic [ref=e395]:
+                - heading "Department Distribution" [level=3] [ref=e397]
+                - generic [ref=e398]:
+                  - img [ref=e401]:
+                    - generic [ref=e407]:
+                      - generic [ref=e412]: Departments
+                      - generic [ref=e418]: Fabrication
+                      - generic [ref=e424]: Powder Coat
+                      - generic [ref=e430]: Assembly
+                  - paragraph [ref=e431]: Click on departments to drill down
+              - generic [ref=e432]:
+                - heading "Production Stages" [level=3] [ref=e434]
+                - application [ref=e438]:
+                  - generic [ref=e450]:
+                    - generic [ref=e451]:
+                      - generic [ref=e453]: "0"
+                      - generic [ref=e455]: "0.5"
+                      - generic [ref=e457]: "1"
+                      - generic [ref=e459]: "1.5"
+                      - generic [ref=e461]: "2"
+                    - generic [ref=e462]:
+                      - generic [ref=e464]: Fabrication
+                      - generic [ref=e466]: PowderCoat
+                      - generic [ref=e468]: Assembly
+          - generic [ref=e469]:
+            - heading "Order Details" [level=3] [ref=e471]
+            - generic [ref=e473]:
+              - generic [ref=e475] [cursor=pointer]:
+                - generic [ref=e476]:
+                  - button [ref=e477]:
+                    - img [ref=e478]
+                  - generic [ref=e480]:
+                    - generic [ref=e481]:
+                      - generic [ref=e482]: PO-2025-001
+                      - generic [ref=e483]: 1 pump
+                    - generic [ref=e484]: Water Corporation • $45,000.00
+                - generic [ref=e485]:
+                  - button [ref=e486]:
+                    - img [ref=e487]
+                  - button [ref=e490]:
+                    - img [ref=e491]
+              - generic [ref=e495] [cursor=pointer]:
+                - generic [ref=e496]:
+                  - button [ref=e497]:
+                    - img [ref=e498]
+                  - generic [ref=e500]:
+                    - generic [ref=e501]:
+                      - generic [ref=e502]: PO-2025-002
+                      - generic [ref=e503]: 1 pump
+                    - generic [ref=e504]: Mining Co Ltd • $32,000.00
+                - generic [ref=e505]:
+                  - button [ref=e506]:
+                    - img [ref=e507]
+                  - button [ref=e510]:
+                    - img [ref=e511]
+              - generic [ref=e515] [cursor=pointer]:
+                - generic [ref=e516]:
+                  - button [ref=e517]:
+                    - img [ref=e518]
+                  - generic [ref=e520]:
+                    - generic [ref=e521]:
+                      - generic [ref=e522]: PO-2025-003
+                      - generic [ref=e523]: 1 pump
+                    - generic [ref=e524]: Civic Municipal • $28,000.00
+                - generic [ref=e525]:
+                  - button [ref=e526]:
+                    - img [ref=e527]
+                  - button [ref=e530]:
+                    - img [ref=e531]
+              - generic [ref=e535] [cursor=pointer]:
+                - generic [ref=e536]:
+                  - button [ref=e537]:
+                    - img [ref=e538]
+                  - generic [ref=e540]:
+                    - generic [ref=e541]:
+                      - generic [ref=e542]: PO-2025-004
+                      - generic [ref=e543]: 1 pump
+                    - generic [ref=e544]: Industrial Plant • $52,000.00
+                - generic [ref=e545]:
+                  - button [ref=e546]:
+                    - img [ref=e547]
+                  - button [ref=e550]:
+                    - img [ref=e551]
+  - generic [ref=e554]: Fabrication
+```

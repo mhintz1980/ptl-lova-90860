@@ -15,7 +15,10 @@ type PieSectorData = {
   value?: number;
   paddingAngle?: number;
   dataKey?: string;
-  payload?: any;
+  payload?: {
+    name: string;
+    value: number;
+  };
 };
 
 type PieSectorDataItem = React.SVGProps<SVGPathElement> & Partial<SectorProps> & PieSectorData;
@@ -56,7 +59,7 @@ const renderActiveShape = ({
   return (
     <g>
       <text x={cx} y={cy} dy={8} textAnchor="middle" fill={fill}>
-        {payload.name}
+        {payload?.name}
       </text>
       <Sector
         cx={cx}

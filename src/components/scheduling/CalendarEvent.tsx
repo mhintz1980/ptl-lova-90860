@@ -72,6 +72,8 @@ export function CalendarEvent({ event, onClick, onDoubleClick, isDragging = fals
       onClick={handleClick}
       onDoubleClick={handleDoubleClick}
       aria-label={`${event.title} - ${stageLabel} - PO ${event.subtitle}`}
+      data-testid="calendar-event"
+      data-span={event.span}
     >
       {/* Model name - prominent */}
       <div className="flex items-center justify-between">

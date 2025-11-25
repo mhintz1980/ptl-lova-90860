@@ -3,14 +3,14 @@ import React from "react";
 import { Pump, Stage } from "../../types";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { ChartProps } from "./dashboardConfig";
+import { ChartProps, DashboardFilters } from "./dashboardConfig";
 import { useApp } from "../../store";
 import { applyDashboardFilters } from "./utils";
 
 interface CapacityChartProps {
   pumps: Pump[];
   headless?: boolean;
-  onDrilldown?: (update: Partial<any>) => void;
+  onDrilldown?: (update: Partial<DashboardFilters>) => void;
 }
 
 interface CapacityTooltipProps {
@@ -100,9 +100,10 @@ export const CapacityChart: React.FC<CapacityChartProps> = ({ pumps, headless, o
       <BarChart
         data={data}
         margin={{ top: 0, right: 0, left: 0, bottom: 40 }}
-        onClick={(data: any) => {
-          if (onDrilldown && data && data.activePayload && data.activePayload[0]) {
-            const stage = data.activePayload[0].payload.displayName;
+        onClick={(data: unknown) => {
+          const chartData = data as { activePayload?: Array<{ payload: { displayName: Stage } }> };
+          if (onDrilldown && chartData?.activePayload?.[0]) {
+            const stage = chartData.activePayload[0].payload.displayName;
             onDrilldown({ stage });
           }
         }}
@@ -158,9 +159,5 @@ export const CapacityByDeptChart: React.FC<ChartProps> = ({ filters, onDrilldown
   return <CapacityChart pumps={filteredPumps} headless={true} onDrilldown={onDrilldown} />;
 };
 
-export const LeadTimeTrendChart: React.FC<ChartProps> = ({ filters }) => {
-  const pumps = useApp((state) => state.pumps);
-  const filteredPumps = React.useMemo(() => applyDashboardFilters(pumps, filters), [pumps, filters]);
-  return <CapacityChart pumps={filteredPumps} />;
-};
+
 

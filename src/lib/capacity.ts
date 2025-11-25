@@ -22,18 +22,26 @@ export const DEFAULT_CAPACITY_CONFIG: CapacityConfig = {
     fabrication: {
         employeeCount: 4,
         workDayHours: { ...DEFAULT_WORK_HOURS },
+        efficiency: 0.85,
+        dailyManHours: 4 * 8 * 0.85,
     },
     assembly: {
         employeeCount: 2,
         workDayHours: { ...DEFAULT_WORK_HOURS },
+        efficiency: 0.85,
+        dailyManHours: 2 * 8 * 0.85,
     },
     testing: {
-        employeeCount: 1,
+        employeeCount: 0.25,
         workDayHours: { ...DEFAULT_WORK_HOURS },
+        efficiency: 0.85,
+        dailyManHours: 0.25 * 8 * 0.85,
     },
     shipping: {
-        employeeCount: 1,
+        employeeCount: 0.25,
         workDayHours: { ...DEFAULT_WORK_HOURS },
+        efficiency: 0.85,
+        dailyManHours: 0.25 * 8 * 0.85,
     },
     powderCoat: {
         vendors: [
@@ -61,8 +69,7 @@ export function calculateWeeklyHours(staffing: DepartmentStaffing): number {
 }
 
 /**
- * Calculate weekly capacity based on how many pumps can START per week
- * This accounts for the fact that each pump occupies an employee for multiple DAYS
+ * Calculate weekly capacity based on daily man-hours
  * @param staffing Department staffing configuration
  * @param daysPerPump How many days each pump occupies an employee (e.g., 3-5 days for fabrication)
  * @returns Number of pumps that can START per week
@@ -71,10 +78,17 @@ export function calculateWeeklyCapacity(
     staffing: DepartmentStaffing,
     daysPerPump: number = 4 // Default: ~4 days per pump per stage
 ): number {
-    // Each employee can handle roughly 5 work days / daysPerPump pumps per week
-    // For example: if a pump takes 4 days, each employee can start ~1.25 pumps/week
-    const pumpsPerEmployeePerWeek = 5 / daysPerPump;
-    return Math.floor(staffing.employeeCount * pumpsPerEmployeePerWeek);
+    // New Logic:
+    // 1. Weekly Man-Hours = Daily Man-Hours * 5 (assuming 5 work days for simplicity in this calculation context)
+    // 2. Man-Hours Per Pump = daysPerPump * 8 (assuming 8 hours/day standard)
+    // 3. Pumps Per Week = Weekly Man-Hours / Man-Hours Per Pump
+
+    const weeklyManHours = staffing.dailyManHours * 5;
+    const manHoursPerPump = daysPerPump * 8;
+
+    if (manHoursPerPump === 0) return 999;
+
+    return Math.floor(weeklyManHours / manHoursPerPump);
 }
 
 /**

@@ -4,13 +4,14 @@ import { Pump } from "../../types";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/Card";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { round } from "../../lib/format";
-import { ChartProps } from "./dashboardConfig";
+import { ChartProps, DashboardFilters } from "./dashboardConfig";
 import { useApp } from "../../store";
 import { applyDashboardFilters } from "./utils";
 
 interface TrendChartProps {
   pumps: Pump[];
   headless?: boolean;
+  onDrilldown?: (update: Partial<DashboardFilters>) => void;
 }
 
 interface TrendTooltipProps {
@@ -40,7 +41,13 @@ function diffDays(pump: Pump): number {
   return Math.abs((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-export const TrendChart: React.FC<TrendChartProps> = ({ pumps, headless }) => {
+interface ChartClickData {
+  activePayload?: Array<{
+    payload: unknown;
+  }>;
+}
+
+export const TrendChart: React.FC<TrendChartProps> = ({ pumps, headless, onDrilldown }) => {
   const weeklyData = React.useMemo(() => {
     const closed = pumps.filter(p => p.stage === "CLOSED" && p.scheduledEnd);
 
@@ -93,6 +100,13 @@ export const TrendChart: React.FC<TrendChartProps> = ({ pumps, headless }) => {
       <AreaChart
         data={weeklyData}
         margin={{ top: 0, right: 0, left: 0, bottom: 40 }}
+        onClick={(data) => {
+          const chartData = data as ChartClickData;
+          if (onDrilldown && chartData && chartData.activePayload && chartData.activePayload[0]) {
+            // Just trigger the next view without specific filter for now
+            onDrilldown({});
+          }
+        }}
       >
         <defs>
           <linearGradient id="colorAvgDays" x1="0" y1="0" x2="0" y2="1">
@@ -145,8 +159,8 @@ export const TrendChart: React.FC<TrendChartProps> = ({ pumps, headless }) => {
   );
 };
 
-export const LeadTimeTrendChart: React.FC<ChartProps> = ({ filters }) => {
+export const LeadTimeTrendChart: React.FC<ChartProps> = ({ filters, onDrilldown }) => {
   const pumps = useApp((state) => state.pumps);
   const filteredPumps = React.useMemo(() => applyDashboardFilters(pumps, filters), [pumps, filters]);
-  return <TrendChart pumps={filteredPumps} headless={true} />;
+  return <TrendChart pumps={filteredPumps} headless={true} onDrilldown={onDrilldown} />;
 };

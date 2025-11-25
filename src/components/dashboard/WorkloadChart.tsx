@@ -10,7 +10,7 @@ interface WorkloadChartProps {
   pumps: Pump[];
   type: "customer" | "model";
   headless?: boolean;
-  onDrilldown?: (update: Partial<any>) => void;
+  onDrilldown?: (update: Partial<import('./dashboardConfig').DashboardFilters>) => void;
 }
 
 const buildCounts = (pumps: Pump[], type: 'customer' | 'model') => {
@@ -54,7 +54,8 @@ export const WorkloadChart: React.FC<WorkloadChartProps> = ({ pumps, type, headl
       headless={headless}
       onDrilldown={(_, value) => {
         if (onDrilldown) {
-          onDrilldown({ [type]: value });
+          const key = type === 'customer' ? 'customerId' : 'modelId';
+          onDrilldown({ [key]: value });
         }
       }}
     />

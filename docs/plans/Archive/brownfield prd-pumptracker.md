@@ -1,0 +1,127 @@
+# Brownfield Enhancement PRD: Production Intelligence Suite
+
+## 1. Intro Project Analysis and Context
+
+### Existing Project Overview
+**PumpTracker Lite** is currently a client-centric, local-first React application utilizing `Zustand` for state management and `localStorage` (via `LocalAdapter`) for persistence.
+* **Core Features:** Dashboard (KPIs), Kanban Board (Drag & Drop), Order Management (Add PO).
+* **Architecture:** Single-Page Application (SPA) built with Vite, TypeScript, Tailwind, and ShadCN.
+* **Constraint:** The system is currently single-user/local-first. All enhancements must work within the browser's memory and storage limits without requiring a complex server backend.
+
+### Enhancement Scope Definition
+This enhancement, titled **"Production Intelligence Suite,"** adds three distinct functional layers to the existing application:
+1.  **Reporting Engine:** Printable, high-contrast views for tactical and strategic alignment.
+2.  **Production Sandbox:** A "What-If" simulation mode allowing safe schedule experimentation without altering live data.
+3.  **Shop Floor HUD (TV Mode):** A passive/active radiator for 1080p+ displays featuring a "Progress Engine" for micro-tasking.
+
+**Impact Assessment:** **Significant Impact**. Requires modification to the global `Zustand` store (to handle "Sandbox State" and new "Milestone" entities), new routing patterns (`/print`, `/kiosk`), and new UI components.
+
+### Goals
+* **Eliminate Ambiguity:** Shop floor leads know exactly what to build next (Monday Morning Brief).
+* **Empower Decision Making:** Management can simulate schedule changes before committing to them (Sandbox).
+* **Drive Idle Productivity:** Fill downtime with value-add micro-tasks managed by Department Leads (Progress Engine).
+
+---
+
+## 2. Requirements
+
+### Functional Requirements (FR)
+
+#### FR1: Reporting Engine (`/print`)
+* **FR1.1:** System must render specific views optimized for CSS `@media print` (hidden nav, high contrast, black/white friendly).
+* **FR1.2:** **"Monday Morning Brief" Report:**
+    * Filterable by Department (Stage).
+    * Must list "Rush/Urgent" items first.
+    * Must list incoming work (pumps scheduled to finish previous stage this week).
+    * Must highlight "Blockers" (e.g., missing Serial Number or BOM data).
+* **FR1.3:** **"Capacity Forecast" Report:**
+    * Matrix view of Stage vs. Week (next 4 weeks).
+    * Cells exceeding defined capacity (default: 20) must be visually distinct (e.g., Bold/Red).
+* **FR1.4:** **"Executive Pulse" Report:**
+    * Visual summary of Trend Charts and Total Throughput Value.
+
+#### FR2: Production Sandbox (Simulation Mode)
+* **FR2.1:** Global "Sandbox Mode" toggle. When active:
+    * UI visual indicator (e.g., yellow/black striped header).
+    * `LocalAdapter` persistence is PAUSED (no writes to localStorage).
+* **FR2.2:** **"Ghost Cards"**:
+    * User can create temporary "Ghost" pumps/orders that exist only in Sandbox memory.
+    * Ghost cards must be visually distinct (e.g., dashed border, opacity).
+* **FR2.3:** **Impact Highlighting:**
+    * Dragging a card (Real or Ghost) triggers immediate recalculation of Capacity Radials and Gantt timelines.
+    * Visual dependencies: Moving a card past a calculated lead time (if logic exists) or capacity limit highlights the conflict.
+* **FR2.4:** **Commit/Discard:**
+    * "Discard": Reverts state to pre-Sandbox snapshot.
+    * "Apply": Commits changes (excluding Ghost cards unless explicitly converted) to live store and resumes persistence.
+
+#### FR3: Shop Floor HUD (`/kiosk`)
+* **FR3.1:** dedicated route `/kiosk/[department]` designed for 1080p viewing at 10ft distance.
+* **FR3.2:** **Slide Rotation:** System cycles through views automatically (15-30s intervals).
+    * *Slide A (Schedule):* "Up Next" list sorted by Priority/Date.
+    * *Slide B (Inventory Nudge):* Context-aware questions based on upcoming model schedule (e.g., "HC-150 in 3 days: Are mounts ready?").
+    * *Slide C (Progress/Opportunity):* Visualization of Milestones and Micro-Tasks.
+* **FR3.3:** **Progress Engine:**
+    * **Milestone Management:** UI for Dept Leads to input long-term goals (e.g., "Quarterly Inventory").
+    * **Micro-Tasking:** Ability to paste/import a list of small tasks linked to a Milestone.
+    * **Display Logic:** If department capacity < 100%, prioritize showing Micro-Tasks on Slide C.
+    * **Gamification:** Visual progress bar for Milestones that updates as tasks are marked complete.
+
+### Non-Functional Requirements (NFR)
+* **NFR1 (Performance):** Sandbox calculations (recalculating capacity for 500+ items) must occur in < 100ms to maintain "drag" fluidity.
+* **NFR2 (Readability):** Kiosk fonts must be legible from 10-15 feet (min 24px-36px base font).
+* **NFR3 (State Integrity):** Sandbox mode must strictly guarantee that *no* simulation data leaks into the permanent store unless explicitly committed.
+
+---
+
+## 3. Technical Constraints & Integration
+
+### Data Model Updates (Zustand)
+To support these features, the `Store` requires specific extensions:
+* **Sandbox State:**
+    * `isSandbox: boolean`
+    * `originalState: AppState | null`
+* **Milestones (New Entity):**
+    * `id`, `title`, `department` (Stage), `deadline`, `tasks: MicroTask[]`.
+* **MicroTask (New Entity):**
+    * `id`, `description`, `isComplete`, `weight` (for progress calc).
+
+### Integration Strategy
+* **Reports:** Pure UI components reading existing Store data. No new data structures needed.
+* **Sandbox:** Middleware or Wrapper pattern around the Store Actions to intercept calls when `isSandbox === true`.
+* **Kiosk:** Standalone page components (`src/pages/Kiosk.tsx`) utilizing existing `useKpis` and filtering logic.
+
+---
+
+## 4. Epic Structure
+
+We will execute this as a **Brownfield Enhancement** split into three focused Epics.
+
+### Epic 1: The Reporting Engine
+**Goal:** Provide immediate tactical clarity to leads via printable briefs.
+* **Story 1.1:** Create `PrintLayout` component and routing structure (`/print/*`).
+* **Story 1.2:** Implement "Monday Morning Brief" view with "Hot List" and "Blocker" logic.
+* **Story 1.3:** Implement "Capacity Forecast" view with 4-week lookahead.
+
+### Epic 2: The Production Sandbox
+**Goal:** Enable risk-free scheduling and "What-If" scenario planning.
+* **Story 2.1:** Implement `Zustand` Sandbox logic (Snapshot/Restore state pattern).
+* **Story 2.2:** Update Kanban/Gantt UI to support "Ghost Card" creation and visual differentiation.
+* **Story 2.3:** Implement "Impact Highlighting" (Capacity checks) during Sandbox drag events.
+
+### Epic 3: Shop Floor HUD & Progress Engine
+**Goal:** Activate the TV screens to drive behavior and micro-productivity.
+* **Story 3.1:** Create Kiosk Layout (`/kiosk`) with auto-rotating slide logic.
+* **Story 3.2:** Implement "Up Next" and "Inventory Nudge" slides.
+* **Story 3.3:** Implement "Milestone & Micro-Task" data model and management UI (for Dept Leads).
+* **Story 3.4:** Implement "Opportunity Board" slide with gamified progress bars.
+
+---
+
+## 5. Validation & Handoff
+
+### Success Criteria
+* [ ] "Monday Morning Brief" prints cleanly on one page without URL headers/footers.
+* [ ] Sandbox mode allows dragging items to ruinous dates, but "Discard" instantly restores the original safe schedule.
+* [ ] Kiosk screen is readable from 10ft and cycles slides smoothly without memory leaks.
+* [ ] "Frank" (Fabrication Lead) can add a "Clamp Rack Organization" milestone and see it appear on the TV.
+```

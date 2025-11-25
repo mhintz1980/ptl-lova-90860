@@ -1,0 +1,134 @@
+title: Fix and Extend Drill-Down Charts
+doc_type: coding_task_prompt
+intended_use: "Give to a coding agent to debug and complete drill-down charts in the dashboard"
+requires_context_spec: "Drill-Down Table Visualization in Low-Code Platforms"
+
+instructions: |-
+  You are helping me finish an interactive “drill-down” analytics dashboard.
+
+  Context you MUST use:
+  - I already defined the desired behavior in a spec called **“Drill-Down Table Visualization in Low-Code Platforms”** (hierarchical data, click-to-drill-down, breadcrumbs, lazy loading, etc.).
+  - Some of that behavior is now partially implemented in my app.
+
+  Current status (important):
+  - Two **donut charts already support drill-down behavior** and are working (or mostly working).
+  - Several charts are currently NOT rendering, so I can’t verify behavior there yet. Specifically:
+
+    - **Production Overview**
+      - Late Orders
+
+    - **Schedule & Lead Times**
+      - Late Orders
+      - Lead Time Trend
+
+    - **Sales & Customers**
+      - Value By Customer
+
+    - **Bottlenecks**
+      - Late Orders
+
+  - These non-rendering charts either:
+    - Fail to render at all (runtime error, missing data, etc.), or
+    - Have broken configuration (fields/props mismatched with the dataset).
+
+  Additionally, I want:
+  - A chart that shows the **total value of all purchase orders (all POs)**, not just per customer/category.  
+    - This can be a new chart or an extension of an existing one, but it must clearly display aggregate PO value across the dataset.
+
+  Your job:
+  1. **Inspect the existing implementation**
+     - Find where the drill-down logic is implemented for the working donut charts (click handlers, state management, data-fetching, and view updates).
+     - Treat this working donut behavior as the **reference implementation** for drill-down.
+
+  2. **Fix all non-rendering charts**
+     - For each of the charts below, identify EXACTLY why they are not rendering and fix it:
+       - Production Overview → Late Orders
+       - Schedule & Lead Times → Late Orders
+       - Schedule & Lead Times → Lead Time Trend
+       - Sales & Customers → Value By Customer
+       - Bottlenecks → Late Orders
+     - Common things to check and correct:
+       - Data shape (keys/fields mismatch),
+       - Component props (wrong types, missing required props),
+       - Null/undefined checks for datasets,
+       - Incorrect imports or missing registration of chart components,
+       - Configuration mismatches between chart options and dataset.
+     - After fixes, all of these charts should:
+       - Render without error,
+       - Respect the existing styling/theme/layout of the dashboard.
+
+  3. **Make the “Value By Customer” donut chart fully functional**
+     - Ensure **“Value By Customer”**:
+       - Renders correctly,
+       - Uses the same drill-down interaction pattern as the other working donut charts.
+     - The click behavior should follow the hierarchical model (e.g., customer → PO-level → line-item or similar, depending on available data).
+     - Keep styling and UX consistent with other donuts.
+
+  4. **Add a chart that shows the total value of ALL purchase orders**
+     - Implement a new chart (or extend an existing one) that displays:
+       - The **aggregate value of all POs** in the current dataset (overall total).
+     - Requirements:
+       - Clearly labeled as total PO value (e.g., “Total Purchase Order Value”).
+       - Use appropriate aggregation logic over all POs (sum of PO values).
+       - Integrate with the existing dashboard layout and theming.
+     - If it makes sense, also support drill-down from this total:
+       - Total PO value → by customer → by PO → by line item (or a similar hierarchy the data supports).
+
+  5. **Make the bar charts support drill-down (where applicable)**
+     - For any bar charts tied to these non-rendering or related views:
+       - Apply the SAME drill-down design used in the donut charts:
+         - Click on a bar → load the next hierarchy level for that selection.
+         - Use shared/global state to track “current level” and selection (e.g., region, customer, product group).
+       - Ensure compatibility with any existing breadcrumbs/back navigation.
+     - Do NOT rewrite the entire chart system:
+       - Reuse and adapt existing drill-down logic from the donuts.
+
+  6. **Make the treemap chart support drill-down (if present on these views)**
+     - Implement click-to-drill-down on treemap nodes:
+       - Clicking a node should focus on that node’s children.
+     - Reuse the same drill-down state and navigation behavior:
+       - Same hierarchical model,
+       - Same breadcrumb/back behavior as donuts and bars.
+     - Fix any rendering or configuration issues that prevent the treemap from working cleanly.
+
+  7. **Respect the original drill-down spec**
+     - Align behavior with the earlier “Drill-Down Table Visualization” spec:
+       - Hierarchical data (parent → child),
+       - Clear clickable affordances,
+       - Ability to navigate back up (breadcrumbs/back button),
+       - Performance considerations (lazy loading, efficient querying).
+     - If there is a central “drill-down controller” or shared logic, extend it rather than creating new, fragmented logic.
+
+  8. **Implementation constraints**
+     - Make **minimal, targeted changes**:
+       - Fix configuration and data issues first,
+       - Then wire in drill-down behavior using existing patterns.
+     - Prefer small, focused updates:
+       - Fixing props and data mapping,
+       - Reusing existing hooks or handlers,
+       - Connecting bar/treemap click events into the existing drill-down logic.
+     - Any new helpers or abstractions should be:
+       - Simple,
+       - Clearly named,
+       - Located logically near related code.
+
+  Output format:
+  - Provide **specific code changes** (diff-style or clearly separated code blocks) for:
+    - Each fixed chart:
+      - Production Overview → Late Orders
+      - Schedule & Lead Times → Late Orders
+      - Schedule & Lead Times → Lead Time Trend
+      - Sales & Customers → Value By Customer
+      - Bottlenecks → Late Orders
+    - The new “Total Purchase Order Value” chart.
+    - Any bar/treemap drill-down wiring you add or modify.
+  - For each group of changes, add a brief explanation (1–2 sentences) describing:
+    - What you changed,
+    - Why it fixes the issue or how it enables drill-down.
+
+  Goal:
+  - All listed charts should:
+    - Render correctly,
+    - Support click-to-drill-down behavior consistent with the working donut implementation (where applicable),
+    - Integrate with navigation (breadcrumbs/back),
+    - Include a clear visualization of the **total value of all purchase orders**.

@@ -1,0 +1,161 @@
+title: PumpTracker Lite Feature Review
+doc_type: product_feature_summary
+intended_use: "Context for an LLM assisting with feature design, debugging, or extension of PumpTracker Lite"
+app_name: "PumpTracker Lite"
+
+sections:
+
+  - id: adding_new_orders
+    title: "1. Adding New Orders"
+    goal: "Input new production demands into the system."
+    features:
+      - name: "Manual Entry"
+        description: "Users can add new Purchase Orders (POs) via the Add PO button in the main toolbar."
+        details:
+          required_fields:
+            - PO Number
+            - Customer Name
+            - Promise Date
+            - Line Items (Model, Quantity, Color, Value)
+      - name: "Line Item Expansion"
+        description: "The system automatically expands PO line items into individual Pump units."
+        details:
+          behavior:
+            - "Each pump gets a unique serial number."
+            - "Initial manufacturing stage is set to QUEUE."
+      - name: "Bulk Import (Seed / Admin)"
+        description: "System supports loading initial data from JSON/CSV sources."
+        inferred_from:
+          - "adapters/local.ts"
+          - "seed.ts"
+        notes:
+          - "UI for general user-facing CSV import is not clearly exposed in the main toolbar."
+          - "Bulk loading may be handled via direct data loading or a more hidden admin function."
+
+  - id: scheduling_and_adjusting
+    title: "2. Scheduling & Adjusting"
+    goal: "Plan production capacity and manage priorities."
+    features:
+      - name: "Backlog Management"
+        elements:
+          - name: "Backlog Dock"
+            description: "Collapsible side panel in the Scheduling view listing all unscheduled jobs."
+            details:
+              criteria:
+                - "Stage: QUEUE"
+                - "No start date assigned"
+          - name: "Auto-Schedule (Magic Button)"
+            description: "Automatically assigns schedule dates to backlog items."
+            scheduling_logic:
+              priority_order:
+                - "Urgent"
+                - "Low"
+              factors:
+                - "Promise date"
+                - "Available daily capacity"
+      - name: "Calendar Planning"
+        elements:
+          - name: "Visual Timeline"
+            description: "6-week rolling calendar view."
+            details:
+              representation:
+                - "Jobs appear as colored bars spanning their production duration (based on model lead times)."
+          - name: "Drag-and-Drop Scheduling"
+            description: "Drag jobs from Backlog Dock onto calendar dates to schedule."
+          - name: "Drag-and-Drop Reschedule"
+            description: "Existing scheduled events can be moved on the calendar."
+            notes:
+              - "Explicit move logic is less prominent than 'drop from backlog', but infrastructure supports rescheduling."
+      - name: "Capacity & Staffing"
+        elements:
+          - name: "Settings Modal"
+            description: "Adjust department staffing levels which influence capacity."
+            fields:
+              - Employee Count
+              - Work Hours
+          - name: "Vendor Management"
+            description: "Configure vendor capacity constraints (e.g., Powder Coat vendors)."
+
+  - id: tracking_and_production
+    title: "3. Tracking & Production"
+    goal: "Monitor progress through manufacturing stages."
+    features:
+      - name: "Kanban Board"
+        description: "Visual pipeline of production stages."
+        stages:
+          - QUEUE
+          - FABRICATION
+          - POWDER COAT
+          - ASSEMBLY
+          - TESTING
+          - SHIPPING
+          - CLOSED
+        behavior:
+          - "Users drag and drop pumps between columns to update stage in real time."
+          - "WIP (Work-In-Progress) limits displayed per column (e.g., '8/10')."
+          - "Visual warnings (e.g., red background) when WIP limits are exceeded."
+        metrics:
+          - "Item count per column."
+          - "Average dwell time (days in stage) per column."
+      - name: "Shop Floor HUD (Kiosk Mode)"
+        description: "Full-screen, auto-rotating display for shop floor monitors."
+        slides:
+          - name: "Up Next"
+            description: "High-priority jobs coming soon."
+          - name: "Inventory Nudge"
+            description: "Alerts for low stock or required parts (implied by component naming)."
+          - name: "Progress"
+            description: "Visual progress bars or charts showing daily/weekly targets."
+
+  - id: reviewing_data_and_insights
+    title: "4. Reviewing Data & Insights"
+    goal: "Analyze performance and financial metrics."
+    features:
+      - name: "Dashboard"
+        elements:
+          - name: "Topic Views"
+            description: "User can switch between analytical topics."
+            examples:
+              - Financial
+              - Production
+              - Capacity
+          - name: "Key Performance Indicators (KPIs)"
+            description: "Top-level metrics such as Revenue and On-Time Delivery."
+          - name: "Charts"
+            chart_types:
+              - Trend Chart: "Historical production volume or value over time."
+              - Capacity Chart: "Load vs. available capacity."
+              - Value Chart: "Order value breakdown by customer or model."
+              - Workload Chart: "Distribution of active jobs across stages."
+          - name: "Drill-Down / Global Filtering"
+            description: "Clicking chart segments applies global filters across the dashboard."
+            behavior:
+              - "Clicking an element (e.g., a bar for 'Customer A') filters all other charts and the master table to that entity."
+          - name: "Favorites / My Dashboard"
+            description: "Users can star charts to build a custom 'My Dashboard' view."
+      - name: "Master Order Table"
+        description: "Tabular view of orders and pumps with grouping."
+        behaviors:
+          - "Orders grouped by PO Number."
+          - "Expandable POs to show individual pump details (status, serial numbers, values)."
+          - "Sorting and filtering via a global search bar and specific filters."
+        filters:
+          - PO
+          - Customer
+          - Model
+          - Priority
+          - Date Range
+
+  - id: sandbox_and_scenarios
+    title: "5. Sandbox & Scenarios"
+    goal: "Test changes without affecting live production data."
+    features:
+      - name: "Simulation Mode (Sandbox)"
+        behaviors:
+          - "Entering Sandbox creates a temporary copy of the entire dataset."
+          - "Users can freely move cards, reschedule jobs, and add orders for what-if analysis."
+        ui_indicators:
+          - "A prominent yellow 'Sandbox Mode' banner indicates simulation context."
+        commit_model:
+          - "Commit: Apply all sandbox changes to the live database."
+          - "Discard: Revert to pre-sandbox state with no impact on live data."

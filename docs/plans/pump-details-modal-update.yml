@@ -1,0 +1,143 @@
+title: "Pump Details Modal – Show Full Pump Data + Safe Edit Section"
+doc_type: "coding_task_prompt"
+app_name: "PumpTracker Lite"
+task_kind: "ui_and_state_update"
+priority: "high"
+
+instructions: |-
+  You are my Claude Code agent working on the PumpTracker Lite project.
+
+  Goal:
+  Update the **Pump Details** modal so that it:
+  1. Shows **all** data that is generated and stored for a pump.
+  2. Groups “sensitive / rarely changed” fields into a **collapsible section** with a clear warning.
+  3. Has an **Edit** mode that makes all fields editable directly from the modal (including the sensitive ones).
+
+  Use the current PumpTracker patterns (React + TS + Zustand + Tailwind) and reuse the existing Pump Details modal rather than creating a new one from scratch.
+
+  --------------------------------------------------
+  1. Pump data that must appear in the Pump Details modal
+  --------------------------------------------------
+
+  For each pump, the following information exists and must be visible somewhere in the modal:
+
+  1) Core Identity
+     - ID (UUID)
+     - Serial Number (4-digit, e.g. 1001)
+     - PO Number (e.g. PO2025-0001)
+     - Customer
+     - Model
+
+  2) Status & Scheduling
+     - Stage (Queue, Fabrication, Powder Coat, Assembly, Testing, Shipping, Closed)
+     - Priority (Low, Normal, High, Rush, Urgent)
+     - Last Update (date/time of last status change)
+     - Scheduled Start (date)
+     - Scheduled End (date)
+
+  3) Manufacturing Data (BOM & Specs)
+     - Engine Model (e.g. HATZ 1B50E)
+     - Gearbox Model (e.g. RENOLD WM6)
+     - Control Panel (e.g. DSEE050)
+     - Description (e.g. "4” Double Diaphragm")
+     - Total Lead Days (total estimated days to build)
+
+  4) Department-Specific Work Content
+     - Fabrication Days
+     - Powder Coat Days
+     - Assembly Days
+     - Testing Days
+
+  5) Visuals & Financials
+     - Powder Color (e.g. Red, Blue)
+     - Value (monetary value/price of the pump)
+
+  6) Derived Man-Hours (READ-ONLY)
+     - The app uses this formula:
+       Required Man-Hours (per department) = Department Lead Time in Days × 8 hours
+     - These values are used by the calendar to determine how long department bars should be based on staffing levels.
+     - In the modal, these can be displayed as **read-only derived fields** next to the corresponding “Days” fields (e.g. “Fabrication: 3 days (24 man-hours)”).
+
+  --------------------------------------------------
+  2. Layout requirements for the Pump Details modal
+  --------------------------------------------------
+
+  The modal should have two main sections:
+
+  A) **Main / Frequently Edited Section** (always visible)
+     This should include:
+     - Core Identity (except ID can be shown in a less prominent way)
+     - Stage
+     - Priority
+     - Customer
+     - Model
+     - Scheduled Start / End
+     - Powder Color
+     - Any high-visibility fields the user interacts with often
+
+  B) **Sensitive / Rarely Changed Section** (collapsible)
+     - This is a special area for fields that *should not normally be edited*:
+       - Value
+       - Engine Model
+       - Gearbox Model
+       - Control Panel
+       - Description
+       - Total Lead Days
+       - Department-specific Days (Fabrication/Powder/Assembly/Testing)
+       - Derived man-hour info (read-only, but grouped here for context)
+     - This section should:
+       - Be collapsed by default.
+       - Have a label that clearly implies these fields shouldn’t be changed except under special conditions.
+         - For example: “Advanced / Rarely Changed Fields – Edit With Caution”.
+       - Be toggled open/closed via a clickable title row and/or an adjacent “+” / “chevron” icon.
+
+  --------------------------------------------------
+  3. Edit behavior
+  --------------------------------------------------
+
+  - The modal should have a clear **“Edit” button**.
+  - Default state: fields are **read-only**.
+  - When the user clicks **Edit**:
+    - All fields become editable:
+      - Both the main section and the advanced/sensitive section.
+    - The Edit button can change to “Save” + “Cancel” or similar, following existing PumpTracker UX patterns.
+    - Derived man-hours should remain **computed**, not directly editable, but should update if underlying days change.
+
+  - For the sensitive/advanced section:
+    - When entering Edit mode, it’s OK to show a small warning near that section such as:
+      - “Changes in this section can affect scheduling and capacity calculations. Only modify under special circumstances.”
+    - The fields themselves become editable once in Edit mode.
+
+  - When saving:
+    - Persist the updated pump data via the existing state management and persistence flow (Zustand + local/supabase adapter).
+    - Ensure any dependent calculations (e.g., total lead days, derived man-hours) are recomputed or rederived correctly.
+
+  --------------------------------------------------
+  4. Implementation details and constraints
+  --------------------------------------------------
+
+  - Reuse the **existing Pump Details modal component**; extend it rather than replacing it.
+  - Keep the UI consistent with current styling:
+    - Use existing `Button`, `Input`, `Card`, etc.
+    - Use Tailwind utility classes already in the project.
+  - Add any missing types for the new fields in the appropriate `types.ts` or model definition if needed.
+  - Ensure the modal can be opened from existing entry points (e.g., clicking a pump card) and that it uses the current selected pump from the store.
+
+  --------------------------------------------------
+  5. Output expectations
+  --------------------------------------------------
+
+  In your work on this task, please:
+
+  1. Identify the Pump Details modal component and the state it pulls from.
+  2. Update the modal to:
+     - Show all fields listed above.
+     - Introduce the collapsible “Advanced / Rarely Changed Fields” section.
+     - Add Edit mode that toggles between read-only and editable for all fields.
+  3. Make sure derived man-hours are displayed in a user-friendly way next to the department days.
+  4. Summarize:
+     - Files changed,
+     - New props or state you introduced,
+     - Any TODOs or follow-up items (if something is partially implemented).
+
+  Keep the implementation **simple, explicit, and easy to debug**. No unnecessary abstractions.

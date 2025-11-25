@@ -96,7 +96,9 @@ export function parseFile(file: File): Promise<{ pumps: Pump[], invalidRows: Raw
           }, { pumps: [] as Pump[], invalidRows: [] as RawPumpRow[] });
           resolve({ pumps, invalidRows });
         } catch (error) {
+          console.error("JSON parsing error:", error);
           reject(new Error("Failed to parse JSON file."));
+
         }
       };
       reader.onerror = reject;

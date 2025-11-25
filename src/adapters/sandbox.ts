@@ -1,17 +1,17 @@
-import { DataAdapter, Pump } from "../types";
+import { DataAdapter } from "../types";
 
 export const SandboxAdapter: DataAdapter = {
     load: async () => {
         // Sandbox should not load data, but if called, return empty or throw
         return [];
     },
-    replaceAll: async (_rows: Pump[]) => {
+    replaceAll: async () => {
         // No-op
     },
-    upsertMany: async (_rows: Pump[]) => {
+    upsertMany: async () => {
         // No-op
     },
-    update: async (_id: string, _patch: Partial<Pump>) => {
+    update: async () => {
         // No-op
     },
 };

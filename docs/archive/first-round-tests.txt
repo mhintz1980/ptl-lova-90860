@@ -1,0 +1,499 @@
+# dashboard-e2e-flow.md
+
+## Prompt: Dashboard E2E flow using Antigravity browser
+
+You are a primary Agent running inside **Google Antigravity**, powered by **Gemini 3 Pro**.
+
+Antigravity gives you:
+- Full access to the **Editor** (codebase).
+- Controlled access to the **Terminal** (to run dev commands).
+- A **Browser Agent / Computer Use sub-agent** that can:
+  - Launch the Antigravity browser (Chrome-based).
+  - Click, scroll, type, select, and interact with the DOM.
+  - Read pages via DOM capture / screenshots.
+  - Record **videos** and generate **Artifacts** documenting what happened in the browser.
+
+Your task:
+Create and run an **end-to-end test** that validates the real user workflow on the **Dashboard page** of my PumpTracker app, using the built-in browser tools. You must:
+- Plan → implement → run tests.
+- Verify both **program logic** and **actual user-visible behavior**.
+- Produce **Artifacts** including at least:
+  - A clear task/implementation plan.
+  - Test result summary.
+  - A **browser recording** of a successful run of the flow.
+
+---
+
+## App behavior to validate on the Dashboard
+
+Assumptions about the Dashboard page:
+
+- It displays one or more **charts** related to pump production/scheduling.
+- Charts can be **scrolled / cycled** by **category** (e.g., via buttons, tabs, or a category selector).
+- Each chart:
+  - **Animates** when it appears or when the category changes.
+  - Has a way to **“Add to favorites”** (e.g., a star, toggle, or button).
+  - Supports a **“drill-down”** interaction:
+    - When a user clicks a portion of the chart (bar/slice/segment),
+      a **new chart** appears showing a deeper breakdown of that portion.
+
+If any of these assumptions are wrong, treat that as a discovery step:
+- Inspect the code and UI to determine the real controls and behavior.
+- Adapt the tests to the actual implementation, but keep the spirit:
+  - category cycling,
+  - favorites,
+  - drill-down into a portion of a parent chart.
+
+---
+
+## What you must do
+
+### 1. Understand the project + dev command
+
+1. Inspect the repository to determine:
+   - The **framework** (e.g., React/Next/Vite).
+   - The existing **test infrastructure** (Playwright / Cypress / Vitest / Jest, etc.).
+   - The correct command to run the dev server (e.g., `npm run dev`, `pnpm dev`, `yarn dev`).
+
+2. Choose the appropriate dev command and:
+   - Use the **Terminal tool** to start the dev server.
+   - Wait until the localhost app is ready (e.g., port 3000 or whatever is configured).
+
+### 2. Launch the app in the Antigravity browser
+
+1. Use the **Browser Agent / Computer Use** tools to:
+   - Open the local URL (e.g., `http://localhost:3000`).
+   - Navigate to the **Dashboard** page the same way a user would:
+     - Click sidebar/nav links, menu items, or dashboard icons.
+2. Confirm that:
+   - The initial Dashboard view has at least one chart rendered.
+   - The page is fully loaded (no spinners / loaders blocking the view).
+
+Record this as an **Artifact**:
+- A short description of how you navigated to the Dashboard.
+- A screenshot or short video of the initial Dashboard state.
+
+### 3. Test category scrolling / cycling behavior
+
+Using **browser control**, perform a user-like series of actions:
+
+1. Identify the UI that changes chart categories (buttons, tabs, dropdown, etc.).
+2. Verify initial state:
+   - Capture the **current category label** and a snapshot of the chart (e.g., legend labels, series names).
+3. Change category:
+   - Click the control to move to the “next” category.
+4. Assert visually and programmatically:
+   - The category label changes.
+   - The chart content changes:
+     - Different data labels / series / values, not just a re-render of identical data.
+   - The chart shows **animation behavior**:
+     - Detect via DOM class changes, CSS transitions, or SVG updates over time.
+5. Switch back to the original category:
+   - Confirm that the chart returns to the original series/labels.
+
+In your test code:
+- Add assertions that the DOM changes in a way consistent with category changes.
+- Optionally validate specific series names or data points if available from the DOM.
+
+### 4. Test “Add to favorites”
+
+1. On a visible chart:
+   - Locate the **“Add to favorites”** control (star, button, etc.).
+2. Click to add the chart to favorites.
+3. Validate:
+   - The favorite icon/state visually toggles (e.g., highlighted star).
+   - The chart appears somewhere in a **“favorites”** area / list / tab.
+4. Reload or navigate away and back to the Dashboard (if favorites are meant to persist):
+   - Confirm that the favorite state persists (or validate the intended behavior if persistence is not implemented).
+
+Add E2E assertions:
+- Existence of the favorite in the favorites list.
+- Correct state of the favorite toggle after the action.
+
+### 5. Test “drill-down” interaction
+
+1. On a “parent” chart:
+   - Identify a clickable region representing a specific segment (bar/slice/segment).
+   - Use the Browser Agent to click that region.
+2. Confirm that a **drill-down chart** appears:
+   - A new chart, expanded view, or modal that shows a breakdown of the parent segment.
+   - The title or labels clearly reference the segment clicked (e.g., “Details for [Category X]”).
+3. Validate data relationships:
+   - The drill-down data is consistent with the parent segment (e.g., sums or subsets).
+4. If there is a **Back / Up one level** action:
+   - Click it.
+   - Confirm that the original parent chart and state are restored.
+
+Add matching Playwright-style assertions to ensure:
+- Drill-down is triggered on click.
+- New chart container is rendered and visible.
+- Back/up action correctly restores the original chart.
+
+### 6. Implement the tests in code
+
+1. Use the existing or most natural **E2E framework**:
+   - Prefer **Playwright** if it is already in use or easy to adopt.
+2. Add a new E2E test file such as:
+   - `tests/e2e/dashboard.e2e.spec.ts`
+3. Implement tests for:
+   - Category cycling.
+   - Add to favorites.
+   - Drill-down and back.
+
+Include clear comments above each test:
+- What user story it represents.
+- What is being asserted in both UI and logic.
+
+### 7. Run tests and produce Artifacts
+
+1. From the Terminal, run the E2E tests (e.g., `npx playwright test tests/e2e/dashboard.e2e.spec.ts` or project’s test command).
+2. Ensure the Browser Agent interaction is captured:
+   - Generate a **video Artifact** of a successful end-to-end run.
+   - Include logs and screenshots where appropriate.
+
+In your final response, provide:
+
+- The **exact test file contents** you created.
+- The **command** to run the Dashboard E2E tests.
+- A concise summary:
+  - Which checks passed.
+  - Any flaky elements or missing features discovered.
+- Links or references to the generated **Artifacts** (task plan, test log, and browser recording) so I can review them in Antigravity.
+
+If any of the expected behaviors are missing or incorrect:
+- Explain what’s wrong.
+- Propose minimal code changes to the app to implement the intended behavior.
+- Offer (but do not auto-apply) these changes for my confirmation.
+```
+```
+
+```markdown
+# settings-and-scheduling-man-hours.md
+
+## Prompt: Settings modal man-hours + scheduling capacity tests
+
+You are an Agent running inside **Google Antigravity** with:
+- Access to the PumpTracker codebase (Editor).
+- Terminal control to run dev server and tests.
+- A Browser/Computer Use sub-agent to drive the UI in the Antigravity browser.
+- The ability to produce **Artifacts** (plans, logs, browser recordings).
+
+Your goal:
+1. Ensure the **Settings** modal correctly shows **employee count and derived man-hours per department**.
+2. Ensure **Scheduling/Calendar** logic properly respects **daily man-hour capacity** for the **Fabrication** department (no impossible “everything finishes in a single day” situations).
+
+You must:
+- Create **automated tests** for both UI and scheduling logic.
+- Use the browser to reproduce the real user behavior.
+- Run the tests and summarize results, along with Artifacts.
+
+---
+
+## Business rules to enforce
+
+### Settings modal
+
+- For each department (e.g., **Fabrication**), the Settings UI must show:
+  - A field for **number of employees**.
+  - A field **directly beside it** showing the department’s **daily man-hours**.
+- Man-hours should be derived from:
+  - `number_of_employees × hours_per_shift_per_day`
+  - If there is a configurable workday length (e.g., 8 hours/day), use that from the code/config.
+  - If not clearly defined, treat that as a bug and propose adding an explicit setting.
+
+### Scheduling / Calendar
+
+- The **man-hours value** is the true **daily capacity** per department.
+- For the **Fabrication** department:
+  - A pump’s Fabrication stage requires a certain number of hours to complete.
+  - If **4 jobs** are scheduled to **start Fabrication on Monday the 24th**, but their combined Fabrication hours **exceed the daily Fabrication capacity**, they must not all start **and finish** Fabrication on that same day.
+  - At least some jobs’ Fabrication stages must spill over into subsequent days.
+
+Currently observed bug:
+- When 4 jobs are dropped on Monday the 24th in Fabrication, they all appear to **complete** Fabrication on that same day, even though this should be impossible given realistic build times.
+
+---
+
+## What you must do
+
+### 1. Inspect and understand configuration
+
+1. Find the code/config where:
+   - Departments are defined.
+   - Employee counts and capacities are stored.
+   - Any existing notion of **hours per day** or **man-hours** is defined.
+
+2. Determine:
+   - How man-hours are currently computed (if at all).
+   - How department capacity is being used in scheduling logic.
+
+If man-hours field does not exist in the Settings UI:
+- Treat this as a missing feature that needs to be implemented.
+- Your tests should **fail** initially, then you propose the minimal changes to add it.
+
+### 2. Start dev server and open Settings
+
+1. Use the Terminal to run the dev command (e.g., `npm run dev`).
+2. Use the Browser Agent to:
+   - Open the local app URL.
+   - Navigate through the real UI to the **Settings** modal/page where departments are configured.
+
+### 3. Test: Settings modal shows employees and man-hours
+
+Create an automated test (e.g., Playwright) that:
+
+1. Navigates to the Settings view as a user (clicking the appropriate buttons/links).
+2. Locates the row/section for **Fabrication**.
+3. Asserts:
+   - There is a visible field (or text) for **number of employees**.
+   - Directly to its side, there is a visible field for **man-hours**.
+4. Calculates the **expected** man-hours based on the codebase rules:
+   - Use real config where available.
+   - If needed, infer `hours_per_day` from constants or settings.
+5. Asserts that the displayed **man-hours** matches the expected value.
+
+If these fields or relationships do not exist:
+- Fail the test.
+- Propose the minimal code changes to:
+  - Introduce the man-hours field in the UI.
+  - Wire it to the real scheduling capacity logic.
+
+### 4. Test: Scheduling respects Fabrication man-hours capacity
+
+Create another test for the **Scheduling/Calendar** view:
+
+1. Use the Browser Agent to:
+   - Navigate to the **Scheduling/Calendar** page via user interactions.
+2. Set up or load a scenario where:
+   - **4 jobs** are scheduled to start their **Fabrication** stage on **Monday the 24th**.
+   - Each job has a known Fabrication hour requirement from configuration or code.
+
+3. In the test:
+   - Compute the **total required Fabrication hours** for the 4 jobs.
+   - Read the **daily Fabrication man-hours capacity** from the Settings or underlying config.
+4. Assertions:
+   - If `total_required_hours_for_4_jobs > daily_fab_man_hours`:
+     - Then in the Calendar UI, the Fabrication stage bars **must not all fit in a single day**.
+     - At least one job’s Fabrication bar must extend beyond Monday the 24th.
+   - Check the DOM for each job’s Fabrication bar:
+     - Read its start date and end date (or number of day cells it covers).
+     - Verify that durations reflect capacity, not just naive “one-day per stage” behavior.
+
+If the Calendar shows all 4 jobs starting and finishing Fabrication on Monday the 24th:
+- Fail the test.
+- Locate the scheduling logic and identify where:
+  - The wrong capacity value is used (e.g., employee count, or a flat constant).
+  - Man-hours are not being applied.
+- Propose precise code changes:
+  - Use man-hours per day as the limiting factor.
+  - Recompute stage durations based on required hours vs. daily capacity.
+
+### 5. Implement and organize tests
+
+1. Add a test file such as:
+   - `tests/e2e/settings-and-scheduling.e2e.spec.ts`
+2. Within that file:
+   - Group tests logically:
+     - `describe("Settings modal - man-hours")`
+     - `describe("Scheduling - Fabrication capacity")`
+   - Use clear, stable selectors:
+     - Prefer `data-testid` attributes where possible.
+
+### 6. Run tests and produce Artifacts
+
+1. Run the E2E tests from the Terminal in Antigravity.
+2. Use Antigravity’s Artifact system to:
+   - Capture a **Task Plan** describing how you verified these rules.
+   - Capture test logs and, ideally, a **browser recording** demonstrating:
+     - Navigating to Settings.
+     - Seeing the employees + man-hours fields.
+     - Scheduling jobs and observing Fabrication timeline behavior.
+
+In your final response:
+
+- Provide the full content of the new test file.
+- Provide the exact CLI command(s) to re-run only these tests.
+- Summarize:
+  - Whether the UI and logic currently meet the business rules.
+  - Any fixes you recommend (with minimal-change diffs if possible).
+- Reference the Artifacts (test run, browser recording) so I can inspect them in Antigravity.
+```
+```
+
+```markdown
+# dashboard-departments-and-powdercoat-swimlane.md
+
+## Prompt: Dashboard departments + Powder Coat swimlane tests
+
+You are an Agent in **Google Antigravity** with:
+- Editor access to the PumpTracker repo.
+- Terminal access to run dev server and tests.
+- A Browser/Computer Use sub-agent for full DOM-level control and page recordings.
+- Ability to produce **Artifacts** (plans, logs, screenshots, browser recordings).
+
+Your goals on the Dashboard and Kanban views:
+
+1. Ensure the **Dashboard Tree Map** only shows valid, human-readable department names.
+2. Ensure the **Powder Coat** swimlane is correctly split into **three vendor sections**, each with a capacity of **3 pumps per week**, and that the old single-lane capacity of 7 is no longer the active constraint.
+
+You must:
+- Reproduce the current behavior via the browser.
+- Implement **automated E2E tests** validating both the display and capacity rules.
+- Run tests and generate Artifacts summarizing what you did.
+
+---
+
+## Business rules to enforce
+
+### Tree Map – department labels
+
+- Departments should appear with **real names**, e.g.:
+  - Fabrication
+  - Powder Coat
+  - Assembly
+  - Testing & Shipping
+  - Other legitimate domains as configured.
+
+- The Dashboard **Tree Map** must **not** show raw internal IDs such as:
+  - `ioyX0SJKlnG86IKFYQSRU4`
+  - `jHfdlieALTpOHzYF3zz0k`
+- These ID-like strings are either:
+  - database keys,
+  - random UUID-style identifiers,
+  - or placeholders,
+  and should not be user-facing.
+
+### Powder Coat swimlane (Kanban / board view)
+
+- The **Powder Coat** lane should be divided into **three horizontal sub-lanes**, representing three powder-coat vendors.
+- Each vendor section has a capacity of **3 pumps per week**.
+- Visually:
+  - The Powder Coat lane should show three distinct vendor sections (e.g., horizontal bands, labeled sublanes, etc.).
+- Capacity logic:
+  - The relevant data model / scheduling logic should treat each sub-lane as having a 3-pump/week capacity.
+  - The old single Powder Coat capacity of 7 should no longer be the main constraint.
+
+---
+
+## What you must do
+
+### 1. Inspect department data and mappings
+
+1. Use the Editor to find:
+   - The structure that defines departments and their IDs.
+   - The logic that feeds data to the Dashboard Tree Map.
+2. Identify:
+   - How labels are chosen for display.
+   - Where the raw IDs (like `ioyX0SJKlnG86IKFYQSRU4`) are coming from.
+
+You will then encode those expectations into tests and fix any mapping issues.
+
+### 2. Start dev server and open Dashboard
+
+1. Use Terminal:
+   - Run the dev server (e.g., `npm run dev`).
+2. Use the Browser Agent:
+   - Open the local app URL.
+   - Navigate via real clicks to the **Dashboard** view that contains the Tree Map.
+
+### 3. Test: Tree Map department labels are valid
+
+Create an E2E test that:
+
+1. Navigates to the Dashboard page.
+2. Locates the Tree Map component in the DOM.
+3. Extracts all visible department labels from the Tree Map.
+4. Asserts the following:
+   - **No label** equals:
+     - `ioyX0SJKlnG86IKFYQSRU4`
+     - `jHfdlieALTpOHzYF3zz0k`
+   - All labels are:
+     - Non-empty strings.
+     - User-friendly (e.g., not looking like random 20+ character IDs).
+5. If any ID-like labels are present:
+   - Fail the test.
+   - Trace the data flow (e.g., from department ID to label).
+   - Propose a fix:
+     - Map IDs to proper display names before passing them to the Tree Map.
+   - Optionally, implement the fix (after you show the code change) and re-run the test.
+
+### 4. Navigate to the board / Kanban view with swimlanes
+
+1. Use the Browser Agent to open the view that renders departments as swimlanes (Kanban board).
+2. Confirm that **Powder Coat** appears as one of the lanes.
+
+### 5. Test: Powder Coat swimlane structure
+
+In your E2E test:
+
+1. Identify the **Powder Coat** lane container.
+2. Inside that container, find its sub-lanes / vendor sections.
+3. Assert:
+   - There are **exactly three** vendor sub-lanes.
+   - Each sub-lane is visually separated (horizontal split) and/or individually labeled.
+4. If the UI does not show three sub-lanes:
+   - Fail the test.
+   - Inspect the board configuration to see if the three vendors were added.
+   - Propose minimal code changes to:
+     - Define three Powder Coat vendor sub-lanes.
+     - Render them distinctly in the UI.
+
+### 6. Test: Powder Coat capacity logic (3 pumps/week per vendor)
+
+1. Determine, from code or config:
+   - The capacity assignment for each Powder Coat sub-lane.
+   - Confirm that each is intended to hold **3 pumps per week**.
+
+2. In your E2E test:
+   - Place pumps/cards into a single Powder Coat vendor sub-lane using UI interactions (drag-and-drop, add buttons, etc.).
+   - Try to exceed **3 pumps** for that vendor in a single week.
+
+3. Assertions:
+   - The system should either:
+     - Prevent adding more than 3 pumps to that vendor/week, or
+     - Clearly signal over-capacity (e.g., visual warning, count highlight, error message).
+   - The old total capacity of **7** for Powder Coat should not be the controlling limit anymore:
+     - Adding pumps should respect the 3-per-vendor rule instead.
+
+If you observe that:
+- There is still a single lane with capacity 7, or
+- The capacity rules ignore the 3-pumps-per-vendor design,
+
+then:
+- Fail the test.
+- Identify where the capacity is defined and still using the old value.
+- Propose and/or implement a code change to:
+  - Replace the single 7-capacity with per-vendor 3-capacity.
+  - Update any capacity calculations used in scheduling or UI.
+
+### 7. Implement and organize tests
+
+1. Add a dedicated test file, e.g.:
+   - `tests/e2e/dashboard-departments-and-powdercoat.e2e.spec.ts`
+2. Inside:
+   - Group tests logically:
+     - `describe("Dashboard Tree Map department labels")`
+     - `describe("Powder Coat swimlane structure and capacity")`
+   - Use stable selectors:
+     - `data-testid="tree-map-department-label"`
+     - `data-testid="swimlane-powdercoat"`
+     - `data-testid="swimlane-vendor"` (or similar).
+
+### 8. Run tests and generate Artifacts
+
+1. Run the E2E test suite from the Terminal.
+2. Use Antigravity’s Artifact system to generate:
+   - A Task/Implementation plan summarizing how you validated department labels and Powder Coat swimlanes.
+   - Logs of the test runs.
+   - A browser recording showing:
+     - The incorrect behavior (if present).
+     - The corrected behavior after fixes (if you apply them).
+
+In your final response:
+
+- Provide the full E2E test file.
+- Provide the commands to re-run just this test suite.
+- Summarize:
+  - Whether any invalid department labels appeared.
+  - Whether Powder Coat is correctly split and capacity-enforced.
+- Outline the minimal code changes you recommend if the current implementation does not match the rules.

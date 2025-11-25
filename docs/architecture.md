@@ -1,3 +1,27 @@
+---
+title: "PumpTracker Lite – Architecture Overview"
+doc_type: "architecture_spec"
+app_name: "PumpTracker Lite"
+version: "1.0"
+status: "active"
+area: ["dashboard", "kanban", "scheduling", "state"]
+related_docs:
+  - "Project Documentation Index"
+  - "Development Guide"
+  - "Testing Guide"
+  - "PumpTracker Lite – Deployment Guide"
+  - "Brownfield PRD – PumpTracker"
+  - "PumpTracker Lite – V2 Architecture"
+summary: >
+  High-level map of UI surfaces (Dashboard, Kanban, Scheduling), shared chart engine,
+  Zustand store responsibilities, seed data, and file organization for PumpTracker Lite.
+primary_entities:
+  - "Pump"
+  - "Stage"
+  - "Dashboard Topic"
+  - "Zustand Store"
+---
+
 # Architecture Overview
 
 ## Client Surfaces
@@ -43,7 +67,7 @@
 
 ## File Organization Cheatsheet
 
-```
+```text
 src/
 ├── adapters/         # Local + Supabase persistence
 ├── components/

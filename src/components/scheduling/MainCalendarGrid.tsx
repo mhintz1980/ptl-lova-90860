@@ -1,16 +1,16 @@
 // src/components/scheduling/MainCalendarGrid.tsx
 import { useMemo } from "react";
 import { useDroppable } from "@dnd-kit/core";
-import { addDays, differenceInCalendarDays, format, isValid, parse, startOfDay, startOfWeek } from "date-fns";
+import { addDays, differenceInCalendarDays, format, startOfDay, startOfWeek } from "date-fns";
 import { cn } from "../../lib/utils";
 import type { Pump, Stage } from "../../types";
 import { CalendarEvent } from "./CalendarEvent";
 import {
-  buildStageTimeline,
   type CalendarStageEvent,
   type StageBlock,
 } from "../../lib/schedule";
 import { useApp } from "../../store";
+import { buildCapacityAwareTimelines } from "../../lib/schedule-helper";
 
 interface MainCalendarGridProps {
   pumps: Pump[];
@@ -78,36 +78,19 @@ export function MainCalendarGrid({
   const stageFilter = useMemo(() => new Set(visibleStages ?? []), [visibleStages]);
 
   const pumpTimelines = useMemo(() => {
+    const { capacityConfig } = useApp.getState();
+
+    // Use the new capacity-aware builder
+    const timelinesMap = buildCapacityAwareTimelines(pumps, capacityConfig, getModelLeadTimes);
+
     return pumps
       .map((pump) => {
-        if (!pump.scheduledStart) {
-          return null;
-        }
-
-        const parsedStart = pump.scheduledStart.includes("T")
-          ? new Date(pump.scheduledStart)
-          : parse(pump.scheduledStart, "yyyy-MM-dd", new Date());
-        if (!isValid(parsedStart)) {
-          return null;
-        }
-
-        const leadTimes = getModelLeadTimes(pump.model);
-        if (!leadTimes) {
-          return null;
-        }
-
-        const timeline = buildStageTimeline(pump, leadTimes, {
-          startDate: startOfDay(parsedStart),
-        });
-
-        if (!timeline.length) {
-          return null;
-        }
-
+        const timeline = timelinesMap[pump.id];
+        if (!timeline || !timeline.length) return null;
         return { pump, timeline };
       })
       .filter((entry): entry is { pump: typeof pumps[number]; timeline: StageBlock[] } => Boolean(entry));
-  }, [pumps, getModelLeadTimes, stageFilter]);
+  }, [pumps, getModelLeadTimes]);
 
   const DroppableCell = ({ date }: { date: Date }) => {
     const dateId = format(date, "yyyy-MM-dd");
@@ -123,7 +106,7 @@ export function MainCalendarGrid({
         className={cn(
           "calendar-cell border-r border-border/40 transition-all duration-150",
           isWeekend && "calendar-weekend",
-          isOver && "bg-primary/20 shadow-inner shadow-[0_0_15px_rgba(37,99,235,0.35)]"
+          isOver && "bg-primary/20 shadow-[0_0_15px_rgba(37,99,235,0.35)]"
         )}
         style={{ minHeight: 24 }}
         data-testid={`calendar-cell-${dateId}`}

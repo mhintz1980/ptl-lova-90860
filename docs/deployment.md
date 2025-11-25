@@ -1,3 +1,24 @@
+---
+title: "PumpTracker Lite – Deployment Guide"
+doc_type: "deployment_guide"
+app_name: "PumpTracker Lite"
+version: "1.0"
+status: "active"
+targets:
+  - "Vercel"
+  - "Netlify"
+  - "AWS S3 + CloudFront"
+  - "Docker"
+  - "Traditional Web Server"
+related_docs:
+  - "Architecture Overview"
+  - "Development Guide"
+  - "Testing Guide"
+summary: >
+  Step-by-step instructions to build and deploy PumpTracker Lite to common hosting
+  environments, with environment variables, SPA routing notes, and rollback patterns.
+---
+
 # PumpTracker Lite - Deployment Guide
 
 This guide covers deploying PumpTracker Lite to various hosting platforms.

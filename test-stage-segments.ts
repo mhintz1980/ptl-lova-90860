@@ -1,5 +1,21 @@
 // Test script to verify getStageSegments selector
+// Mock localStorage
+if (typeof localStorage === 'undefined') {
+  interface GlobalWithLocalStorage {
+    localStorage: Storage;
+  }
+  (global as unknown as GlobalWithLocalStorage).localStorage = {
+    getItem: () => null,
+    setItem: () => { },
+    removeItem: () => { },
+    clear: () => { },
+    length: 0,
+    key: () => null,
+  };
+}
+
 import { useApp } from './src/store';
+import { StageBlock } from './src/lib/schedule';
 
 // Mock pump data for testing
 const mockPump = {
@@ -32,7 +48,7 @@ function testStageSegments() {
 
   if (segments) {
     console.log(`Found ${segments.length} stage segments:`);
-    segments.forEach((segment, index) => {
+    segments.forEach((segment: StageBlock, index) => {
       console.log(`  ${index + 1}. ${segment.stage}: ${segment.start.toISOString()} to ${segment.end.toISOString()} (${segment.days} days)`);
     });
   } else {

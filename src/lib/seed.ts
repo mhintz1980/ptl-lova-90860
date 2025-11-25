@@ -155,7 +155,7 @@ function generatePumpFromCatalog(
     // Determine current stage based on dates
     let currentStage: Stage = "QUEUE";
     let lastUpdate = poDate.toISOString();
-    let scheduledEnd = testingEnd.toISOString();
+    const scheduledEnd = testingEnd.toISOString();
 
     const nowTime = now.getTime();
     if (nowTime >= testingEnd.getTime()) {

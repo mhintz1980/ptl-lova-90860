@@ -2,7 +2,7 @@
 import React from "react";
 import { Pump } from "../../types";
 import { HoverAnimatedPieChart } from "../charts/HoverAnimatedPieChart";
-import { ChartProps } from "./dashboardConfig";
+import { ChartProps, DashboardFilters } from "./dashboardConfig";
 import { useApp } from "../../store";
 import { applyDashboardFilters } from "./utils";
 
@@ -10,7 +10,7 @@ interface ValueChartProps {
   pumps: Pump[];
   type: "customer" | "model";
   headless?: boolean;
-  onDrilldown?: (update: Partial<any>) => void;
+  onDrilldown?: (update: Partial<DashboardFilters>) => void;
 }
 
 const aggregatePoValue = (pumps: Pump[], type: 'customer' | 'model') => {

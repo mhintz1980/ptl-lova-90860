@@ -20,7 +20,7 @@ interface HoverAnimatedPieChartProps<T extends DataPoint> {
   title: string;
   subtitle?: string;
   headless?: boolean;
-  onDrilldown?: (key: string, value: any) => void;
+  onDrilldown?: (key: string, value: string | number) => void;
   valueFormatter?: (value: number, item?: T) => string;
   height?: number;
 }
@@ -187,17 +187,18 @@ export function HoverAnimatedPieChart<T extends DataPoint>({
                 cornerRadius: 999,
                 activeIndex: activeSlice,
                 activeShape: renderActiveShape,
-                onMouseEnter: (_: any, index: number) => setActiveSlice(index),
-                onClick: (data: any) => {
-                  if (onDrilldown && data && data[nameKey]) {
-                    onDrilldown(String(nameKey), data[nameKey]);
+                onMouseEnter: (_: unknown, index: number) => setActiveSlice(index),
+                onClick: (data: PieSectorDataItem) => {
+                  const payload = data.payload as T;
+                  if (onDrilldown && payload && payload[nameKey]) {
+                    onDrilldown(String(nameKey), payload[nameKey]);
                   }
                 }
               } satisfies PieProps & {
                 activeIndex: number;
                 activeShape: typeof renderActiveShape;
-                onMouseEnter: (_: any, index: number) => void;
-                onClick: (data: any) => void;
+                onMouseEnter: (_: unknown, index: number) => void;
+                onClick: (data: PieSectorDataItem) => void;
               })}
             >
               {data.map((item, index) => (
@@ -228,8 +229,11 @@ export function HoverAnimatedPieChart<T extends DataPoint>({
               onMouseEnter={() => setActiveSlice(index)}
               onFocus={() => setActiveSlice(index)}
               onClick={() => {
+                console.log('Legend item clicked:', nameKey, item[nameKey]);
                 if (onDrilldown) {
                   onDrilldown(String(nameKey), item[nameKey]);
+                } else {
+                  console.log('onDrilldown is missing');
                 }
               }}
               title={`${label} – ${valueFormatter(value, item)} (${percentage}%)`}

@@ -1,19 +1,15 @@
-import { test as base } from '@playwright/test';
+import { test as base, Page } from '@playwright/test';
 import { SchedulingPageHelper } from '../helpers/test-utils';
 
 // Define custom fixtures
-export type TestOptions = {
-  // Add any test-specific options here
-};
+export type TestOptions = Record<string, unknown>;
 
 // Extend the base test with custom fixtures
-export const test = base.extend<TestOptions & {
-  schedulingPage: SchedulingPageHelper;
-}>({
+export const test = base.extend<TestOptions & { schedulingPage: SchedulingPageHelper }>({
   // Custom fixture for scheduling page helper
-  schedulingPage: async ({ page }, use) => {
+  schedulingPage: async ({ page }: { page: Page }, helperUse: (helper: SchedulingPageHelper) => Promise<void>) => {
     const helper = new SchedulingPageHelper(page);
-    await use(helper);
+    await helperUse(helper);
   },
 });
 

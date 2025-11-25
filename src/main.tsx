@@ -14,8 +14,8 @@ function bootstrapTheme() {
     stored === "light" || stored === "dark"
       ? stored
       : prefersDark
-      ? "dark"
-      : "light";
+        ? "dark"
+        : "light";
 
   root.classList.remove("light", "dark");
   root.classList.add(mode);
@@ -24,7 +24,7 @@ function bootstrapTheme() {
 bootstrapTheme();
 
 if (import.meta.env.DEV || import.meta.env.VITE_E2E === "true") {
-  (window as any).useApp = useApp;
+  (window as unknown as { useApp: typeof useApp }).useApp = useApp;
 }
 
 createRoot(document.getElementById("root")!).render(

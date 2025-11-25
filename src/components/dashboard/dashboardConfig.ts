@@ -18,7 +18,9 @@ export type ChartId =
     | 'pumpsByModel'
     | 'reworkRate'
     | 'valueByCustomer'
-    | 'treemap';
+    | 'treemap'
+    | 'pumpTable'
+    | 'totalPoValue';
 
 // ---- Shared filters for drilldown ----
 export interface DashboardFilters {
@@ -41,6 +43,7 @@ export interface ChartConfig {
     description?: string;
     component: ComponentType<ChartProps>;
     defaultSize?: 'sm' | 'md' | 'lg';
+    drillDownSequence?: ChartId[];
 }
 
 export interface TopicConfig {

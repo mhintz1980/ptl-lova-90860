@@ -1,13 +1,19 @@
 // src/adapters/local.ts
 import { Pump, DataAdapter } from "../types";
 import { seed } from "../lib/seed";
+import { CONFIG } from "../config";
+import { getTestPumps } from "../data/test-dataset";
 
-const KEY = "pumptracker-data-v2-catalog";
+const KEY = CONFIG.USE_TEST_DATASET 
+  ? "pumptracker-data-v2-test-fixed-v2" 
+  : "pumptracker-data-v2-catalog";
 
 export const LocalAdapter: DataAdapter = {
   async load(): Promise<Pump[]> {
     const raw = localStorage.getItem(KEY);
-    return raw ? JSON.parse(raw) : seed();
+    if (raw) return JSON.parse(raw);
+    
+    return CONFIG.USE_TEST_DATASET ? getTestPumps() : seed();
   },
   async replaceAll(rows: Pump[]) {
     localStorage.setItem(KEY, JSON.stringify(rows));

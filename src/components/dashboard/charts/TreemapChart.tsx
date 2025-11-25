@@ -8,9 +8,54 @@ import { applyDashboardFilters } from '../utils';
 import { Pump } from '../../../types';
 import { Stage } from '../../../types';
 
+// ... (rest of imports and interfaces) ...
+
+interface TreemapNode {
+    name: string;
+    value: number;
+}
+
+const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: { payload: TreemapNode; value: number }[] }) => {
+    if (active && payload && payload.length) {
+        return (
+            <div className="bg-popover border border-border rounded-md shadow-lg p-2 text-sm">
+                <p className="font-semibold">{payload[0].payload.name}</p>
+                <p className="text-muted-foreground">Count: {payload[0].value}</p>
+            </div>
+        );
+    }
+    return null;
+};
+
+interface AnimatedTreemapContentProps {
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    index?: number;
+    name?: string;
+    value?: number;
+    colors?: string[];
+    payload?: TreemapNode;
+    onClick?: (node: TreemapNode) => void;
+}
+
 // Custom content component for the Treemap nodes
-const AnimatedTreemapContent = (props: any) => {
-    const { x, y, width, height, index, name, value, colors, payload } = props;
+const AnimatedTreemapContent = (props: AnimatedTreemapContentProps) => {
+    const { x, y, width, height, index, name, value, colors, payload, onClick } = props;
+
+    if (
+        x === undefined ||
+        y === undefined ||
+        width === undefined ||
+        height === undefined ||
+        index === undefined ||
+        !colors ||
+        !payload ||
+        !onClick
+    ) {
+        return null;
+    }
 
     return (
         <g>
@@ -36,7 +81,7 @@ const AnimatedTreemapContent = (props: any) => {
                     transformBox: 'fill-box',
                     transformOrigin: 'center',
                 }}
-                onClick={() => props.onClick(payload)}
+                onClick={() => onClick(payload)}
             />
             {width > 50 && height > 30 && (
                 <text
@@ -79,7 +124,7 @@ const COLORS = [
 ];
 
 export const TreemapChart: React.FC<ChartProps> = ({ filters, onDrilldown }) => {
-    const pumps = useApp((state: any) => state.pumps);
+    const pumps = useApp((state) => state.pumps);
     const filteredPumps = useMemo(() => applyDashboardFilters(pumps, filters), [pumps, filters]);
 
     // Group by Stage (or maybe Model if Stage is filtered?)
@@ -101,24 +146,12 @@ export const TreemapChart: React.FC<ChartProps> = ({ filters, onDrilldown }) => 
             .sort((a, b) => b.value - a.value);
     }, [filteredPumps, groupBy]);
 
-    const handleNodeClick = (node: any) => {
+    const handleNodeClick = (node: TreemapNode) => {
         if (groupBy === 'stage') {
             onDrilldown({ stage: node.name as Stage });
         } else {
             onDrilldown({ modelId: node.name });
         }
-    };
-
-    const CustomTooltip = ({ active, payload }: any) => {
-        if (active && payload && payload.length) {
-            return (
-                <div className="bg-popover border border-border rounded-md shadow-lg p-2 text-sm">
-                    <p className="font-semibold">{payload[0].payload.name}</p>
-                    <p className="text-muted-foreground">Count: {payload[0].value}</p>
-                </div>
-            );
-        }
-        return null;
     };
 
     return (

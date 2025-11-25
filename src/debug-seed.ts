@@ -1,6 +1,13 @@
 // Quick debug module to verify seed function
 import { seed } from "./lib/seed";
 
+// Extend Window interface to include our debug function
+declare global {
+  interface Window {
+    debugSeed: typeof debugSeed;
+  }
+}
+
 // Export a function to check seed data from browser console
 export function debugSeed() {
   console.log('🔍 PumpTracker Seed Debug');
@@ -24,9 +31,16 @@ export function debugSeed() {
 
       // Show BOM details if available
       if ('engine_model' in pump) {
-        console.log(`   Engine: ${(pump as any).engine_model}`);
-        console.log(`   Gearbox: ${(pump as any).gearbox_model}`);
-        console.log(`   Control Panel: ${(pump as any).control_panel_model}`);
+        const extendedPump = pump as typeof pumps[0] & {
+          engine_model?: string | null;
+          gearbox_model?: string | null;
+          control_panel_model?: string | null;
+          description?: string;
+          total_lead_days?: number;
+        };
+        console.log(`   Engine: ${extendedPump.engine_model}`);
+        console.log(`   Gearbox: ${extendedPump.gearbox_model}`);
+        console.log(`   Control Panel: ${extendedPump.control_panel_model}`);
       }
     });
 
@@ -49,6 +63,6 @@ export function debugSeed() {
 
 // Auto-run debug in development
 if (typeof window !== 'undefined') {
-  (window as any).debugSeed = debugSeed;
+  window.debugSeed = debugSeed;
   console.log('🔧 Debug function available: window.debugSeed()');
 }

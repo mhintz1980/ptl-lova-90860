@@ -1,3 +1,25 @@
+---
+title: "PumpTracker Lite – Testing Guide"
+doc_type: "testing_guide"
+app_name: "PumpTracker Lite"
+version: "1.0"
+status: "active"
+test_layers:
+  - "unit"
+  - "integration"
+  - "end_to_end"
+tools:
+  - "Vitest"
+  - "Playwright"
+related_docs:
+  - "Development Guide"
+  - "Architecture Overview"
+  - "PumpTracker Lite – Deployment Guide"
+summary: >
+  How to run and interpret unit, integration, and E2E tests for PumpTracker Lite,
+  including Playwright base URL overrides and checks for scheduling legend filters.
+---
+
 # Testing Guide
 
 ## Unit & Integration (Vitest)
