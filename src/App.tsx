@@ -1,33 +1,37 @@
 // src/App.tsx
-import { useEffect, useState, useMemo } from "react";
-import { useApp } from "./store";
-import { AddPoModal } from "./components/toolbar/AddPoModal";
-import { Dashboard } from "./pages/Dashboard";
-import { Kanban } from "./pages/Kanban";
-import { SchedulingView } from "./components/scheduling/SchedulingView";
-import { Toaster } from "sonner";
-import { Pump } from "./types";
-import { AppShell } from "./components/layout/AppShell";
-import type { AppView } from "./components/layout/navigation";
-import { applyFilters } from "./lib/utils";
-import { sortPumps } from "./lib/sort";
+import { useEffect, useState, useMemo } from 'react'
+import { useAxe } from '@axe-core/react'
+import { useApp } from './store'
+import { AddPoModal } from './components/toolbar/AddPoModal'
+import { Dashboard } from './pages/Dashboard'
+import { Kanban } from './pages/Kanban'
+import { SchedulingView } from './components/scheduling/SchedulingView'
+import { Toaster } from 'sonner'
+import { Pump } from './types'
+import { AppShell } from './components/layout/AppShell'
+import type { AppView } from './components/layout/navigation'
+import { applyFilters } from './lib/utils'
+import { sortPumps } from './lib/sort'
 // Debug import for development
-import "./debug-seed";
+import './debug-seed'
 
 function App() {
-  const { load, pumps, filters, sortField, sortDirection, loading } = useApp();
-  const [isAddPoModalOpen, setIsAddPoModalOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<AppView>("dashboard");
-  const [selectedPump, setSelectedPump] = useState<Pump | null>(null);
+  const { load, pumps, filters, sortField, sortDirection, loading } = useApp()
+  const [isAddPoModalOpen, setIsAddPoModalOpen] = useState(false)
+  const [currentView, setCurrentView] = useState<AppView>('dashboard')
+  const [selectedPump, setSelectedPump] = useState<Pump | null>(null)
+
+  // Accessibility testing
+  useAxe()
 
   useEffect(() => {
-    load();
-  }, [load]);
+    load()
+  }, [load])
 
   const filteredPumps = useMemo(() => {
-    const filtered = applyFilters(pumps, filters);
-    return sortPumps(filtered, sortField, sortDirection);
-  }, [pumps, filters, sortField, sortDirection]);
+    const filtered = applyFilters(pumps, filters)
+    return sortPumps(filtered, sortField, sortDirection)
+  }, [pumps, filters, sortField, sortDirection])
 
   return (
     <>
@@ -38,9 +42,9 @@ function App() {
         onOpenAddPo={() => setIsAddPoModalOpen(true)}
       >
         <div className="w-full px-6 py-6">
-          {currentView === "dashboard" ? (
+          {currentView === 'dashboard' ? (
             <Dashboard pumps={filteredPumps} onSelectPump={setSelectedPump} />
-          ) : currentView === "kanban" ? (
+          ) : currentView === 'kanban' ? (
             <Kanban pumps={filteredPumps} onSelectPump={setSelectedPump} />
           ) : loading ? (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
@@ -137,12 +141,12 @@ function App() {
                   </p>
                   <span
                     className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                      selectedPump.priority === "Urgent" ||
-                      selectedPump.priority === "Rush"
-                        ? "bg-red-500/15 text-red-400"
-                        : selectedPump.priority === "High"
-                        ? "bg-orange-500/15 text-orange-300"
-                        : "bg-muted text-muted-foreground"
+                      selectedPump.priority === 'Urgent' ||
+                      selectedPump.priority === 'Rush'
+                        ? 'bg-red-500/15 text-red-400'
+                        : selectedPump.priority === 'High'
+                        ? 'bg-orange-500/15 text-orange-300'
+                        : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {selectedPump.priority}
@@ -174,12 +178,12 @@ function App() {
                   </p>
                   <p className="font-medium text-foreground">
                     {new Date(selectedPump.scheduledEnd).toLocaleDateString(
-                      "en-US",
+                      'en-US',
                       {
-                        weekday: "short",
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
+                        weekday: 'short',
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
                       }
                     )}
                   </p>
@@ -192,14 +196,14 @@ function App() {
                 </p>
                 <p className="font-medium text-foreground">
                   {new Date(selectedPump.last_update).toLocaleDateString(
-                    "en-US",
+                    'en-US',
                     {
-                      weekday: "short",
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
+                      weekday: 'short',
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
                     }
                   )}
                 </p>
@@ -209,7 +213,7 @@ function App() {
         </div>
       )}
     </>
-  );
+  )
 }
 
-export default App;
+export default App
