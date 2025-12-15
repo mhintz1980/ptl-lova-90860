@@ -56,6 +56,41 @@ src/
 
 Use this map when adding a feature: extend the component surface, update the store (with selectors + actions), and wire any new styling tokens through `index.css`.
 
+### DDD Domain Layer (New)
+
+A clean domain layer was added following Domain-Driven Design principles:
+
+```
+src/
+├── domain/                    # Pure business logic (NO external imports)
+│   ├── shared/Entity.ts       # Base entity class
+│   ├── production/
+│   │   ├── entities/Pump.ts   # Pump aggregate root
+│   │   ├── value-objects/     # Stage, Priority
+│   │   ├── events/            # PumpCreated, PumpStageMoved, etc.
+│   │   └── repository.ts      # IPumpRepository interface
+│   └── sales/
+│       ├── entities/          # PurchaseOrder, LineItem
+│       └── repository.ts      # IOrderRepository interface
+├── application/               # Use case orchestration
+│   ├── commands/              # Command definitions
+│   └── handlers/              # Command handlers
+├── infrastructure/            # External concerns
+│   ├── eventBus/              # Domain event pub/sub
+│   └── persistence/           # Repository implementations
+│       ├── adapters/          # DataAdapter interface + impls
+│       └── repositories/      # PumpRepository, OrderRepository
+└── presentation/
+    └── hooks/usePumpCommands.ts  # React hook for domain operations
+```
+
+**Key Invariants Enforced**:
+- Stage transitions must be sequential (QUEUE → FABRICATION → POWDER_COAT → ...)
+- CLOSED is a terminal stage (no transitions allowed)
+- Serial numbers are immutable after creation
+
+**Feature Flag**: Set `USE_NEW_DOMAIN=true` in `usePumpCommands.ts` to activate.
+
 ## Building and Running
 
 ### Prerequisites
