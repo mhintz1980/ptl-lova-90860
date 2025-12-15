@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ddd"
+version = "1.0.0"
+description = "Document-Driven Development workflow collection for Amplifier"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [
+    {name = "Brian Krabach", email = "robotdad@users.noreply.github.com"}
+]
+
+[project.urls]
+repository = "https://github.com/robotdad/amplifier-collection-ddd"
+documentation = "https://github.com/robotdad/amplifier-collection-ddd#readme"
+
+[tool.setuptools]
+packages = {find = {}}
+
+[tool.setuptools.package-data]
+"*" = ["*.md", "*.toml"]
+
+[tool.amplifier.collection]
+author = "robotdad"
+capabilities = [
+    "Document-first development workflow for existing codebases",
+    "Context poisoning prevention via systematic file processing",
+    "Retcon writing for perfect docs-code synchronization",
+    "Philosophy-aligned development (Ruthless Simplicity + Modular Design)",
+    "Systematic multi-file processing with file crawling technique"
+]
+
+[tool.amplifier.collection.requires]
+foundation = "^1.0.0"

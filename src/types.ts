@@ -112,7 +112,6 @@ export interface Milestone {
   department: Stage;
   deadline: string; // ISO
   createdAt: string; // ISO
-  org_id?: string;
 }
 
 export interface MicroTask {

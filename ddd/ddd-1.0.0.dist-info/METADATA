@@ -1,0 +1,374 @@
+Metadata-Version: 2.4
+Name: ddd
+Version: 1.0.0
+Summary: Document-Driven Development workflow collection for Amplifier
+Author-email: Brian Krabach <robotdad@users.noreply.github.com>
+License-Expression: MIT
+Project-URL: repository, https://github.com/robotdad/amplifier-collection-ddd
+Project-URL: documentation, https://github.com/robotdad/amplifier-collection-ddd#readme
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Dynamic: license-file
+
+# Document-Driven Development Collection
+
+> Systematic documentation-first development for existing codebases with AI assistance
+
+---
+
+## What This Provides
+
+The **DDD Collection** equips Amplifier with a proven methodology for evolving existing codebases where documentation leads and code follows:
+
+**Package Structure**: The `ddd/` directory contains Python package metadata for pip installation. Collection content (agents, profiles, context) is in the root-level directories.
+
+- **5 specialized workflow agents** - Each expert in a DDD phase
+- **2 mode-specific profiles** - Documentation mode and implementation mode
+- **Core DDD techniques** - File crawling, retcon writing, context poisoning prevention
+- **Philosophy integration** - Ruthless Simplicity + Modular Design enforcement
+
+### The Core Principle
+
+**"Documentation IS the specification. Code implements what documentation describes."**
+
+Traditional: Code → Docs (drift inevitable)
+DDD: **Docs → Approval → Code** (perfect sync by design)
+
+---
+
+## Quick Start
+
+### Installation
+
+```bash
+# Install the collection (requires foundation collection)
+amplifier collection add git+https://github.com/robotdad/amplifier-collection-ddd@main
+
+# Verify installation
+amplifier collection show ddd
+```
+
+### Usage
+
+```bash
+# Documentation Phase (Planning, docs updates, approval)
+amplifier profile use ddd:documentation
+amplifier run "Plan authentication feature with JWT tokens"
+
+# The session has access to:
+# - planning-architect (problem framing, design, planning)
+# - documentation-retroner (systematic doc updates)
+
+# Implementation Phase (Code planning, implementation, testing, cleanup)
+amplifier profile use ddd:implementation
+amplifier run "Implement the authentication plan"
+
+# The session has access to:
+# - code-planner (gap analysis, implementation planning)
+# - implementation-verifier (code + testing)
+# - finalization-specialist (cleanup + finalization)
+```
+
+---
+
+## When to Use DDD
+
+### ✅ Use DDD For
+
+- **Feature additions to existing codebases** - Integrate with current architecture
+- **Refactoring existing systems** - Define target state in docs first
+- **Multi-file changes** - Systematic processing of 10+ files
+- **Cross-cutting concerns** - Changes touching many parts of system
+- **Documentation debt cleanup** - Bring docs current with code
+- **Architecture evolution** - Define new structure before refactoring
+
+### ❌ Don't Use DDD For
+
+- **Greenfield projects** - Use spec-kit collection instead
+- **Simple bug fixes** - Single file changes
+- **Trivial updates** - Typo fixes, version bumps
+- **Emergency hotfixes** - When speed > process
+
+---
+
+## Resources
+
+### Profiles
+
+- **documentation** - Active for planning, doc updates, approval (Phases 0-2)
+- **implementation** - Active for code planning, implementation, testing (Phases 3-6)
+
+### Agents (5 specialists)
+
+| Agent | Expertise | Phase |
+|-------|-----------|-------|
+| **planning-architect** | Problem framing, reconnaissance, design | Planning (0-1) |
+| **documentation-retroner** | File crawling, retcon writing, DRY enforcement | Documentation (2) |
+| **code-planner** | Gap analysis, implementation planning | Code Planning (3) |
+| **implementation-verifier** | Implementation, testing, verification | Implementation (4-5) |
+| **finalization-specialist** | Cleanup, final verification, delivery | Finalization (6) |
+
+### Context
+
+**Philosophy**:
+- `ddd-principles.md` - Core DDD principles and approach
+- `links-to-foundation.md` - Integration with IMPLEMENTATION_PHILOSOPHY and MODULAR_DESIGN_PHILOSOPHY
+
+**Core Concepts** (Essential Techniques):
+- `file-crawling.md` - Systematic multi-file processing without context overload
+- `context-poisoning.md` - Understanding and prevention strategies
+- `retcon-writing.md` - Writing as-if-feature-already-exists
+
+**Note**: Progressive organization is detailed in `documentation-retroner` agent (Technique 5)
+
+**Phases** (Step-by-Step Guides):
+- `00-planning-and-alignment.md` - Problem framing and design
+- `01-documentation-retcon.md` - Systematic doc updates
+- `02-approval-gate.md` - Review and iteration
+- `03-implementation-planning.md` - Code gap analysis
+- `04-code-implementation.md` - Implementation and testing
+- `05-testing-and-verification.md` - User-level testing
+- `06-cleanup-and-push.md` - Finalization and delivery
+
+---
+
+## Example Workflow
+
+### Adding Authentication to Existing API
+
+```bash
+# === Phase 1: Planning ===
+amplifier profile use ddd:documentation
+amplifier run "Plan adding JWT authentication to existing REST API"
+
+# planning-architect creates:
+# - Problem analysis
+# - Design proposals
+# - Complete plan in ai_working/ddd/plan.md
+
+# === Phase 2: Documentation Updates ===
+amplifier run "Update all documentation for new auth feature"
+
+# documentation-retroner:
+# - Uses file crawling for systematic processing
+# - Applies retcon writing ("The API uses JWT auth")
+# - Prevents context poisoning (DRY enforcement)
+# - Creates ai_working/ddd/docs_status.md for review
+
+# YOU review and commit docs when satisfied
+
+# === Phase 3: Code Planning ===
+amplifier profile use ddd:implementation
+amplifier run "Plan implementation for updated documentation"
+
+# code-planner:
+# - Compares current code vs new docs
+# - Identifies gaps
+# - Creates implementation chunks
+# - ai_working/ddd/code_plan.md
+
+# === Phase 4: Implementation ===
+amplifier run "Implement authentication following code_plan.md"
+
+# implementation-verifier:
+# - Implements chunk by chunk
+# - Tests as user would (not just unit tests)
+# - Verifies against documentation
+# - YOU authorize each commit
+
+# === Phase 5: Finalization ===
+amplifier run "Final verification and cleanup"
+
+# finalization-specialist:
+# - Integration testing
+# - Cleanup temporary artifacts
+# - Prepare for push
+# - YOU authorize push/PR
+```
+
+---
+
+## Key Techniques
+
+### File Crawling
+
+When updating many files (10+), agents use **file crawling** to avoid context overload:
+
+1. Generate checklist of files to update
+2. Process ONE file at a time
+3. Mark complete and move to next
+4. **Token efficiency**: 99.5% reduction for large batches
+
+Reference: `context/core-concepts/file-crawling.md`
+
+### Retcon Writing
+
+Documentation written **as if feature already exists**:
+
+- ❌ "We will add authentication"
+- ✅ "The API uses JWT authentication"
+
+No future tense, no "coming soon", no migration notes in docs.
+
+Reference: `context/core-concepts/retcon-writing.md`
+
+### Context Poisoning Prevention
+
+Agents detect and eliminate:
+- Duplicate documentation (same concept in multiple places)
+- Contradictory statements
+- Inconsistent terminology
+- Maximum DRY enforcement
+
+Reference: `context/core-concepts/context-poisoning.md`
+
+---
+
+## Philosophy Foundation
+
+DDD builds on these core philosophies:
+
+### Ruthless Simplicity
+- Start minimal, grow as needed
+- Avoid future-proofing
+- Question every abstraction
+- Clear over clever
+
+Reference: `@foundation:IMPLEMENTATION_PHILOSOPHY.md`
+
+### Modular Design
+- Clear interfaces (studs) defined first
+- Self-contained modules (bricks)
+- Regeneratable from specs
+- Human architects, AI builds
+
+Reference: `@foundation:MODULAR_DESIGN_PHILOSOPHY.md`
+
+---
+
+## Migration from Slash Commands
+
+If you're using the existing `/ddd:*` slash commands in Claude Code:
+
+### Old Workflow
+```bash
+/ddd:1-plan Feature description
+/ddd:2-docs
+/ddd:3-code-plan
+/ddd:4-code
+/ddd:5-finish
+```
+
+### New Workflow
+```bash
+# Documentation phase
+amplifier profile use ddd:documentation
+amplifier run "Plan and document feature"
+
+# Implementation phase
+amplifier profile use ddd:implementation
+amplifier run "Implement feature"
+```
+
+**Benefits of collection approach**:
+- Richer agent capabilities (delegation, state management)
+- Better integration with Amplifier ecosystem
+- Cross-collection collaboration
+- Event observability
+- Can combine with other collections (spec-kit, design-intelligence)
+
+---
+
+## Advanced Usage
+
+### With Spec-Kit Collection
+
+Combine DDD with formal specifications:
+
+```bash
+# Create formal specification
+amplifier profile use spec-kit:spec-writer
+amplifier run "Create API specification"
+
+# Update documentation referencing spec
+amplifier profile use ddd:documentation
+amplifier run "Update docs to reference specs/api.md"
+
+# Implement with existing codebase
+amplifier profile use ddd:implementation
+amplifier run "Implement spec with integration"
+```
+
+### With Design Intelligence
+
+Combine DDD with design expertise:
+
+```bash
+# Design UI components
+amplifier profile use design-intelligence:designer
+amplifier run "Design authentication UI"
+
+# Document the design
+amplifier profile use ddd:documentation
+amplifier run "Document UI component usage"
+```
+
+---
+
+## Installation Methods
+
+### Via Amplifier CLI (Recommended)
+
+```bash
+amplifier collection add git+https://github.com/robotdad/amplifier-collection-ddd@v1.0.0
+```
+
+### Via uvx (If collection adds scenario tools later)
+
+```bash
+uvx --from git+https://github.com/robotdad/amplifier-collection-ddd@v1.0.0 ddd-helper
+```
+
+### Specific Versions
+
+```bash
+# Latest release
+amplifier collection add git+https://github.com/robotdad/amplifier-collection-ddd@v1.0.0
+
+# Development version
+amplifier collection add git+https://github.com/robotdad/amplifier-collection-ddd@main
+
+# Specific commit
+amplifier collection add git+https://github.com/robotdad/amplifier-collection-ddd@abc1234
+```
+
+---
+
+## Contributing
+
+Contributions welcome! See [SUPPORT.md](SUPPORT.md) for how to:
+- Report issues
+- Request features
+- Submit pull requests
+
+---
+
+## License
+
+MIT License - See [LICENSE](LICENSE) for details.
+
+---
+
+## Related Collections
+
+- **foundation** - Base profiles and shared context (required dependency)
+- **developer-expertise** - Additional development agents
+- **spec-kit** - Specification-driven development for greenfield work
+- **design-intelligence** - Design expertise and methodology
+
+---
+
+**Version**: 1.0.0
+**Author**: robotdad
+**Repository**: https://github.com/robotdad/amplifier-collection-ddd
