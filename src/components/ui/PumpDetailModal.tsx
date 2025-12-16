@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Pump, Priority, Stage, STAGES } from "../../types";
 import { StageDurations } from "../../lib/schedule";
-import { X, Edit2, Save, ChevronDown, ChevronRight, AlertTriangle } from "lucide-react";
+import { X, Edit2, Save, ChevronDown, ChevronRight, AlertTriangle, Pause, Play } from "lucide-react";
 import { Button } from "./Button";
 import { Input } from "./Input";
 import { format, parseISO, isValid } from "date-fns";
@@ -29,7 +29,14 @@ interface PumpFormData extends Pump {
 const PRIORITIES: Priority[] = ["Low", "Normal", "High", "Rush", "Urgent"];
 
 export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
-    const { updatePump, getModelLeadTimes, pumps } = useApp();
+    const { updatePump, getModelLeadTimes, pumps, pausePump, resumePump } = useApp();
+
+    // Get live pump data from store (prop may be stale)
+    const currentPump = useMemo((): Pump | null => {
+        if (!pump) return null;
+        return pumps.find(p => p.id === pump.id) ?? pump;
+    }, [pump, pumps]);
+
     const [isEditing, setIsEditing] = useState(false);
     const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
     const [formData, setFormData] = useState<Pump | null>(null);
@@ -46,14 +53,14 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
 
     // Initialize form data when pump opens
     useEffect(() => {
-        if (pump) {
-            setFormData({ ...pump });
+        if (currentPump) {
+            setFormData({ ...currentPump });
             setIsEditing(false);
             setIsAdvancedOpen(false);
         }
-    }, [pump]);
+    }, [currentPump?.id]); // Only reset when opening a different pump
 
-    if (!pump || !formData) return null;
+    if (!currentPump || !formData) return null;
 
     // Helper to handle input changes
     const handleChange = <K extends keyof Pump>(field: K, value: Pump[K]) => {
@@ -80,7 +87,7 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
     };
 
     const handleCancel = () => {
-        setFormData({ ...pump });
+        if (currentPump) setFormData({ ...currentPump });
         setIsEditing(false);
     };
 
@@ -170,46 +177,108 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
             onClick={onClose}
         >
             <div
-                className="bg-background shadow-frame border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 m-4 animate-in zoom-in-95 duration-200"
+                className={cn(
+                    "relative bg-background shadow-frame border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 m-4 animate-in zoom-in-95 duration-200",
+                    currentPump.isPaused && "grayscale-[50%]"
+                )}
                 onClick={(e) => e.stopPropagation()}
             >
+                {/* PAUSED stamp - large rubber stamp style */}
+                {currentPump.isPaused && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20 overflow-visible">
+                        <div
+                            className="border-[8px] border-red-600 rounded-lg px-8 py-3 opacity-75 select-none bg-white/20 dark:bg-black/10"
+                            style={{
+                                transform: 'rotate(-22deg) scale(1.1)',
+                            }}
+                        >
+                            <span
+                                className="text-red-600 font-black text-7xl tracking-[0.2em] uppercase"
+                                style={{
+                                    fontFamily: 'Impact, Haettenschweiler, sans-serif',
+                                }}
+                            >
+                                PAUSED
+                            </span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Header */}
-                <div className="mb-6 flex items-start justify-between">
+                <div className="mb-6 flex items-start justify-between relative z-10">
                     <div>
                         <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
                             Pump Details
-                            <span className="text-sm font-normal text-muted-foreground">#{pump.serial}</span>
+                            <span className="text-sm font-normal text-muted-foreground">#{currentPump.serial}</span>
                         </h2>
                     </div>
                     <div className="flex items-center gap-2">
+                        {/* Pause/Resume button - small, sharp corners, left of Edit */}
+                        {currentPump.stage !== 'QUEUE' && currentPump.stage !== 'CLOSED' && (
+                            currentPump.isPaused ? (
+                                <button
+                                    onClick={() => resumePump(currentPump.id)}
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-bold rounded-sm bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm"
+                                    title="Resume Production"
+                                >
+                                    <Play className="h-3.5 w-3.5" />
+                                    Resume
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={() => pausePump(currentPump.id)}
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold rounded-sm border border-orange-400 text-orange-600 hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
+                                    title="Pause Production"
+                                >
+                                    <Pause className="h-3.5 w-3.5" />
+                                    Pause
+                                </button>
+                            )
+                        )}
+
                         {isEditing ? (
                             <>
                                 <Button variant="outline" size="sm" onClick={handleCancel} className="font-semibold">
                                     Cancel
                                 </Button>
-                                <Button size="sm" onClick={handleSave} className="gap-2 font-semibold">
+                                <Button size="sm" onClick={handleSave} className="gap-2 font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-blue-500/25">
                                     <Save className="h-4 w-4" />
                                     Save
                                 </Button>
                             </>
                         ) : (
-                            <Button variant="outline" size="sm" onClick={() => setIsEditing(true)} className="gap-2 font-semibold border-2 hover:bg-primary/10">
+                            <Button
+                                size="sm"
+                                onClick={() => setIsEditing(true)}
+                                className="gap-2 font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-md hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+                            >
                                 <Edit2 className="h-4 w-4" />
                                 Edit
                             </Button>
                         )}
-                        <Button
-                            variant="ghost"
-                            size="icon"
+
+                        {/* Exit button - visible in both modes */}
+                        <button
                             onClick={onClose}
-                            className="h-8 w-8 rounded-full hover:bg-muted"
+                            className="h-8 w-8 rounded-full flex items-center justify-center bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 transition-colors"
+                            title="Close"
                         >
                             <X className="h-4 w-4" />
-                        </Button>
+                        </button>
                     </div>
                 </div>
 
-                <div className="space-y-6">
+                {/* Paused info banner - only show when paused */}
+                {currentPump.isPaused && currentPump.pausedAt && (
+                    <div className="mb-4 px-3 py-2 bg-orange-100 dark:bg-orange-900/30 border border-orange-300 dark:border-orange-700 rounded-lg text-center text-sm text-orange-700 dark:text-orange-400 relative z-10">
+                        Paused since {format(parseISO(currentPump.pausedAt), "MMM d, yyyy 'at' h:mm a")}
+                        {currentPump.totalPausedDays !== undefined && currentPump.totalPausedDays > 0 && (
+                            <span className="font-bold"> ({currentPump.totalPausedDays} days total)</span>
+                        )}
+                    </div>
+                )}
+
+                <div className="space-y-6 relative z-10">
                     {/* Main Section */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {/* PO Number - Text Input Only */}
@@ -328,7 +397,10 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                                 </>
                             ) : (
                                 <div className="flex items-center gap-2">
-                                    {formData.powder_color && <div className="h-3 w-3 rounded-full border border-border bg-current text-muted-foreground" />}
+                                    <span
+                                        className="h-3 w-8 rounded-full border border-border/60"
+                                        style={{ backgroundColor: formData.powder_color || "hsl(var(--border))" }}
+                                    />
                                     <p className="font-medium text-foreground">{formData.powder_color || 'N/A'}</p>
                                 </div>
                             )}
@@ -507,7 +579,7 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                     </div>
 
                     <div className="text-xs text-muted-foreground text-right">
-                        Last Updated: {format(new Date(pump.last_update), "EEE, MMM d, yyyy 'at' h:mm a")}
+                        Last Updated: {format(new Date(currentPump.last_update), "EEE, MMM d, yyyy 'at' h:mm a")}
                     </div>
                 </div>
             </div>

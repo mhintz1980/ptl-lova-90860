@@ -3,7 +3,7 @@ import { Pump } from "../../types";
 import { formatDate } from "../../lib/format";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
+import { GripVertical, Lock } from "lucide-react";
 import { PRIORITY_DOT } from "./constants";
 import { useApp } from "../../store";
 import { useMemo } from "react";
@@ -44,7 +44,9 @@ export function PumpCard({
     [pump.model]
   );
 
-  const { isSandbox, originalSnapshot } = useApp();
+  const { isSandbox, originalSnapshot, isPumpLocked } = useApp();
+
+  const isLocked = useMemo(() => isPumpLocked(pump.id), [isPumpLocked, pump.id]);
 
   const isGhost = useMemo(() => {
     if (!isSandbox || !originalSnapshot) return false;
@@ -69,16 +71,46 @@ export function PumpCard({
       className={cn(
         "group relative overflow-hidden rounded-xl border bg-card/90 px-4 py-4 shadow-layer-md transition-all duration-200",
         isGhost ? "border-dashed border-yellow-500 bg-yellow-50/50" : "border-border",
+        pump.isPaused && "border-dashed border-red-400 bg-card/70",
         disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing",
         !disabled && "hover:-translate-y-[2px] hover:shadow-layer-lg"
       )}
       onClick={onClick}
     >
+      {/* PAUSED stamp - large rubber stamp style */}
+      {pump.isPaused && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 overflow-visible">
+          <div
+            className="border-[5px] border-red-600 rounded-md px-4 py-1 opacity-65 select-none bg-white/20 dark:bg-black/10"
+            style={{
+              transform: 'rotate(-22deg) scale(1.4)',
+            }}
+          >
+            <span
+              className="text-red-600 font-black text-2xl tracking-[0.15em] uppercase"
+              style={{
+                fontFamily: 'Impact, Haettenschweiler, sans-serif',
+              }}
+            >
+              PAUSED
+            </span>
+          </div>
+        </div>
+      )}
+
       {isGhost && (
-        <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-bl">
+        <div className="absolute top-0 right-0 bg-yellow-500 text-black text-[10px] font-bold px-1.5 py-0.5 rounded-bl z-20">
           GHOST
         </div>
       )}
+
+      {isLocked && !isGhost && !pump.isPaused && (
+        <div className="absolute top-0 left-0 bg-amber-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-br z-20 flex items-center gap-0.5">
+          <Lock className="h-2.5 w-2.5" />
+          LOCKED
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-1">
           <div className="flex items-center text-sm font-semibold text-foreground">
@@ -141,6 +173,12 @@ export function PumpCard({
               </span>
             </div>
           )}
+          {pump.isPaused && pump.totalPausedDays !== undefined && pump.totalPausedDays > 0 && (
+            <div className="flex items-center justify-between text-orange-600">
+              <span>Days Paused</span>
+              <span className="font-bold">{pump.totalPausedDays}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between border-t border-border/60 pt-2 text-[11px]">
             <span>Last update</span>
             <span className="text-foreground/80">{formatDate(pump.last_update)}</span>
@@ -151,3 +189,4 @@ export function PumpCard({
     </div>
   );
 }
+
