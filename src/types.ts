@@ -27,6 +27,11 @@ export interface Pump {
   value: number;           // numeric
   scheduledEnd?: string;   // ISO
   scheduledStart?: string; // ISO
+  // Pause state
+  isPaused?: boolean;      // true if job is in limbo
+  pausedAt?: string;       // ISO timestamp when paused
+  pausedStage?: Stage;     // stage where job was paused
+  totalPausedDays?: number; // accumulated pause duration
   // derived, non-persistent:
   promiseDate?: string;    // from PO line
   work_hours?: {

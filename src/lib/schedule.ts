@@ -114,6 +114,9 @@ export function buildStageTimeline(
   leadTimes: StageDurations,
   options?: { startDate?: Date; capacityConfig?: CapacityConfig }
 ): StageBlock[] {
+  // Helper to round to nearest quarter day (0.25)
+  const roundToQuarter = (value: number) => Math.round(value * 4) / 4;
+
   // If capacity config and work hours are present, recalculate durations
   let durations = sanitizeDurations(leadTimes);
 
@@ -124,19 +127,19 @@ export function buildStageTimeline(
     durations = durations.map(d => {
       let days = d.days;
 
-      // Calculate days based on man-hours and capacity
+      // Calculate days based on man-hours and capacity - use fractional days
       if (d.stage === "FABRICATION" && work_hours.fabrication) {
-        days = Math.ceil(work_hours.fabrication / capacityConfig.fabrication.dailyManHours);
+        days = roundToQuarter(work_hours.fabrication / capacityConfig.fabrication.dailyManHours);
       } else if (d.stage === "ASSEMBLY" && work_hours.assembly) {
-        days = Math.ceil(work_hours.assembly / capacityConfig.assembly.dailyManHours);
+        days = roundToQuarter(work_hours.assembly / capacityConfig.assembly.dailyManHours);
       } else if (d.stage === "TESTING" && work_hours.testing) {
-        days = Math.ceil(work_hours.testing / capacityConfig.testing.dailyManHours);
+        days = roundToQuarter(work_hours.testing / capacityConfig.testing.dailyManHours);
       } else if (d.stage === "SHIPPING" && work_hours.shipping) {
-        days = Math.ceil(work_hours.shipping / capacityConfig.shipping.dailyManHours);
+        days = roundToQuarter(work_hours.shipping / capacityConfig.shipping.dailyManHours);
       }
       // Powder Coat remains fixed as it's a vendor lead time
 
-      return { ...d, days: Math.max(1, days) };
+      return { ...d, days: Math.max(0.25, days) };
     });
   }
 
@@ -144,13 +147,39 @@ export function buildStageTimeline(
     return [];
   }
 
-  const totalDays = durations.reduce((sum, entry) => sum + entry.days, 0);
+  // For in-production pumps, filter to only show current stage and future stages
+  const currentStage = pump.stage;
+  const isInProduction = currentStage !== 'QUEUE' && currentStage !== 'CLOSED';
+
+  let filteredDurations = durations;
+  if (isInProduction) {
+    const currentStageIndex = PRODUCTION_STAGES.indexOf(currentStage);
+    if (currentStageIndex >= 0) {
+      // Filter to only include current stage and stages after it
+      filteredDurations = durations.filter(d => {
+        const stageIndex = PRODUCTION_STAGES.indexOf(d.stage);
+        return stageIndex >= currentStageIndex;
+      });
+    }
+  }
+
+  if (filteredDurations.length === 0) {
+    return [];
+  }
+
+  const totalDays = filteredDurations.reduce((sum, entry) => sum + entry.days, 0);
   const timelineStart = startOfDay(options?.startDate ?? resolveScheduleStart(pump, totalDays));
 
+  // Helper for fractional days (date-fns addDays truncates decimals)
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const addFractionalDays = (date: Date, days: number): Date => {
+    return new Date(date.getTime() + days * MS_PER_DAY);
+  };
+
   let cursor = timelineStart;
-  return durations.map((entry) => {
+  return filteredDurations.map((entry) => {
     const start = cursor;
-    const end = addBusinessDays(start, entry.days);
+    const end = addFractionalDays(start, entry.days);
     cursor = end;
     return { stage: entry.stage, start, end, days: entry.days, pump };
   });
@@ -163,8 +192,13 @@ function buildEventSegments(
   totalDays: number
 ): CalendarStageEvent[] {
   const segments: CalendarStageEvent[] = [];
-  const startOffset = differenceInCalendarDays(block.start, viewStart);
-  const endOffset = differenceInCalendarDays(block.end, viewStart);
+
+  // Use fractional day offsets (hours / 24)
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+  const differenceInFractionalDays = (a: Date, b: Date) => (a.getTime() - b.getTime()) / MS_PER_DAY;
+
+  const startOffset = differenceInFractionalDays(block.start, viewStart);
+  const endOffset = differenceInFractionalDays(block.end, viewStart);
   const idleDays = pump.last_update
     ? Math.max(
       0,
@@ -176,34 +210,31 @@ function buildEventSegments(
     return segments;
   }
 
-  let cursor = clamp(startOffset, 0, totalDays - 1);
-  let remaining = Math.max(1, clamp(endOffset, 0, totalDays) - cursor);
+  // Calculate the clamped span (minimum 0.25 days = quarter day)
+  const clampedStart = clamp(startOffset, 0, totalDays);
+  const clampedEnd = clamp(endOffset, 0, totalDays);
+  const span = Math.max(0.25, clampedEnd - clampedStart);
 
-  while (remaining > 0) {
-    const startDay = ((cursor % 7) + 7) % 7;
-    const week = Math.floor(cursor / 7);
-    const capacity = Math.min(remaining, 7 - startDay);
+  // For fractional days, we create a single segment (no week-wrapping for simplicity)
+  const startDay = clampedStart % 7;
+  const week = Math.floor(clampedStart / 7);
 
-    segments.push({
-      id: `${pump.id}-${block.stage}-${segments.length}`,
-      pumpId: pump.id,
-      stage: block.stage,
-      title: pump.model,
-      subtitle: pump.po,
-      customer: pump.customer,
-      priority: pump.priority,
-      idleDays,
-      week,
-      startDay,
-      span: Math.max(1, capacity),
-      row: week,
-      startDate: block.start,
-      endDate: block.end,
-    });
-
-    cursor += capacity;
-    remaining -= capacity;
-  }
+  segments.push({
+    id: `${pump.id}-${block.stage}-0`,
+    pumpId: pump.id,
+    stage: block.stage,
+    title: pump.model,
+    subtitle: pump.po,
+    customer: pump.customer,
+    priority: pump.priority,
+    idleDays,
+    week,
+    startDay,
+    span,
+    row: week,
+    startDate: block.start,
+    endDate: block.end,
+  });
 
   return segments;
 }

@@ -65,9 +65,14 @@ export function CalendarEvent({ event, onClick, onDoubleClick, isDragging = fals
       ref={setNodeRef}
       style={
         {
-          gridColumnStart: event.startDay + 1,
-          gridColumnEnd: `span ${event.span}`,
+          gridColumnStart: Math.floor(event.startDay) + 1,
+          // Use span for grid positioning, then adjust width for fractional precision
+          gridColumnEnd: `span ${Math.max(1, Math.ceil(event.span))}`,
           gridRowStart: event.row + 1,
+          // Fractional width: span/ceilSpan * 100% gives proportional width within the grid cell(s)
+          width: event.span < 1 || event.span % 1 !== 0
+            ? `${(event.span / Math.ceil(event.span)) * 100}%`
+            : undefined,
         } as React.CSSProperties
       }
       {...attributes}

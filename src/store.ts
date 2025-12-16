@@ -44,6 +44,8 @@ export interface AppState {
   addPO: (payload: AddPoPayload) => void;
   moveStage: (id: string, to: Stage) => void;
   updatePump: (id: string, patch: Partial<Pump>) => void;
+  pausePump: (id: string) => void;
+  resumePump: (id: string) => void;
   schedulePump: (id: string, dropDate: string) => void;
   clearSchedule: (id: string) => void;
   clearQueueSchedules: () => number;
@@ -78,6 +80,7 @@ export interface AppState {
   filtered: () => Pump[];
   getModelLeadTimes: (model: string) => StageDurations | undefined;
   getStageSegments: (id: string) => StageBlock[] | undefined;
+  isPumpLocked: (id: string) => boolean;
 }
 
 export const useApp = create<AppState>()(
@@ -165,6 +168,12 @@ export const useApp = create<AppState>()(
       },
 
       moveStage: (id, to) => {
+        // Check if pump is locked
+        if (get().isPumpLocked(id)) {
+          console.warn('Cannot move locked pump:', id);
+          return;
+        }
+
         const now = new Date().toISOString();
         const newPumps = get().pumps.map((p) =>
           p.id === id ? { ...p, stage: to, last_update: now } : p
@@ -180,6 +189,40 @@ export const useApp = create<AppState>()(
         );
         set({ pumps: newPumps });
         get().adapter.update(id, { ...patch, last_update: now });
+      },
+
+      pausePump: (id) => {
+        const pump = get().pumps.find((p) => p.id === id);
+        if (!pump || pump.isPaused) return;
+
+        const now = new Date().toISOString();
+        const patch: Partial<Pump> = {
+          isPaused: true,
+          pausedAt: now,
+          pausedStage: pump.stage,
+          last_update: now,
+        };
+
+        get().updatePump(id, patch);
+      },
+
+      resumePump: (id) => {
+        const pump = get().pumps.find((p) => p.id === id);
+        if (!pump || !pump.isPaused) return;
+
+        const now = new Date();
+        const pausedAt = pump.pausedAt ? new Date(pump.pausedAt) : now;
+        const pausedDays = Math.floor((now.getTime() - pausedAt.getTime()) / (1000 * 60 * 60 * 24));
+        const totalPaused = (pump.totalPausedDays || 0) + pausedDays;
+
+        const patch: Partial<Pump> = {
+          isPaused: false,
+          pausedAt: undefined,
+          totalPausedDays: totalPaused,
+          last_update: now.toISOString(),
+        };
+
+        get().updatePump(id, patch);
       },
 
       schedulePump: (id, dropDate) => {
@@ -523,6 +566,35 @@ export const useApp = create<AppState>()(
         if (!leadTimes) return undefined;
 
         return buildStageTimeline(pump, leadTimes, { capacityConfig: get().capacityConfig });
+      },
+
+      isPumpLocked: (id) => {
+        const { pumps, lockDate } = get();
+        if (!lockDate) return false;
+
+        const pump = pumps.find((p) => p.id === id);
+        if (!pump) return false;
+
+        // A pump is locked if:
+        // 1. It has a scheduledStart on or before the lock date, OR
+        // 2. It's past QUEUE stage (actively in production)
+        if (pump.stage !== 'QUEUE' && pump.stage !== 'CLOSED') {
+          // Check if it started on/before lock date
+          if (pump.scheduledStart) {
+            const startDate = pump.scheduledStart.split('T')[0];
+            return startDate <= lockDate;
+          }
+          // In production without schedule = always locked if lock date is set
+          return true;
+        }
+
+        // QUEUE pumps are locked only if scheduled on/before lock date
+        if (pump.scheduledStart) {
+          const startDate = pump.scheduledStart.split('T')[0];
+          return startDate <= lockDate;
+        }
+
+        return false;
       },
     }),
     {
