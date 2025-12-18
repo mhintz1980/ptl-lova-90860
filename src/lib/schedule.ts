@@ -1,6 +1,7 @@
 import { addBusinessDays, differenceInCalendarDays, startOfDay, addDays } from "date-fns";
 import type { Pump, Stage, CapacityConfig } from "../types";
 import { PRODUCTION_STAGES } from "./stage-constants";
+import { getModelWorkHours } from "./seed";
 
 type StageKey = "fabrication" | "powder_coat" | "assembly" | "testing" | "shipping" | "total_days";
 
@@ -36,6 +37,7 @@ export interface CalendarStageEvent {
   row: number;
   startDate: Date;
   endDate: Date;
+  shipDate?: Date;  // Final job ship date for tooltip
 }
 
 export interface BuildCalendarEventsOptions {
@@ -114,33 +116,36 @@ export function buildStageTimeline(
   leadTimes: StageDurations,
   options?: { startDate?: Date; capacityConfig?: CapacityConfig }
 ): StageBlock[] {
-  // Helper to round to nearest quarter day (0.25)
-  const roundToQuarter = (value: number) => Math.round(value * 4) / 4;
+  // Helper to round to nearest hour (1/24 of a day)
+  const roundToHour = (value: number) => Math.round(value * 24) / 24;
 
   // If capacity config and work hours are present, recalculate durations
   let durations = sanitizeDurations(leadTimes);
 
-  if (options?.capacityConfig && pump.work_hours) {
+  if (options?.capacityConfig) {
     const { capacityConfig } = options;
-    const { work_hours } = pump;
+    // Use catalog work_hours, not pump.work_hours (pump may have stale data)
+    const work_hours = getModelWorkHours(pump.model);
 
-    durations = durations.map(d => {
-      let days = d.days;
+    if (work_hours) {
+      durations = durations.map(d => {
+        let days = d.days;
 
-      // Calculate days based on man-hours and capacity - use fractional days
-      if (d.stage === "FABRICATION" && work_hours.fabrication) {
-        days = roundToQuarter(work_hours.fabrication / capacityConfig.fabrication.dailyManHours);
-      } else if (d.stage === "ASSEMBLY" && work_hours.assembly) {
-        days = roundToQuarter(work_hours.assembly / capacityConfig.assembly.dailyManHours);
-      } else if (d.stage === "TESTING" && work_hours.testing) {
-        days = roundToQuarter(work_hours.testing / capacityConfig.testing.dailyManHours);
-      } else if (d.stage === "SHIPPING" && work_hours.shipping) {
-        days = roundToQuarter(work_hours.shipping / capacityConfig.shipping.dailyManHours);
-      }
-      // Powder Coat remains fixed as it's a vendor lead time
+        // Calculate days based on man-hours and capacity - use fractional days
+        if (d.stage === "FABRICATION" && work_hours.fabrication) {
+          days = roundToHour(work_hours.fabrication / capacityConfig.fabrication.dailyManHours);
+        } else if (d.stage === "ASSEMBLY" && work_hours.assembly) {
+          days = roundToHour(work_hours.assembly / capacityConfig.assembly.dailyManHours);
+        } else if (d.stage === "TESTING" && work_hours.testing) {
+          days = roundToHour(work_hours.testing / capacityConfig.testing.dailyManHours);
+        } else if (d.stage === "SHIPPING" && work_hours.shipping) {
+          days = roundToHour(work_hours.shipping / capacityConfig.shipping.dailyManHours);
+        }
+        // Powder Coat remains fixed as it's a vendor lead time
 
-      return { ...d, days: Math.max(0.25, days) };
-    });
+        return { ...d, days: Math.max(0.25, days) };
+      });
+    }
   }
 
   if (durations.length === 0) {

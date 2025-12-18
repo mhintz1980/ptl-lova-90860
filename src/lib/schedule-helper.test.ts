@@ -44,11 +44,11 @@ describe('Schedule Helper - Dynamic Durations', () => {
         expect(blocks).toBeDefined();
 
         // Check Fabrication
-        // 12h work / 32h per day = 0.375 days → roundToQuarter = 0.5 days = 12 hours
+        // 12h work / 32h per day = 0.375 days → roundToHour = 9/24 = 0.375 days = 9 hours
         const fabBlock = blocks.find(b => b.stage === 'FABRICATION');
         expect(fabBlock).toBeDefined();
         const fabDurationHours = (new Date(fabBlock!.end).getTime() - new Date(fabBlock!.start).getTime()) / 3600000;
-        expect(fabDurationHours).toBe(12); // 0.5 days
+        expect(fabDurationHours).toBe(9); // 0.375 days with hourly precision
 
         // Check Testing
         // 2h work / 2h per day = 1.0 day → roundToQuarter = 1.0 days = 24 hours

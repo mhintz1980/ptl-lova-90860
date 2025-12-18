@@ -2,131 +2,371 @@
   "models": [
     {
       "model": "DD-4S",
-      "description": "4” Double Diaphragm",
+      "description": "4\" Double Diaphragm",
       "price": 20000,
-      "bom": { "engine": "HATZ 1B50E", "gearbox": "RENOLD WM6", "control_panel": "DSEE050" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 12, "assembly": 8, "testing": 2, "shipping": 2 }
+      "bom": {
+        "engine": "HATZ 1B50E",
+        "gearbox": "RENOLD WM6",
+        "control_panel": "DSEE050"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "DD-4S SAFE",
-      "description": "4” Double Diaphragm (Enclosed)",
+      "description": "4\" Double Diaphragm (Enclosed)",
       "price": 25000,
-      "bom": { "engine": "HATZ 1B50E", "gearbox": "RENOLD WM6", "control_panel": "DSEE050" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 16, "assembly": 12, "testing": 2, "shipping": 2 }
+      "bom": {
+        "engine": "HATZ 1B50E",
+        "gearbox": "RENOLD WM6",
+        "control_panel": "DSEE050"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "DD-6",
-      "description": "6” Double Diaphragm",
+      "description": "6\" Double Diaphragm",
       "price": 24000,
-      "bom": { "engine": "HATZ 1D90E", "gearbox": "RENOLD WM6", "control_panel": "DSEE050" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 14, "assembly": 10, "testing": 2, "shipping": 2 }
+      "bom": {
+        "engine": "HATZ 1D90E",
+        "gearbox": "RENOLD WM6",
+        "control_panel": "DSEE050"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "DD-6 SAFE",
-      "description": "6” Double Diaphragm (Enclosed)",
+      "description": "6\" Double Diaphragm (Enclosed)",
       "price": 30000,
-      "bom": { "engine": "HATZ 1D90E", "gearbox": "RENOLD WM6", "control_panel": "DSEE050" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1.25, "testing": 0.25, "total_days": 10.0 },
-      "work_hours": { "fabrication": 18, "assembly": 14, "testing": 2, "shipping": 2 }
+      "bom": {
+        "engine": "HATZ 1D90E",
+        "gearbox": "RENOLD WM6",
+        "control_panel": "DSEE050"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1.25,
+        "testing": 0.25,
+        "total_days": 10.0
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 17.5,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "DV-6",
-      "description": "6” Vacuum Assisted, Double Diaphragm",
+      "description": "6\" Vacuum Assisted, Double Diaphragm",
       "price": 29000,
-      "bom": { "engine": "HATZ 1D90E", "gearbox": "RENOLD WM6", "control_panel": "DSEE050" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1.25, "testing": 0.25, "total_days": 10.0 },
-      "work_hours": { "fabrication": 20, "assembly": 12, "testing": 3, "shipping": 2 }
+      "bom": {
+        "engine": "HATZ 1D90E",
+        "gearbox": "RENOLD WM6",
+        "control_panel": "DSEE050"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1.25,
+        "testing": 0.25,
+        "total_days": 10.0
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 17.5,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "DD-8",
-      "description": "8” Double Diaphragm",
+      "description": "8\" Double Diaphragm",
       "price": 38000,
-      "bom": { "engine": "HATZ 3H5OT", "gearbox": "RENOLD WM8", "control_panel": "DSEE050" },
-      "lead_times": { "fabrication": 2, "powder_coat": 7, "assembly": 2, "testing": 0.25, "total_days": 11.25 },
-      "work_hours": { "fabrication": 24, "assembly": 16, "testing": 4, "shipping": 3 }
+      "bom": {
+        "engine": "HATZ 3H5OT",
+        "gearbox": "RENOLD WM8",
+        "control_panel": "DSEE050"
+      },
+      "lead_times": {
+        "fabrication": 2,
+        "powder_coat": 7,
+        "assembly": 2,
+        "testing": 0.25,
+        "total_days": 11.25
+      },
+      "work_hours": {
+        "fabrication": 56,
+        "assembly": 28,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "RL200",
-      "description": "8” Rotary Lobe",
+      "description": "8\" Rotary Lobe",
       "price": 45000,
-      "bom": { "engine": "Isuzu FT4 4LE2X", "gearbox": "TWIN DISC RM70", "control_panel": "MPC-10" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 22, "assembly": 14, "testing": 4, "shipping": 3 }
+      "bom": {
+        "engine": "Isuzu FT4 4LE2X",
+        "gearbox": "TWIN DISC RM70",
+        "control_panel": "MPC-10"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "RL200-SAFE",
-      "description": "8” Rotary Lobe Enclosed",
+      "description": "8\" Rotary Lobe Enclosed",
       "price": 49500,
-      "bom": { "engine": "Isuzu FT4 4LE2X", "gearbox": "TWIN DISC RM70", "control_panel": "MPC-10" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 28, "assembly": 18, "testing": 4, "shipping": 3 }
+      "bom": {
+        "engine": "Isuzu FT4 4LE2X",
+        "gearbox": "TWIN DISC RM70",
+        "control_panel": "MPC-10"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "RL300",
-      "description": "12” Rotary Lobe",
+      "description": "12\" Rotary Lobe",
       "price": 50000,
-      "bom": { "engine": "Perkins 904J", "gearbox": "TWIN DISC RM100", "control_panel": "MPC-10" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 30, "assembly": 20, "testing": 6, "shipping": 4 }
+      "bom": {
+        "engine": "Perkins 904J",
+        "gearbox": "TWIN DISC RM100",
+        "control_panel": "MPC-10"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "RL300-SAFE",
-      "description": "12” Rotary Lobe Enclosed",
+      "description": "12\" Rotary Lobe Enclosed",
       "price": 55000,
-      "bom": { "engine": "Perkins 904J", "gearbox": "TWIN DISC RM100", "control_panel": "MPC-10" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 36, "assembly": 24, "testing": 6, "shipping": 4 }
+      "bom": {
+        "engine": "Perkins 904J",
+        "gearbox": "TWIN DISC RM100",
+        "control_panel": "MPC-10"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "HC-150",
-      "description": "6” High CFM High Vacuum Centrifugal Pump",
+      "description": "6\" High CFM High Vacuum Centrifugal Pump",
       "price": 36000,
-      "bom": { "engine": "HATZ 3H5OTIC", "gearbox": null, "control_panel": "CATTRON MCU-C" },
-      "lead_times": { "fabrication": 2, "powder_coat": 7, "assembly": 1.25, "testing": 0.25, "total_days": 10.5 },
-      "work_hours": { "fabrication": 24, "assembly": 16, "testing": 4, "shipping": 3 }
+      "bom": {
+        "engine": "HATZ 3H5OTIC",
+        "gearbox": null,
+        "control_panel": "CATTRON MCU-C"
+      },
+      "lead_times": {
+        "fabrication": 2,
+        "powder_coat": 7,
+        "assembly": 1.25,
+        "testing": 0.25,
+        "total_days": 10.5
+      },
+      "work_hours": {
+        "fabrication": 56,
+        "assembly": 17.5,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "HC-150-SAFE",
-      "description": "6” High CFM High Vacuum Centrifugal Pump Enclosed",
+      "description": "6\" High CFM High Vacuum Centrifugal Pump Enclosed",
       "price": null,
-      "bom": { "engine": "HATZ 3H5OTIC", "gearbox": null, "control_panel": "CATTRON MCU-C" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1.25, "testing": 0.25, "total_days": 10.0 },
-      "work_hours": { "fabrication": 30, "assembly": 20, "testing": 4, "shipping": 3 }
+      "bom": {
+        "engine": "HATZ 3H5OTIC",
+        "gearbox": null,
+        "control_panel": "CATTRON MCU-C"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1.25,
+        "testing": 0.25,
+        "total_days": 10.0
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 17.5,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "PP-150",
-      "description": "6” Piston Pump Enclosed",
+      "description": "6\" Piston Pump Enclosed",
       "price": 25000,
-      "bom": { "engine": "HATZ 1D90-EZ", "gearbox": null, "control_panel": "MPC-10" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 18, "assembly": 12, "testing": 3, "shipping": 2 }
+      "bom": {
+        "engine": "HATZ 1D90-EZ",
+        "gearbox": null,
+        "control_panel": "MPC-10"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "SIP-150",
-      "description": "6” Screw Impeller Centrifugal Pump",
+      "description": "6\" Screw Impeller Centrifugal Pump",
       "price": 30000,
-      "bom": { "engine": "HATZ 3H5OTIC", "gearbox": null, "control_panel": "MPC-10" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 20, "assembly": 14, "testing": 3, "shipping": 2 }
+      "bom": {
+        "engine": "HATZ 3H5OTIC",
+        "gearbox": null,
+        "control_panel": "MPC-10"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "DP-150",
-      "description": "6” Vacuum Assisted Centrifugal Trash Pump",
+      "description": "6\" Vacuum Assisted Centrifugal Trash Pump",
       "price": 25000,
-      "bom": { "engine": "Deutz TCD 2.9", "gearbox": null, "control_panel": "MPC-10" },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 16, "assembly": 10, "testing": 2, "shipping": 2 }
+      "bom": {
+        "engine": "Deutz TCD 2.9",
+        "gearbox": null,
+        "control_panel": "MPC-10"
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     },
     {
       "model": "HP-150",
-      "description": "6” x 3” High Pressure Centrifugal Pump",
+      "description": "6\" x 3\" High Pressure Centrifugal Pump",
       "price": 25000,
-      "bom": { "engine": null, "gearbox": null, "control_panel": null },
-      "lead_times": { "fabrication": 1.5, "powder_coat": 7, "assembly": 1, "testing": 0.25, "total_days": 9.75 },
-      "work_hours": { "fabrication": 14, "assembly": 8, "testing": 2, "shipping": 2 }
+      "bom": {
+        "engine": null,
+        "gearbox": null,
+        "control_panel": null
+      },
+      "lead_times": {
+        "fabrication": 1.5,
+        "powder_coat": 7,
+        "assembly": 1,
+        "testing": 0.25,
+        "total_days": 9.75
+      },
+      "work_hours": {
+        "fabrication": 42,
+        "assembly": 14,
+        "testing": 0.5,
+        "shipping": 0.5
+      }
     }
   ],
   "customers": [
