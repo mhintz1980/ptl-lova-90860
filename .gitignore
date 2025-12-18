@@ -34,3 +34,10 @@ dist-ssr
 # Test results
 /playwright-report/
 /test-results/
+
+# Large binary files
+*.vsix
+*.vsix:Zone.Identifier
+test_failure.txt
+playwright-report/
+test-results/

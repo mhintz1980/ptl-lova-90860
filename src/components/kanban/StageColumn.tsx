@@ -17,7 +17,7 @@ interface StageColumnProps {
 }
 
 export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: StageColumnProps) {
-  const { collapsedStages, toggleStageCollapse, wipLimits, sortField, sortDirection, capacityConfig } = useApp();
+  const { collapsedStages, toggleStageCollapse, wipLimits, sortField, sortDirection } = useApp();
   const isCollapsed = collapsedStages[stage];
   const wipLimit = wipLimits?.[stage] ?? null;
   const sortedPumps = useMemo(
@@ -27,36 +27,6 @@ export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: 
   const isOverLimit = typeof wipLimit === "number" ? sortedPumps.length > wipLimit : false;
   const countLabel = wipLimit != null ? `${sortedPumps.length} / ${wipLimit}` : `${sortedPumps.length}`;
 
-  const { totalHours, dailyCapacity } = useMemo(() => {
-    if (stage === "QUEUE" || stage === "CLOSED" || stage === "POWDER COAT") {
-      return { totalHours: 0, dailyCapacity: 0 };
-    }
-
-    const key = stage === "FABRICATION" ? "fabrication" :
-      stage === "ASSEMBLY" ? "assembly" :
-        stage === "TESTING" ? "testing" :
-          stage === "SHIPPING" ? "shipping" : null;
-
-    if (!key) return { totalHours: 0, dailyCapacity: 0 };
-
-    const hours = sortedPumps.reduce((sum, pump) => sum + (pump.work_hours?.[key] || 0), 0);
-    const capacity = capacityConfig[key].dailyManHours;
-
-    return { totalHours: hours, dailyCapacity: capacity };
-  }, [sortedPumps, stage, capacityConfig]);
-
-  const isOverCapacity = dailyCapacity > 0 && totalHours > dailyCapacity;
-
-  const averageDwell = useMemo(() => {
-    if (!sortedPumps.length) return null;
-    const now = Date.now();
-    const samples = sortedPumps
-      .map((pump) => pump.last_update ? Math.max(0, (now - new Date(pump.last_update).getTime()) / (1000 * 60 * 60 * 24)) : null)
-      .filter((value): value is number => value !== null);
-    if (!samples.length) return null;
-    const avg = samples.reduce((sum, value) => sum + value, 0) / samples.length;
-    return `${avg.toFixed(1)}d`;
-  }, [sortedPumps]);
 
   const { setNodeRef, isOver } = useDroppable({
     id: stage,
@@ -84,10 +54,10 @@ export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: 
         <button
           type="button"
           data-stage-header={stage}
-          data-over-limit={isOverLimit || isOverCapacity || undefined}
+          data-over-limit={isOverLimit || undefined}
           className={cn(
             "flex w-full items-center justify-between gap-2 border-b border-border/60 bg-card/60 px-3 py-2.5 text-left transition-colors",
-            (isOverLimit || isOverCapacity) ? "bg-destructive/15 hover:bg-destructive/20 border-destructive/40" : "hover:bg-card"
+            isOverLimit ? "bg-destructive/15 hover:bg-destructive/20 border-destructive/40" : "hover:bg-card"
           )}
           onClick={() => toggleStageCollapse(stage)}
         >
@@ -97,22 +67,12 @@ export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: 
               <span className="truncate" title={stage}>
                 {stage}
               </span>
-              <div className="flex flex-col items-end text-xs font-medium text-muted-foreground">
-                <span>{countLabel}</span>
-                <div className="flex items-center gap-2">
-                  {dailyCapacity > 0 && (
-                    <span className={cn(
-                      "text-[10px]",
-                      isOverCapacity ? "text-destructive font-bold" : "text-muted-foreground"
-                    )}>
-                      {totalHours}h / {dailyCapacity}h
-                    </span>
-                  )}
-                  <span className="text-[11px] uppercase tracking-wide">
-                    Avg {averageDwell ?? "–"}
-                  </span>
-                </div>
-              </div>
+              <span className={cn(
+                "text-xs font-medium",
+                isOverLimit ? "text-destructive" : "text-muted-foreground"
+              )}>
+                {countLabel}
+              </span>
             </div>
           </div>
           <span className="text-muted-foreground hover:text-foreground">

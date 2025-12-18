@@ -3,7 +3,7 @@ import { Pump } from "../../types";
 import { formatDate } from "../../lib/format";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
-import { GripVertical, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { PRIORITY_DOT } from "./constants";
 import { useApp } from "../../store";
 import { useMemo } from "react";
@@ -69,7 +69,7 @@ export function PumpCard({
       {...attributes}
       {...listeners}
       className={cn(
-        "group relative overflow-hidden rounded-xl border bg-card/90 px-4 py-4 shadow-layer-md transition-all duration-200",
+        "group relative overflow-hidden rounded-xl border bg-card/90 pl-5 pr-4 py-4 shadow-layer-md transition-all duration-200",
         isGhost ? "border-dashed border-yellow-500 bg-yellow-50/50" : "border-border",
         pump.isPaused && "border-dashed border-red-400 bg-card/70",
         disabled ? "cursor-default" : "cursor-grab active:cursor-grabbing",
@@ -77,6 +77,12 @@ export function PumpCard({
       )}
       onClick={onClick}
     >
+      {/* Powder coat color stripe on left edge */}
+      <div
+        className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl"
+        style={{ backgroundColor: pump.powder_color || "hsl(var(--border))" }}
+        title={pump.powder_color ? `Powder Coat: ${pump.powder_color}` : "No powder coat"}
+      />
       {/* PAUSED stamp - large rubber stamp style */}
       {pump.isPaused && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 overflow-visible">
@@ -111,7 +117,17 @@ export function PumpCard({
         </div>
       )}
 
-      <div className="flex items-start justify-between gap-3">
+      {/* Priority indicator in top right */}
+      {!isGhost && !pump.isPaused && !isLocked && (
+        <div className="absolute top-2 right-2 z-10">
+          <span
+            className={`block h-3 w-3 rounded-full ${PRIORITY_DOT[pump.priority]}`}
+            title={`Priority: ${pump.priority}`}
+          />
+        </div>
+      )}
+
+      <div className="flex items-start gap-3">
         <div className="flex-1 space-y-1">
           <div className="flex items-center text-sm font-semibold text-foreground">
             <span className="truncate" title={pump.model}>
@@ -127,22 +143,6 @@ export function PumpCard({
             <span className="block truncate" title={`Serial #${pump.serial}`}>
               Serial #{pump.serial}
             </span>
-          </div>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <div className="text-muted-foreground transition-colors group-hover:text-foreground">
-            <GripVertical className="h-4 w-4" />
-          </div>
-          <div className="flex items-center gap-2">
-            <span
-              className={`h-2.5 w-2.5 rounded-full ${PRIORITY_DOT[pump.priority]}`}
-              title={`Priority: ${pump.priority}`}
-            />
-            <span
-              className="h-2 w-6 rounded-full border border-border/60"
-              style={{ backgroundColor: pump.powder_color || "hsl(var(--border))" }}
-              title={pump.powder_color ? `Powder Coat: ${pump.powder_color}` : "No powder coat"}
-            />
           </div>
         </div>
       </div>

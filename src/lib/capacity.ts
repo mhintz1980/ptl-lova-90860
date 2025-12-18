@@ -17,31 +17,32 @@ export const DEFAULT_WORK_HOURS: WorkDayHours = {
 
 /**
  * Default capacity configuration matching user specs
+ * Fab=28, Asm=14, Test=2, Ship=2 man-hours/day at 87.5% efficiency
  */
 export const DEFAULT_CAPACITY_CONFIG: CapacityConfig = {
     fabrication: {
         employeeCount: 4,
         workDayHours: { ...DEFAULT_WORK_HOURS },
-        efficiency: 0.85,
-        dailyManHours: 4 * 8 * 0.85,
+        efficiency: 0.875,
+        dailyManHours: 28,
     },
     assembly: {
         employeeCount: 2,
         workDayHours: { ...DEFAULT_WORK_HOURS },
-        efficiency: 0.85,
-        dailyManHours: 2 * 8 * 0.85,
+        efficiency: 0.875,
+        dailyManHours: 14,
     },
     testing: {
-        employeeCount: 0.25,
+        employeeCount: 0.28,
         workDayHours: { ...DEFAULT_WORK_HOURS },
-        efficiency: 0.85,
-        dailyManHours: 0.25 * 8 * 0.85,
+        efficiency: 0.875,
+        dailyManHours: 2,
     },
     shipping: {
-        employeeCount: 0.25,
+        employeeCount: 0.28,
         workDayHours: { ...DEFAULT_WORK_HOURS },
-        efficiency: 0.85,
-        dailyManHours: 0.25 * 8 * 0.85,
+        efficiency: 0.875,
+        dailyManHours: 2,
     },
     powderCoat: {
         vendors: [

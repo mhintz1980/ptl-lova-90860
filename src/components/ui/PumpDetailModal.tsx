@@ -29,7 +29,7 @@ interface PumpFormData extends Pump {
 const PRIORITIES: Priority[] = ["Low", "Normal", "High", "Rush", "Urgent"];
 
 export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
-    const { updatePump, getModelLeadTimes, pumps, pausePump, resumePump } = useApp();
+    const { updatePump, getModelLeadTimes, pumps, pausePump, resumePump, capacityConfig } = useApp();
 
     // Get live pump data from store (prop may be stale)
     const currentPump = useMemo((): Pump | null => {
@@ -91,10 +91,12 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
         setIsEditing(false);
     };
 
-    // Derived Man-Hours Calculation
-    const calculateManHours = (days: number | undefined) => {
+    // Derived Man-Hours Calculation - uses stage-specific capacity
+    const calculateManHours = (days: number | undefined, stage: 'fabrication' | 'assembly' | 'testing' | 'shipping') => {
         if (!days) return 0;
-        return days * 8;
+        const stageConfig = capacityConfig[stage];
+        const dailyManHours = stageConfig?.dailyManHours ?? 8;
+        return Math.round(days * dailyManHours * 10) / 10; // Round to 1 decimal
     };
 
     // Lead times are stored on the pump object in the "extra" fields from seed.ts?
@@ -544,10 +546,10 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                                     <h4 className="text-sm font-medium mb-3">Department Work Content</h4>
                                     <div className="grid grid-cols-1 gap-3">
                                         {[
-                                            { label: 'Fabrication', days: fabDays, key: 'fabrication_days' },
-                                            { label: 'Powder Coat', days: pcDays, key: 'powder_coat_days' },
-                                            { label: 'Assembly', days: assemblyDays, key: 'assembly_days' },
-                                            { label: 'Testing', days: testingDays, key: 'testing_days' },
+                                            { label: 'Fabrication', days: fabDays, key: 'fabrication_days', stage: 'fabrication' as const },
+                                            { label: 'Powder Coat', days: pcDays, key: 'powder_coat_days', stage: null },
+                                            { label: 'Assembly', days: assemblyDays, key: 'assembly_days', stage: 'assembly' as const },
+                                            { label: 'Testing', days: testingDays, key: 'testing_days', stage: 'testing' as const },
                                         ].map((dept) => (
                                             <div key={dept.key} className="grid grid-cols-12 gap-4 items-center">
                                                 <div className="col-span-4 text-sm text-muted-foreground">{dept.label}</div>
@@ -568,7 +570,7 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                                                     )}
                                                 </div>
                                                 <div className="col-span-5 text-xs text-muted-foreground text-right">
-                                                    ({calculateManHours(dept.days).toFixed(1)} man-hours)
+                                                    {dept.stage ? `(${calculateManHours(dept.days, dept.stage)} man-hours)` : '(vendor)'}
                                                 </div>
                                             </div>
                                         ))}

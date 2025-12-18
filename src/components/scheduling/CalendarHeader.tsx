@@ -6,8 +6,9 @@ import {
 } from "../../lib/stage-constants";
 import { cn } from "../../lib/utils";
 import { useApp } from "../../store";
-import { Wand2, Trash2, Lock } from "lucide-react";
+import { Wand2, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { LockDatePicker } from "../toolbar/LockDatePicker";
 
 export function CalendarHeader() {
   const clearQueueSchedules = useApp((state) => state.clearQueueSchedules);
@@ -15,8 +16,6 @@ export function CalendarHeader() {
   const stageFilters = useApp((state) => state.schedulingStageFilters);
   const toggleStageFilter = useApp((state) => state.toggleSchedulingStageFilter);
   const clearStageFilters = useApp((state) => state.clearSchedulingStageFilters);
-  const lockDate = useApp((state) => state.lockDate);
-  const setLockDate = useApp((state) => state.setLockDate);
 
   const handleClear = () => {
     const cleared = clearQueueSchedules();
@@ -70,16 +69,7 @@ export function CalendarHeader() {
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2 rounded-full border border-border/60 bg-card/80 px-3 py-1">
-            <Lock className="h-3.5 w-3.5 text-muted-foreground" />
-            <input
-              type="date"
-              className="bg-transparent text-xs text-foreground focus:outline-none"
-              value={lockDate || ""}
-              onChange={(e) => setLockDate(e.target.value || null)}
-              title="Lock schedules before this date"
-            />
-          </div>
+          <LockDatePicker />
 
           {stageFilters.length > 0 && (
             <Button
