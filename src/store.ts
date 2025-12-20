@@ -11,6 +11,8 @@ import { applyFilters, genSerial } from "./lib/utils";
 import { sortPumps, SortDirection, SortField } from "./lib/sort";
 import type { CapacityConfig, DepartmentStaffing, PowderCoatVendor } from "./types";
 import { DEFAULT_CAPACITY_CONFIG, getStageCapacity } from "./lib/capacity";
+import { eventStore } from "./infrastructure/events/EventStore";
+import { pumpStageMoved } from "./domain/production/events/PumpStageMoved";
 
 // --- Store Definition ---
 
@@ -174,11 +176,36 @@ export const useApp = create<AppState>()(
           return;
         }
 
+        const pump = get().pumps.find(p => p.id === id);
+        if (!pump) {
+          console.warn('Pump not found:', id);
+          return;
+        }
+
+        const fromStage = pump.stage;
+        
+        // Skip if already in target stage
+        if (fromStage === to) {
+          return;
+        }
+
         const now = new Date().toISOString();
+        
+        // 1. Create and persist domain event (TRUTH)
+        // Note: Domain events use POWDER_COAT (underscore), app uses POWDER COAT (space)
+        // This cast handles the type mismatch during transition period
+        const event = pumpStageMoved(id, fromStage as any, to as any);
+        eventStore.append(event).catch(err => {
+          console.error('Failed to persist stage move event:', err);
+        });
+
+        // 2. Update pump state (derived from event)
         const newPumps = get().pumps.map((p) =>
           p.id === id ? { ...p, stage: to, last_update: now } : p
         );
         set({ pumps: newPumps });
+        
+        // 3. Persist to adapter
         get().adapter.update(id, { stage: to, last_update: now });
       },
 
