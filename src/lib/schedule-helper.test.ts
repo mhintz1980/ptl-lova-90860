@@ -1,14 +1,22 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { buildCapacityAwareTimelines } from './schedule-helper'
 import { DEFAULT_CAPACITY_CONFIG } from './capacity'
 import { Pump } from '../types'
+import { getModelWorkHours } from './seed'
+
+// Mock the seed module to provide work hours for TEST-MODEL
+vi.mock('./seed', () => ({
+  getModelWorkHours: vi.fn(),
+  getModelLeadTimes: vi.fn(),
+}))
+
+const mockGetModelWorkHours = vi.mocked(getModelWorkHours)
 
 describe('Schedule Helper - Dynamic Durations', () => {
   const mockPump: Pump = {
     id: 'p1',
     model: 'TEST-MODEL',
     scheduledStart: '2025-01-01T09:00:00.000Z', // Wednesday
-    // ... other required fields
     serial: 1,
     po: 'PO1',
     customer: 'C1',
@@ -16,11 +24,6 @@ describe('Schedule Helper - Dynamic Durations', () => {
     priority: 'Normal',
     value: 1000,
     last_update: '',
-    work_hours: {
-      fabrication: 12,
-      assembly: 8,
-      ship: 2,
-    },
   }
 
   const mockLeadTimes = {
@@ -31,10 +34,16 @@ describe('Schedule Helper - Dynamic Durations', () => {
     total_days: 5,
   }
 
-  const leadTimeLookup = (stage: string) => {
-    void stage
-    return mockLeadTimes
-  }
+  const leadTimeLookup = (_model: string) => mockLeadTimes
+
+  beforeEach(() => {
+    // Return work hours for TEST-MODEL
+    mockGetModelWorkHours.mockReturnValue({
+      fabrication: 12,
+      assembly: 8,
+      ship: 2,
+    })
+  })
 
   it('should calculate durations based on capacity', () => {
     // Setup Config
