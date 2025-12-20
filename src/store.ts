@@ -29,6 +29,9 @@ import type {
 import { DEFAULT_CAPACITY_CONFIG, getStageCapacity } from './lib/capacity'
 import { eventStore } from './infrastructure/events/EventStore'
 import { pumpStageMoved } from './domain/production/events/PumpStageMoved'
+import { pumpPaused } from './domain/production/events/PumpPaused'
+import { pumpResumed } from './domain/production/events/PumpResumed'
+import { WORK_STAGES } from './lib/stage-constants'
 
 // --- Store Definition ---
 
@@ -198,12 +201,9 @@ export const useApp = create<AppState>()(
         get().adapter.upsertMany(expanded)
       },
 
+      // Constitution §3: Kanban Truth Rules
       moveStage: (id, to) => {
-        // Check if pump is locked
-        if (get().isPumpLocked(id)) {
-          console.warn('Cannot move locked pump:', id)
-          return
-        }
+        // Constitution §3.2: Locks never block Kanban - removed isPumpLocked check
 
         const pump = get().pumps.find((p) => p.id === id)
         if (!pump) {
@@ -221,21 +221,49 @@ export const useApp = create<AppState>()(
         const now = new Date().toISOString()
 
         // 1. Create and persist domain event (TRUTH)
-        // Note: Domain events use POWDER_COAT (underscore), app uses POWDER COAT (space)
-        // This cast handles the type mismatch during transition period
-        const event = pumpStageMoved(id, fromStage as any, to as any)
+        const event = pumpStageMoved(id, fromStage, to)
         eventStore.append(event).catch((err) => {
           console.error('Failed to persist stage move event:', err)
         })
 
-        // 2. Update pump state (derived from event)
+        // 2. Check if entering a full WORK stage -> auto-pause (Constitution §3.3)
+        let shouldAutoPause = false
+        if (WORK_STAGES.includes(to)) {
+          const { pumps, wipLimits } = get()
+          const wipLimit = wipLimits[to]
+          if (wipLimit !== null) {
+            // Count ACTIVE (non-paused) pumps in target stage
+            const activeInStage = pumps.filter(
+              (p) => p.stage === to && !p.isPaused && p.id !== id
+            ).length
+            shouldAutoPause = activeInStage >= wipLimit
+          }
+        }
+
+        // 3. Update pump state
+        const patch: Partial<Pump> = {
+          stage: to,
+          last_update: now,
+        }
+
+        if (shouldAutoPause) {
+          patch.isPaused = true
+          patch.pausedAt = now
+          patch.pausedStage = to
+          // Emit auto-pause event
+          const pauseEvent = pumpPaused(id, to, 'auto')
+          eventStore.append(pauseEvent).catch((err) => {
+            console.error('Failed to persist pause event:', err)
+          })
+        }
+
         const newPumps = get().pumps.map((p) =>
-          p.id === id ? { ...p, stage: to, last_update: now } : p
+          p.id === id ? { ...p, ...patch } : p
         )
         set({ pumps: newPumps })
 
-        // 3. Persist to adapter
-        get().adapter.update(id, { stage: to, last_update: now })
+        // 4. Persist to adapter
+        get().adapter.update(id, patch)
       },
 
       updatePump: (id, patch) => {
@@ -247,11 +275,19 @@ export const useApp = create<AppState>()(
         get().adapter.update(id, { ...patch, last_update: now })
       },
 
-      pausePump: (id) => {
+      // Constitution §3.3: Pause is truth
+      pausePump: (id, reason: 'auto' | 'manual' = 'manual') => {
         const pump = get().pumps.find((p) => p.id === id)
         if (!pump || pump.isPaused) return
 
         const now = new Date().toISOString()
+
+        // Emit domain event
+        const event = pumpPaused(id, pump.stage, reason)
+        eventStore.append(event).catch((err) => {
+          console.error('Failed to persist pause event:', err)
+        })
+
         const patch: Partial<Pump> = {
           isPaused: true,
           pausedAt: now,
@@ -262,9 +298,27 @@ export const useApp = create<AppState>()(
         get().updatePump(id, patch)
       },
 
+      // Constitution §3.3: Unpause blocked if would exceed capacity
       resumePump: (id) => {
         const pump = get().pumps.find((p) => p.id === id)
         if (!pump || !pump.isPaused) return
+
+        // Constitution §3.3: Block resume if it would exceed WIP limit
+        if (WORK_STAGES.includes(pump.stage)) {
+          const { pumps, wipLimits } = get()
+          const wipLimit = wipLimits[pump.stage]
+          if (wipLimit !== null) {
+            const activeInStage = pumps.filter(
+              (p) => p.stage === pump.stage && !p.isPaused && p.id !== id
+            ).length
+            if (activeInStage >= wipLimit) {
+              console.warn(
+                `Cannot resume pump ${id}: Stage ${pump.stage} at WIP limit (${activeInStage}/${wipLimit})`
+              )
+              return // Block resume
+            }
+          }
+        }
 
         const now = new Date()
         const pausedAt = pump.pausedAt ? new Date(pump.pausedAt) : now
@@ -272,6 +326,12 @@ export const useApp = create<AppState>()(
           (now.getTime() - pausedAt.getTime()) / (1000 * 60 * 60 * 24)
         )
         const totalPaused = (pump.totalPausedDays || 0) + pausedDays
+
+        // Emit domain event
+        const event = pumpResumed(id, pump.stage, pausedDays)
+        eventStore.append(event).catch((err) => {
+          console.error('Failed to persist resume event:', err)
+        })
 
         const patch: Partial<Pump> = {
           isPaused: false,

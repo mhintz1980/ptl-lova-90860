@@ -107,7 +107,7 @@ describe('MovePumpStageHandler', () => {
         const result = await handler.execute({
             type: 'MovePumpStage',
             pumpId: 'pump-001',
-            toStage: 'TESTING',
+            toStage: 'SHIP',
         });
 
         expect(result.ok).toBe(false);
