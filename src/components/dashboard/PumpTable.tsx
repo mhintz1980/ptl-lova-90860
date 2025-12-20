@@ -30,13 +30,14 @@ const priorityColors: Record<PriorityDot, string> = {
   Urgent: "bg-red-500",
 };
 
+// Constitution §2.1: Canonical stage labels
 const stageLabels: Record<Stage, string> = {
-  "QUEUE": "Queue",
+  QUEUE: "Queue",
   FABRICATION: "Fabrication",
-  "POWDER COAT": "Powder Coat",
+  STAGED_FOR_POWDER: "Staged",
+  POWDER_COAT: "Powder Coat",
   ASSEMBLY: "Assembly",
-  TESTING: "Testing",
-  SHIPPING: "Shipping",
+  SHIP: "Ship",
   CLOSED: "Closed",
 };
 

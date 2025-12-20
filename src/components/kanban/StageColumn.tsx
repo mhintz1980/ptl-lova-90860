@@ -33,14 +33,15 @@ export function StageColumn({ stage, pumps, collapsed, onCardClick, activeId }: 
     data: { type: "column", stage },
   });
 
+  // Constitution §2.1: Canonical stage accent colors
   const stageAccent: Record<Stage, string> = {
-    "QUEUE": "bg-slate-400",
-    "FABRICATION": "bg-blue-500",
-    "POWDER COAT": "bg-purple-500",
-    "ASSEMBLY": "bg-amber-500",
-    "TESTING": "bg-orange-500",
-    "SHIPPING": "bg-emerald-500",
-    "CLOSED": "bg-cyan-500",
+    QUEUE: "bg-slate-400",
+    FABRICATION: "bg-blue-500",
+    STAGED_FOR_POWDER: "bg-cyan-500",
+    POWDER_COAT: "bg-purple-500",
+    ASSEMBLY: "bg-amber-500",
+    SHIP: "bg-emerald-500",
+    CLOSED: "bg-green-500",
   };
 
   return (

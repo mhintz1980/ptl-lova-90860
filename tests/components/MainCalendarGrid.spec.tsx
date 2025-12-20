@@ -19,12 +19,12 @@ const pumps: Pump[] = [
   },
 ];
 
+// Constitution §2.1: Canonical StageDurations
 const mockGetModelLeadTimes = vi.fn().mockReturnValue({
   fabrication: 2,
   powder_coat: 3,
   assembly: 1,
-  testing: 1,
-  total_days: 7,
+  ship: 1, // merged testing+shipping
 });
 
 vi.mock("../../src/store", () => {
@@ -53,6 +53,6 @@ describe("MainCalendarGrid", () => {
     expect(events.length).toBeGreaterThan(1);
     const stages = events.map((node) => node.getAttribute("data-stage"));
     expect(stages).toContain("FABRICATION");
-    expect(stages).toContain("POWDER COAT");
+    expect(stages).toContain("POWDER_COAT"); // Constitution §2.1: underscore
   });
 });

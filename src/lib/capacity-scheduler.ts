@@ -29,24 +29,14 @@ const normalizeDays = (value?: number): number =>
 
 /**
  * Computes fabrication and total duration from stage lead times
+ * Constitution §2.1: ship replaces testing+shipping
  */
 export const computeDurationSummary = (leadTimes: StageDurations) => {
   const fabrication = normalizeDays(leadTimes.fabrication)
   const powder = normalizeDays(leadTimes.powder_coat)
   const assembly = normalizeDays(leadTimes.assembly)
-  const testing = normalizeDays(leadTimes.testing)
-  const baseSum = fabrication + powder + assembly + testing
-
-  let shipping = normalizeDays(leadTimes.shipping)
-  if (
-    typeof leadTimes.shipping !== 'number' &&
-    typeof leadTimes.total_days === 'number'
-  ) {
-    const remainder = Math.max(leadTimes.total_days - baseSum, 0)
-    shipping = normalizeDays(remainder)
-  }
-
-  const total = baseSum + shipping
+  const ship = normalizeDays(leadTimes.ship) // Constitution §2.1: merged testing+shipping
+  const total = fabrication + powder + assembly + ship
   return { fabricationDays: fabrication, totalDays: total }
 }
 

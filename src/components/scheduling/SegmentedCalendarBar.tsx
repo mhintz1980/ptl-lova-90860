@@ -32,13 +32,14 @@ export function SegmentedCalendarBar({
 }: SegmentedCalendarBarProps) {
   // Sort segments by stage sequence to ensure proper order
   const sortedSegments = useMemo(() => {
+    // Constitution §2.1: Canonical stage order
     const stageOrder: Record<Stage, number> = {
-      "QUEUE": 0,
+      QUEUE: 0,
       FABRICATION: 1,
-      "POWDER COAT": 2,
-      ASSEMBLY: 3,
-      TESTING: 4,
-      SHIPPING: 5,
+      STAGED_FOR_POWDER: 2,
+      POWDER_COAT: 3,
+      ASSEMBLY: 4,
+      SHIP: 5,
       CLOSED: 6,
     };
 

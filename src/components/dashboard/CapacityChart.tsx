@@ -33,13 +33,14 @@ interface CapacityTooltipProps {
   }>
 }
 
+// Constitution §2.1: Canonical stage order
 const STAGE_ORDER: Stage[] = [
   'QUEUE',
   'FABRICATION',
-  'POWDER COAT',
+  'STAGED_FOR_POWDER',
+  'POWDER_COAT',
   'ASSEMBLY',
-  'TESTING',
-  'SHIPPING',
+  'SHIP',
   'CLOSED',
 ]
 
@@ -61,14 +62,15 @@ const getStageCapacity = (pumps: Pump[]) => {
   return stageCounts
 }
 
+// Constitution §2.1: Canonical stage colors
 const getStageColor = (stage: Stage) => {
   const colors: Record<Stage, string> = {
     QUEUE: 'hsl(var(--muted-foreground))',
     FABRICATION: 'hsl(var(--chart-1))',
-    'POWDER COAT': 'hsl(var(--chart-2))',
+    STAGED_FOR_POWDER: 'hsl(var(--chart-6))',
+    POWDER_COAT: 'hsl(var(--chart-2))',
     ASSEMBLY: 'hsl(var(--chart-3))',
-    TESTING: 'hsl(var(--chart-4))',
-    SHIPPING: 'hsl(var(--chart-5))',
+    SHIP: 'hsl(var(--chart-5))',
     CLOSED: 'hsl(var(--muted))',
   }
   return colors[stage]

@@ -16,10 +16,10 @@ interface CalendarLegendProps {
 const ACTIVE_STAGES: Stage[] = [
   "QUEUE",
   "FABRICATION",
-  "POWDER COAT",
+  "POWDER_COAT",
   "ASSEMBLY",
-  "TESTING",
-  "SHIPPING",
+  "SHIP",
+  "SHIP",
 ];
 
 function LegendItem({ stage, active }: { stage: Stage; active: boolean }) {

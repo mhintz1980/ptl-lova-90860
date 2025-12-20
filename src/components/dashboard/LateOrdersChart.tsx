@@ -21,13 +21,14 @@ const getLateOrdersByStage = (pumps: Pump[]) => {
         return isAfter(now, promise);
     });
 
+    // Constitution §2.1: Canonical stage order
     const stages: Stage[] = [
         "QUEUE",
         "FABRICATION",
-        "POWDER COAT",
+        "STAGED_FOR_POWDER",
+        "POWDER_COAT",
         "ASSEMBLY",
-        "TESTING",
-        "SHIPPING"
+        "SHIP",
     ];
 
     return stages.map(stage => {
@@ -40,14 +41,15 @@ const getLateOrdersByStage = (pumps: Pump[]) => {
     }).filter(d => d.count > 0); // Only show stages with late orders
 };
 
+// Constitution §2.1: Canonical stage colors
 const getStageColor = (stage: string) => {
     const colors: Record<string, string> = {
         "QUEUE": "hsl(var(--muted-foreground))",
         "FABRICATION": "hsl(var(--chart-1))",
-        "POWDER COAT": "hsl(var(--chart-2))",
+        "STAGED_FOR_POWDER": "hsl(var(--chart-6))",
+        "POWDER_COAT": "hsl(var(--chart-2))",
         "ASSEMBLY": "hsl(var(--chart-3))",
-        "TESTING": "hsl(var(--chart-4))",
-        "SHIPPING": "hsl(var(--chart-5))",
+        "SHIP": "hsl(var(--chart-5))",
     };
     return colors[stage] || "hsl(var(--primary))";
 };

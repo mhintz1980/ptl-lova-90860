@@ -10,22 +10,24 @@ import { cn } from "../../lib/utils";
 import { getCatalogData } from "../../lib/seed";
 import { buildStageTimeline, StageBlock } from "../../lib/schedule";
 
+// Constitution §2.1: Canonical production stages for progress bar
 const PROGRESS_STAGES: Stage[] = [
     "FABRICATION",
-    "POWDER COAT",
+    "STAGED_FOR_POWDER",
+    "POWDER_COAT",
     "ASSEMBLY",
-    "TESTING",
-    "SHIPPING",
+    "SHIP",
 ];
 
+// Constitution §2.1: Stage colors for progress bar
 const STAGE_BAR_COLORS: Record<Stage, string> = {
-    "FABRICATION": "from-blue-600 to-blue-400",
-    "POWDER COAT": "from-purple-600 to-purple-400",
-    "ASSEMBLY": "from-amber-600 to-amber-400",
-    "TESTING": "from-orange-600 to-orange-400",
-    "SHIPPING": "from-emerald-600 to-emerald-400",
-    "QUEUE": "from-slate-600 to-slate-400",
-    "CLOSED": "from-cyan-600 to-cyan-400",
+    QUEUE: "from-slate-600 to-slate-400",
+    FABRICATION: "from-blue-600 to-blue-400",
+    STAGED_FOR_POWDER: "from-cyan-600 to-cyan-400",
+    POWDER_COAT: "from-purple-600 to-purple-400",
+    ASSEMBLY: "from-amber-600 to-amber-400",
+    SHIP: "from-emerald-600 to-emerald-400",
+    CLOSED: "from-green-600 to-green-400",
 };
 
 function TimelineProgress({ pump, blocks }: { pump: Pump, blocks: StageBlock[] }) {
@@ -94,7 +96,7 @@ function TimelineProgress({ pump, blocks }: { pump: Pump, blocks: StageBlock[] }
                                     "text-[10px] font-bold uppercase tracking-widest transition-all",
                                     (isCompleted || isCurrent) ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" : "text-muted-foreground/40"
                                 )}>
-                                    {stage === "POWDER COAT" ? "POWDER" : stage}
+                                    {stage === "POWDER_COAT" ? "POWDER" : stage}
                                 </span>
                             </div>
 
@@ -194,8 +196,8 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
         setIsEditing(false);
     };
 
-    // Derived Man-Hours Calculation - uses stage-specific capacity
-    const calculateManHours = (days: number | undefined, stage: 'fabrication' | 'assembly' | 'testing' | 'shipping') => {
+    // Constitution §2.1: ship replaces testing/shipping
+    const calculateManHours = (days: number | undefined, stage: 'fabrication' | 'assembly' | 'ship') => {
         if (!days) return 0;
         const stageConfig = capacityConfig[stage];
         const dailyManHours = stageConfig?.dailyManHours ?? 8;
@@ -225,7 +227,7 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
     const fabDays = getLeadTime('fabrication_days', 'fabrication');
     const pcDays = getLeadTime('powder_coat_days', 'powder_coat');
     const assemblyDays = getLeadTime('assembly_days', 'assembly');
-    const testingDays = getLeadTime('testing_days', 'testing');
+    const testingDays = getLeadTime('testing_days', 'ship');  // Constitution §2.1: ship replaces testing
 
     // Update handler for these specific "extra" fields
     // Update handler for these specific "extra" fields
@@ -390,7 +392,7 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                         <div className="relative pt-6 px-1">
                             <TimelineProgress
                                 pump={currentPump}
-                                blocks={buildStageTimeline(currentPump, catalogLeadTimes || { fabrication: 0, powder_coat: 0, assembly: 0, testing: 0 }, { capacityConfig })}
+                                blocks={buildStageTimeline(currentPump, catalogLeadTimes || { fabrication: 0, powder_coat: 0, assembly: 0, ship: 0 }, { capacityConfig })}
                             />
                         </div>
 
@@ -680,7 +682,7 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                                                 { label: 'Fabrication', days: fabDays, key: 'fabrication_days', stage: 'fabrication' as const },
                                                 { label: 'Powder Coat', days: pcDays, key: 'powder_coat_days', stage: null },
                                                 { label: 'Assembly', days: assemblyDays, key: 'assembly_days', stage: 'assembly' as const },
-                                                { label: 'Testing', days: testingDays, key: 'testing_days', stage: 'testing' as const },
+                                                { label: 'Testing/Ship', days: testingDays, key: 'testing_days', stage: 'ship' as const },
                                             ].map((dept) => (
                                                 <div key={dept.key} className="flex items-center justify-between py-2 border-b border-white/5 group hover:bg-white/5 transition-colors px-2 rounded">
                                                     <div className="text-xs font-medium text-muted-foreground uppercase">{dept.label}</div>

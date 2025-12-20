@@ -8,7 +8,7 @@ export function UpNextSlide() {
 
     const upNext = useMemo(() => {
         return pumps
-            .filter((p) => p.stage !== "CLOSED" && p.stage !== "SHIPPING")
+            .filter((p) => p.stage !== "CLOSED" && p.stage !== "SHIP")
             .sort((a, b) => {
                 // Sort by Priority (Urgent > Rush > High > Normal > Low)
                 const priorityWeight = { Urgent: 4, Rush: 3, High: 2, Normal: 1, Low: 0 };

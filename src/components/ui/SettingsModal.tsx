@@ -67,17 +67,16 @@ export function SettingsModal({ isOpen, onClose }: SettingsModalProps) {
                         </div>
 
                         <div className="grid gap-4 sm:grid-cols-2">
-                            {/* Helper to render a department card */}
-                            {(["fabrication", "assembly", "testing", "shipping"] as const).map((stage) => {
+                            {/* Constitution §2.1: ship replaces testing+shipping */}
+                            {(["fabrication", "assembly", "ship"] as const).map((stage) => {
                                 const config = capacityConfig[stage];
                                 const colorMap = {
                                     fabrication: "blue",
                                     assembly: "purple",
-                                    testing: "amber",
-                                    shipping: "emerald",
+                                    ship: "emerald",
                                 };
                                 const color = colorMap[stage];
-                                const label = stage.charAt(0).toUpperCase() + stage.slice(1);
+                                const label = stage === "ship" ? "Ship (Test+Ship)" : stage.charAt(0).toUpperCase() + stage.slice(1);
 
                                 return (
                                     <div key={stage} className="rounded-xl border border-border bg-card p-4 space-y-3">

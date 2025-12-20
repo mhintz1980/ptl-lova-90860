@@ -21,7 +21,7 @@ export const PumpCardGrid: React.FC<ChartProps> = ({ filters }) => {
 
     const isLate = (pump: Pump) => {
         if (!pump.scheduledEnd) return false;
-        return new Date(pump.scheduledEnd) < new Date() && pump.stage !== 'CLOSED' && pump.stage !== 'SHIPPING';
+        return new Date(pump.scheduledEnd) < new Date() && pump.stage !== 'CLOSED' && pump.stage !== 'SHIP';
     };
 
     return (

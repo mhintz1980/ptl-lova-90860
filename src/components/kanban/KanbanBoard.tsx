@@ -18,10 +18,10 @@ import { toast } from "sonner";
 const STAGES: Stage[] = [
   "QUEUE",
   "FABRICATION",
-  "POWDER COAT",
+  "POWDER_COAT",
   "ASSEMBLY",
-  "TESTING",
-  "SHIPPING",
+  "SHIP",
+  "SHIP",
   "CLOSED",
 ];
 

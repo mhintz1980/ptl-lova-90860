@@ -181,7 +181,7 @@ describe('Constitution Invariants', () => {
       store.moveStage('test-pump-5', 'ASSEMBLY');
       await new Promise(resolve => setTimeout(resolve, 10));
       
-      store.moveStage('test-pump-5', 'TESTING');
+      store.moveStage('test-pump-5', 'SHIP');
       await new Promise(resolve => setTimeout(resolve, 50));
       
       // Verify event order
@@ -192,7 +192,7 @@ describe('Constitution Invariants', () => {
       const stageEvents = events as any[];
       expect(stageEvents[0].toStage).toBe('FABRICATION');
       expect(stageEvents[1].toStage).toBe('ASSEMBLY');
-      expect(stageEvents[2].toStage).toBe('TESTING');
+      expect(stageEvents[2].toStage).toBe('SHIP');
       
       // Verify chronological order
       expect(events[0].occurredAt.getTime()).toBeLessThan(events[1].occurredAt.getTime());

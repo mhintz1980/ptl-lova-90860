@@ -42,10 +42,10 @@ export function FilterBar({ className, layout = "inline" }: FilterBarProps) {
   const stages: Stage[] = [
     "QUEUE",
     "FABRICATION",
-    "POWDER COAT",
+    "POWDER_COAT",
     "ASSEMBLY",
-    "TESTING",
-    "SHIPPING",
+    "SHIP",
+    "SHIP",
     "CLOSED",
   ];
 
