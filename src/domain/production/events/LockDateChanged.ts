@@ -1,11 +1,11 @@
 import type { DomainEvent } from './DomainEvent'
 
 /**
- * Domain event emitted when the global lock date is changed.
+ * LockDateChanged domain event.
  *
- * Constitution §7: Lock date affects forecast/projection only, never truth.
- * Pumps with forecastStart ≤ lockDate are "locked" from forecast operations
- * (autoSchedule, clearQueueSchedules) but NOT from Kanban moves (§3.2).
+ * Constitution §7: Emitted when the global lock date changes.
+ * Lock date changes affect forecast-hint operations
+ * (autoSetForecastHints, clearQueueForecastHints) but NOT Kanban moves (§3.2).
  */
 export interface LockDateChanged extends DomainEvent {
   eventType: 'LockDateChanged'

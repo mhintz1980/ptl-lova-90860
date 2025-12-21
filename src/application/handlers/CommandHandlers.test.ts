@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
     MovePumpStageHandler,
-    SchedulePumpHandler,
+    SetForecastHintHandler,
     PlaceOrderHandler,
 } from './CommandHandlers';
 import { Pump } from '../../domain/production/entities/Pump';
@@ -131,8 +131,8 @@ describe('MovePumpStageHandler', () => {
     });
 });
 
-describe('SchedulePumpHandler', () => {
-    let handler: SchedulePumpHandler;
+describe('SetForecastHintHandler', () => {
+    let handler: SetForecastHintHandler;
     let pumpRepo: IPumpRepository;
     let eventBus: EventBus;
     let testPump: Pump;
@@ -153,7 +153,7 @@ describe('SchedulePumpHandler', () => {
 
         pumpRepo = createMockPumpRepository(pumps);
         eventBus = new EventBus();
-        handler = new SchedulePumpHandler(pumpRepo, eventBus);
+        handler = new SetForecastHintHandler(pumpRepo, eventBus);
     });
 
     it('should schedule a pump and publish event', async () => {

@@ -149,23 +149,23 @@ describe('Pump Entity', () => {
     })
   })
 
-  describe('schedule() and clearSchedule()', () => {
-    it('should set scheduled dates', () => {
+  describe('setForecastHint() and clearForecastHint()', () => {
+    it('should set forecast hint dates', () => {
       const pump = Pump.create(basePumpProps)
       const start = new Date('2025-01-15')
       const end = new Date('2025-01-20')
 
-      pump.schedule(start, end)
+      pump.setForecastHint(start, end)
 
       expect(pump.forecastStart).toBe(start.toISOString())
       expect(pump.forecastEnd).toBe(end.toISOString())
     })
 
-    it('should clear scheduled dates', () => {
+    it('should clear forecast hint dates', () => {
       const pump = Pump.create(basePumpProps)
-      pump.schedule(new Date('2025-01-15'), new Date('2025-01-20'))
+      pump.setForecastHint(new Date('2025-01-15'), new Date('2025-01-20'))
 
-      pump.clearSchedule()
+      pump.clearForecastHint()
 
       expect(pump.forecastStart).toBeUndefined()
       expect(pump.forecastEnd).toBeUndefined()
