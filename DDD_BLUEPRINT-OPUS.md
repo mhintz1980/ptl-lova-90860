@@ -58,30 +58,30 @@ To consider this architecture successfully implemented, the following criteria m
 
 ### Codebase Verification Results
 
-| Claim | Verified | Notes |
-|-------|----------|-------|
-| `store.ts` ~546 lines | ✅ 545 lines | Accurate |
-| No domain folder exists | ✅ Confirmed | `src/domain/` needs to be created |
-| Stage enum matches blueprint | ✅ Confirmed | `src/types.ts` L3-11 |
-| `org_id` on Milestone | ⚠️ Still present | `src/types.ts` L115 - needs removal per confirmed decisions |
+| Claim                        | Verified         | Notes                                                       |
+| ---------------------------- | ---------------- | ----------------------------------------------------------- |
+| `store.ts` ~546 lines        | ✅ 545 lines     | Accurate                                                    |
+| No domain folder exists      | ✅ Confirmed     | `src/domain/` needs to be created                           |
+| Stage enum matches blueprint | ✅ Confirmed     | `src/types.ts` L3-11                                        |
+| `org_id` on Milestone        | ⚠️ Still present | `src/types.ts` L115 - needs removal per confirmed decisions |
 
 ### Documentation Quality (DDD Core Concepts)
 
-| Criterion | Status | Notes |
-|-----------|--------|-------|
-| Retcon Writing | ✅ Pass | No future tense violations found |
-| Context Poisoning | ⚠️ Minor | Stage naming: "POWDER COAT" vs "Powder Coat" inconsistency |
-| DRY Enforcement | ⚠️ Minor | Stage sequence repeated 4 times in document |
-| Progressive Organization | ✅ Pass | Good structure; TOC added in OPUS version |
+| Criterion                | Status   | Notes                                                      |
+| ------------------------ | -------- | ---------------------------------------------------------- |
+| Retcon Writing           | ✅ Pass  | No future tense violations found                           |
+| Context Poisoning        | ⚠️ Minor | Stage naming: "POWDER COAT" vs "Powder Coat" inconsistency |
+| DRY Enforcement          | ⚠️ Minor | Stage sequence repeated 4 times in document                |
+| Progressive Organization | ✅ Pass  | Good structure; TOC added in OPUS version                  |
 
 ### Implementation Plan Assessment
 
-| Criterion | Status | Notes |
-|-----------|--------|-------|
-| Chunk Sizing | ✅ Pass | 4 phases, appropriately scoped |
+| Criterion             | Status  | Notes                                          |
+| --------------------- | ------- | ---------------------------------------------- |
+| Chunk Sizing          | ✅ Pass | 4 phases, appropriately scoped                 |
 | Dependency Sequencing | ✅ Pass | Interfaces → Logic → Integration order correct |
-| Risk Coverage | ✅ Pass | 8 risks identified with mitigations |
-| Verification Plan | ✅ Pass | Unit + Integration + Manual testing defined |
+| Risk Coverage         | ✅ Pass | 8 risks identified with mitigations            |
+| Verification Plan     | ✅ Pass | Unit + Integration + Manual testing defined    |
 
 ### Recommendations Applied
 
@@ -99,35 +99,40 @@ To consider this architecture successfully implemented, the following criteria m
 
 ## A) Ubiquitous Language Glossary
 
-| Term                       | Definition                                                                                                                       |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| **Pump**                   | The manufactured asset. Each pump has a unique serial number and progresses through production stages.                           |
-| **Serial Number**          | A 4-digit unique identifier assigned to each pump at creation.                                                                   |
-| **Purchase Order (PO)**    | A customer's order that may contain multiple line items, each specifying a pump model and quantity.                              |
-| **Line Item**              | A single entry on a PO specifying model, quantity, color, and promise date. Expands into individual Pump records.                |
-| **Customer**               | The external party placing orders (e.g., "United Rentals", "Sunbelt Rentals").                                                   |
-| **Pump Model**             | A catalog entry defining the pump type (e.g., "DD-6 SAFE"), its price, BOM (Bill of Materials), lead times, and work hours.      |
-| **Stage**                  | A discrete step in the production workflow. Ordered: QUEUE → FABRICATION → POWDER COAT → ASSEMBLY → TESTING → SHIPPING → CLOSED. |
-| **Work-In-Progress (WIP)** | Pumps currently in production stages (not QUEUE or CLOSED).                                                                      |
-| **Lead Time**              | The expected number of business days to complete a production stage for a given model.                                           |
-| **Work Hours**             | The man-hours required per stage per model, used for capacity calculations.                                                      |
-| **Capacity**               | The weekly or daily throughput limit for a stage, derived from employee count, work hours, and efficiency.                       |
-| **Promise Date**           | The date by which the customer expects delivery; drives priority and late order detection.                                       |
-| **Scheduled Start/End**    | The projected start and completion dates calculated from lead times and capacity.                                                |
-| **Priority**               | Urgency level: Low, Normal, High, Rush, Urgent. Affects scheduling order.                                                        |
-| **Stage Move**             | The action of transitioning a pump from one stage to the next (the core production event).                                       |
-| **Auto-Schedule**          | System action that assigns scheduled dates to unscheduled QUEUE pumps based on priority and capacity.                            |
-| **Sandbox Mode**           | A simulation mode where changes are not persisted, allowing "what-if" scenario planning.                                         |
-| **Milestone**              | A department-level goal with a deadline (part of the Progress Engine).                                                           |
-| **MicroTask**              | A small, completable task linked to a milestone.                                                                                 |
-| **Powder Coat Vendor**     | An external vendor providing powder coating services, with a weekly pump capacity.                                               |
-| **Drill-Down**             | UX pattern where clicking a chart segment reveals the next level of detail within the same dataset.                              |
-| **Drill-Through**          | UX pattern where clicking navigates to a different view/report for contextual information.                                       |
+| Term                       | Definition                                                                                                                             |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| **Pump**                   | The manufactured asset. Each pump has a unique serial number and progresses through production stages.                                 |
+| **Serial Number**          | A 4-digit unique identifier assigned to each pump at creation.                                                                         |
+| **Purchase Order (PO)**    | A customer's order that may contain multiple line items, each specifying a pump model and quantity.                                    |
+| **Line Item**              | A single entry on a PO specifying model, quantity, color, and promise date. Expands into individual Pump records.                      |
+| **Customer**               | The external party placing orders (e.g., "United Rentals", "Sunbelt Rentals").                                                         |
+| **Pump Model**             | A catalog entry defining the pump type (e.g., "DD-6 SAFE"), its price, BOM (Bill of Materials), lead times, and work hours.            |
+| **Stage**                  | A discrete step in the production workflow. Ordered: QUEUE → FABRICATION → STAGED_FOR_POWDER → POWDER_COAT → ASSEMBLY → SHIP → CLOSED. |
+| **Work-In-Progress (WIP)** | Pumps currently in production stages (not QUEUE or CLOSED).                                                                            |
+| **Lead Time**              | The expected number of business days to complete a production stage for a given model.                                                 |
+| **Work Hours**             | The man-hours required per stage per model, used for capacity calculations.                                                            |
+| **Capacity**               | The weekly or daily throughput limit for a stage, derived from employee count, work hours, and efficiency.                             |
+| **Promise Date**           | The date by which the customer expects delivery; drives priority and late order detection.                                             |
+| **Scheduled Start/End**    | Forecast hint dates set by dragging to calendar. These are **planning metadata**, not truth — the projection engine recalculates them. |
+| **Priority**               | Urgency level: Low, Normal, High, Rush, Urgent. Affects scheduling order.                                                              |
+| **Stage Move**             | The action of transitioning a pump from one stage to the next (the core production event). **This is truth.**                          |
+| **Auto-Schedule**          | System action that assigns forecast hint dates to unscheduled QUEUE pumps based on priority and capacity.                              |
+| **Sandbox Mode**           | A simulation mode where changes are not persisted, allowing "what-if" scenario planning.                                               |
+| **Milestone**              | A department-level goal with a deadline (part of the Progress Engine).                                                                 |
+| **MicroTask**              | A small, completable task linked to a milestone.                                                                                       |
+| **Powder Coat Vendor**     | An external vendor providing powder coating services, with a weekly pump capacity.                                                     |
+| **Drill-Down**             | UX pattern where clicking a chart segment reveals the next level of detail within the same dataset.                                    |
+| **Drill-Through**          | UX pattern where clicking navigates to a different view/report for contextual information.                                             |
 
 > [!IMPORTANT]
-> **Stage Sequence (Canonical)**: QUEUE → FABRICATION → POWDER COAT → ASSEMBLY → TESTING → SHIPPING → CLOSED
+> **Stage Sequence (Canonical per Constitution v1.2)**: QUEUE → FABRICATION → STAGED_FOR_POWDER → POWDER_COAT → ASSEMBLY → SHIP → CLOSED
 >
 > This is the authoritative reference. Stage transitions must follow this exact order with no skipping.
+>
+> - `STAGED_FOR_POWDER` is a **buffer stage** (no man-hours consumed)
+> - `SHIP` replaces legacy `TESTING` + `SHIPPING`
+>
+> **Scheduling Model**: Calendar is a **projection** (forecast), not truth. Only Kanban moves are truth.
 
 ---
 
@@ -215,12 +220,12 @@ graph TB
 
 #### Value Objects
 
-| Value Object     | Properties                                                                 | Notes                                |
-| ---------------- | -------------------------------------------------------------------------- | ------------------------------------ |
-| `Stage`          | enum: QUEUE, FABRICATION, POWDER COAT, ASSEMBLY, TESTING, SHIPPING, CLOSED | Ordered; defines valid transitions.  |
-| `Priority`       | enum: Low, Normal, High, Rush, Urgent                                      | Affects scheduling order.            |
-| `ScheduleWindow` | `startISO`, `endISO`                                                       | Immutable once calculated.           |
-| `StageBlock`     | `stage`, `start`, `end`, `days`, `pump`                                    | Represents a pump's time in a stage. |
+| Value Object     | Properties                                                                       | Notes                                          |
+| ---------------- | -------------------------------------------------------------------------------- | ---------------------------------------------- |
+| `Stage`          | enum: QUEUE, FABRICATION, STAGED_FOR_POWDER, POWDER_COAT, ASSEMBLY, SHIP, CLOSED | Ordered; defines valid transitions.            |
+| `Priority`       | enum: Low, Normal, High, Rush, Urgent                                            | Affects scheduling order.                      |
+| `ScheduleWindow` | `startISO`, `endISO`                                                             | Forecast hint; recalculated by projection.     |
+| `StageBlock`     | `stage`, `start`, `end`, `days`, `pump`                                          | Represents a pump's projected time in a stage. |
 
 #### Aggregates
 
@@ -244,20 +249,26 @@ graph TB
 
 #### Domain Events
 
-| Event                 | Trigger                  | Payload                                                 |
-| --------------------- | ------------------------ | ------------------------------------------------------- |
-| `PumpCreated`         | New pump added (from PO) | `{ pumpId, serial, model, customer, po, stage: QUEUE }` |
-| `PumpStageMoved`      | Stage transition         | `{ pumpId, fromStage, toStage, timestamp }`             |
-| `PumpScheduled`       | Schedule assigned        | `{ pumpId, scheduledStart, scheduledEnd }`              |
-| `PumpScheduleCleared` | Schedule removed         | `{ pumpId }`                                            |
-| `PumpUpdated`         | Any attribute change     | `{ pumpId, changes }`                                   |
+| Event                 | Trigger                        | Payload                                                 |
+| --------------------- | ------------------------------ | ------------------------------------------------------- | ----------- |
+| `PumpCreated`         | New pump added (from PO)       | `{ pumpId, serial, model, customer, po, stage: QUEUE }` |
+| `PumpStageMoved`      | Stage transition (TRUTH)       | `{ pumpId, fromStage, toStage, timestamp }`             |
+| `PumpPaused`          | WIP limit auto-pause or manual | `{ pumpId, stage, reason: 'auto'                        | 'manual' }` |
+| `PumpResumed`         | Unpaused when WIP available    | `{ pumpId, stage, pausedDays }`                         |
+| `ForecastHintUpdated` | Calendar drop (planning only)  | `{ pumpId, scheduledStart, scheduledEnd }`              |
+| `PumpUpdated`         | Any attribute change           | `{ pumpId, changes }`                                   |
+
+> [!NOTE]
+> **Scheduling is NOT truth**. `ForecastHintUpdated` replaces the old `PumpScheduled` event.
+> Calendar dates are planning metadata that the projection engine recalculates.
+> Only `PumpStageMoved` events represent actual production truth.
 
 #### Invariants
 
-1. **Stage Order**: Pumps must progress QUEUE → FABRICATION → POWDER COAT → ASSEMBLY → TESTING → SHIPPING → CLOSED. No skipping.
+1. **Stage Order**: Pumps must progress QUEUE → FABRICATION → STAGED_FOR_POWDER → POWDER_COAT → ASSEMBLY → SHIP → CLOSED. No skipping.
 2. **Unique Serial**: No two pumps may share the same serial number.
-3. **WIP Limits**: A stage may have a WIP limit (e.g., FABRICATION max 8). Enforced at UI/policy level, not strictly by aggregate.
-4. **Immutable After Close**: Once CLOSED, a pump cannot be re-opened (business rule to confirm).
+3. **WIP Limits**: WORK stages (FABRICATION, ASSEMBLY, SHIP) have WIP limits. Pumps auto-pause when entering a full stage.
+4. **Immutable After Close**: Once CLOSED, a pump cannot be re-opened (business rule confirmed).
 
 ---
 
@@ -316,11 +327,11 @@ graph TB
 
 #### Value Objects
 
-| Value Object      | Properties                                                        |
-| ----------------- | ----------------------------------------------------------------- |
-| `BillOfMaterials` | `engine`, `gearbox`, `control_panel`                              |
-| `LeadTimes`       | `fabrication`, `powder_coat`, `assembly`, `testing`, `total_days` |
-| `WorkHours`       | `fabrication`, `assembly`, `testing`, `shipping`                  |
+| Value Object      | Properties                                                                |
+| ----------------- | ------------------------------------------------------------------------- |
+| `BillOfMaterials` | `engine`, `gearbox`, `control_panel`                                      |
+| `LeadTimes`       | `fabrication`, `powder_coat`, `assembly`, `ship`, `total_days`            |
+| `WorkHours`       | `fabrication`, `assembly`, `ship` (Constitution: merged testing+shipping) |
 
 #### Invariants
 
@@ -334,10 +345,14 @@ graph TB
 
 #### Entities
 
-| Entity             | Identity                                           | Attributes                                                     |
-| ------------------ | -------------------------------------------------- | -------------------------------------------------------------- |
-| `DepartmentConfig` | `stage` (FABRICATION, ASSEMBLY, TESTING, SHIPPING) | `employeeCount`, `workDayHours`, `efficiency`, `dailyManHours` |
-| `PowderCoatVendor` | `id`                                               | `name`, `maxPumpsPerWeek`                                      |
+| Entity             | Identity                              | Attributes                                                     |
+| ------------------ | ------------------------------------- | -------------------------------------------------------------- |
+| `DepartmentConfig` | `stage` (FABRICATION, ASSEMBLY, SHIP) | `employeeCount`, `workDayHours`, `efficiency`, `dailyManHours` |
+| `PowderCoatVendor` | `id`                                  | `name`, `maxPumpsPerWeek`                                      |
+
+> [!NOTE]
+> **WORK_STAGES** per Constitution §3.3: FABRICATION, ASSEMBLY, SHIP
+> These stages consume man-hours and have WIP limits. STAGED_FOR_POWDER is a buffer (no man-hours).
 
 #### Aggregates
 
@@ -348,8 +363,7 @@ graph TB
 │  │  CapacityConfig (Aggregate Root)                       │  │
 │  │  - fabrication: DepartmentConfig                       │  │
 │  │  - assembly: DepartmentConfig                          │  │
-│  │  - testing: DepartmentConfig                           │  │
-│  │  - shipping: DepartmentConfig                          │  │
+│  │  - ship: DepartmentConfig  (merged testing+shipping)   │  │
 │  │  - powderCoat: { vendors: PowderCoatVendor[] }         │  │
 │  └───────────────────────────────────────────────────────┘  │
 │                                                              │
@@ -388,10 +402,12 @@ graph TB
 | User Goal                        | Actor             | Command                                   | Events                                        | Read Model Update                                |
 | -------------------------------- | ----------------- | ----------------------------------------- | --------------------------------------------- | ------------------------------------------------ |
 | **Place a new order**            | Sales User        | `PlaceOrder(po, customer, lines[])`       | `OrderPlaced`, `PumpCreated` (×N)             | Orders list, Backlog count, WIP totals           |
-| **Move pump to next stage**      | Shop Floor Worker | `MovePumpStage(pumpId, toStage)`          | `PumpStageMoved`                              | Kanban columns, Stage WIP counts, Timeline       |
-| **Schedule a pump**              | Scheduler         | `SchedulePump(pumpId, startDate)`         | `PumpScheduled`                               | Calendar grid, Backlog dock                      |
-| **Auto-schedule backlog**        | Scheduler         | `AutoSchedule()`                          | `PumpScheduled` (×N)                          | Calendar grid, Backlog cleared                   |
-| **Clear pump schedule**          | Scheduler         | `ClearSchedule(pumpId)`                   | `PumpScheduleCleared`                         | Pump returns to backlog                          |
+| **Move pump to next stage**      | Shop Floor Worker | `MovePumpStage(pumpId, toStage)`          | `PumpStageMoved`, possibly `PumpPaused`       | Kanban columns, Stage WIP counts, Timeline       |
+| **Set forecast hint (schedule)** | Scheduler         | `SetForecastHint(pumpId, startDate)`      | `ForecastHintUpdated` (planning metadata)     | Calendar grid, Backlog dock                      |
+| **Auto-schedule backlog**        | Scheduler         | `AutoSchedule()`                          | `ForecastHintUpdated` (×N)                    | Calendar grid, Backlog cleared                   |
+| **Clear forecast hint**          | Scheduler         | `ClearForecastHint(pumpId)`               | `ForecastHintUpdated` (cleared)               | Pump returns to backlog                          |
+| **Pause pump (manual)**          | Shop Floor Worker | `PausePump(pumpId)`                       | `PumpPaused`                                  | WIP counts adjusted                              |
+| **Resume pump**                  | Shop Floor Worker | `ResumePump(pumpId)`                      | `PumpResumed` (if WIP available)              | WIP counts adjusted                              |
 | **Update pump details**          | Admin             | `UpdatePump(pumpId, patch)`               | `PumpUpdated`                                 | Pump detail modal, Kanban card                   |
 | **Drill down on WIP by Model**   | Analyst           | (Read operation)                          | —                                             | Show pumps filtered by model, then by customer   |
 | **Drill down on Value by Model** | Analyst           | (Read operation)                          | —                                             | Show orders/customers contributing to that value |
@@ -401,6 +417,13 @@ graph TB
 | **Adjust department staffing**   | Admin             | `UpdateDepartmentStaffing(stage, config)` | —                                             | Capacity recalculated                            |
 | **Create milestone**             | Manager           | `AddMilestone(milestone)`                 | `MilestoneCreated`                            | Kiosk progress widget                            |
 | **Toggle micro-task**            | Worker            | `ToggleMicroTask(taskId)`                 | `MicroTaskCompleted` / `MicroTaskUncompleted` | Progress bar update                              |
+
+> [!IMPORTANT]
+> **Scheduling is PROJECTION, not truth.**
+>
+> - `SetForecastHint` sets planning metadata (scheduledStart/End) which the projection engine may recalculate.
+> - Only `PumpStageMoved` events represent actual production truth.
+> - Calendar is a read model built from Kanban state + lead times.
 
 ### D.2 Read Models for Dashboard Drill-Down
 
@@ -581,13 +604,11 @@ For the **modular monolith**, APIs are in-process function calls via hooks and a
 ### E.5 Integration Patterns
 
 1. **Event-Driven (In-Process)**:
-
    - `OrderPlaced` → Production Control creates Pump records
    - `PumpStageMoved` → Analytics updates read models
    - Future: Event sourcing for audit trail (the "Ledger" concept from PROJECT_REBUILD_PLAN)
 
 2. **Query-Based (Read Models)**:
-
    - Dashboard queries optimized views (WipByModel, ValueByCustomer)
    - Read models can be materialized views or computed on-demand
 
@@ -600,58 +621,65 @@ For the **modular monolith**, APIs are in-process function calls via hooks and a
 This plan breaks down the migration into atomic, verifiable phases.
 
 #### Phase 1: Domain Core Extraction
+
 **Goal**: Establish the domain layer without breaking the app.
 
-*   `[NEW] src/domain/production/value-objects/Stage.ts`
-*   `[NEW] src/domain/production/value-objects/Priority.ts`
-*   `[NEW] src/domain/production/entities/Pump.ts` (Pure logic, no store deps)
-*   `[NEW] src/domain/sales/entities/PurchaseOrder.ts`
-*   `[NEW] src/domain/shared/Entity.ts` (Base class)
+- `[NEW] src/domain/production/value-objects/Stage.ts`
+- `[NEW] src/domain/production/value-objects/Priority.ts`
+- `[NEW] src/domain/production/entities/Pump.ts` (Pure logic, no store deps)
+- `[NEW] src/domain/sales/entities/PurchaseOrder.ts`
+- `[NEW] src/domain/shared/Entity.ts` (Base class)
 
 #### Phase 2: Application Layer & Services
+
 **Goal**: Connect Domain logic to Application flow.
 
-*   `[NEW] src/domain/production/services/SchedulingService.ts`
-*   `[NEW] src/application/commands/MovePumpCommand.ts`
-*   `[NEW] src/application/commands/SchedulePumpCommand.ts`
-*   `[NEW] src/infrastructure/eventBus/EventBus.ts`
-*   `[NEW] src/domain/production/events/PumpStageMoved.ts`
+- `[NEW] src/domain/production/services/SchedulingService.ts`
+- `[NEW] src/application/commands/MovePumpCommand.ts`
+- `[NEW] src/application/commands/SchedulePumpCommand.ts`
+- `[NEW] src/infrastructure/eventBus/EventBus.ts`
+- `[NEW] src/domain/production/events/PumpStageMoved.ts`
 
 #### Phase 3: Infrastructure & Persistence
+
 **Goal**: Implement repositories that unify Supabase + LocalStorage.
 
-*   `[NEW] src/domain/production/repository.ts` (Interface)
-*   `[NEW] src/infrastructure/persistence/repositories/PumpRepository.ts`
-*   `[NEW] src/infrastructure/persistence/adapters/SupabaseAdapter.ts`
-*   `[MODIFY] src/store.ts` (Remove logic, delegate to Repositories/Commands)
+- `[NEW] src/domain/production/repository.ts` (Interface)
+- `[NEW] src/infrastructure/persistence/repositories/PumpRepository.ts`
+- `[NEW] src/infrastructure/persistence/adapters/SupabaseAdapter.ts`
+- `[MODIFY] src/store.ts` (Remove logic, delegate to Repositories/Commands)
 
 #### Phase 4: Verification & UI Integration
+
 **Goal**: Wire new Architecture to UI Components.
 
-*   `[MODIFY] src/components/kanban/KanbanBoard.tsx` (Use new hooks)
-*   `[MODIFY] src/components/scheduling/SchedulingView.tsx` (Use SchedulingService)
-*   `[NEW] src/components/dashboard/DrillDownContainer.tsx`
+- `[MODIFY] src/components/kanban/KanbanBoard.tsx` (Use new hooks)
+- `[MODIFY] src/components/scheduling/SchedulingView.tsx` (Use SchedulingService)
+- `[NEW] src/components/dashboard/DrillDownContainer.tsx`
 
 ---
 
 ## F) Verification Plan
 
 ### F.1 Unit Testing Strategy
-*   **Framework**: Vitest
-*   **Scope**: All Domain Entities, Value Objects, and Domain Services.
-*   **Key Invariants to Test**:
-    *   `Pump.ts`: Cannot move from CLOSED to FABRICATION.
-    *   `Pump.ts`: Cannot skip stages (e.g. FABRICATION -> TESTING).
-    *   `Naming`: Serial numbers match regex pattern.
+
+- **Framework**: Vitest
+- **Scope**: All Domain Entities, Value Objects, and Domain Services.
+- **Key Invariants to Test**:
+  - `Pump.ts`: Cannot move from CLOSED to FABRICATION.
+  - `Pump.ts`: Cannot skip stages (e.g. FABRICATION -> TESTING).
+  - `Naming`: Serial numbers match regex pattern.
 
 ### F.2 Integration Testing Strategy
-*   **Framework**: Vitest (Service Layer)
-*   **Scope**: Command Handlers and Repositories.
-*   **Scenarios**:
-    *   "Execute MovePumpCommand -> Persistence Updated -> Event Emitted -> Read Model Updated"
-    *   "Execute AutoSchedule -> All Pumps have valid dates -> Capacity respected"
+
+- **Framework**: Vitest (Service Layer)
+- **Scope**: Command Handlers and Repositories.
+- **Scenarios**:
+  - "Execute MovePumpCommand -> Persistence Updated -> Event Emitted -> Read Model Updated"
+  - "Execute AutoSchedule -> All Pumps have valid dates -> Capacity respected"
 
 ### F.3 Manual Verification Strategy
+
 1.  **Smoke Test**: Load Dashboard, ensure no white screen.
 2.  **Legacy Flow**: Drag card in Kanban. Reload page. Position persisted?
 3.  **Drill Down**: Click "WIP by Model" chart slice. Does list filter?
@@ -662,38 +690,34 @@ This plan breaks down the migration into atomic, verifiable phases.
 
 ### F.1 Identified Risks in Existing System
 
-| Risk                          | Severity  | Evidence                                                                   | Mitigation                                                                   |
-| ----------------------------- | --------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| **Monolithic Store**          | 🔴 High   | `store.ts` is 545 lines with mixed domain logic, persistence, and UI state | Extract domain logic into `domain/` modules; keep store thin                 |
-| **Implicit PO Model**         | 🟡 Medium | PO exists only as a string on Pump; no aggregate                           | Explicit `PurchaseOrder` entity enables PO-level analytics and drill-through |
-| **No Event History**          | 🟡 Medium | Stage moves update in place; no audit trail                                | Introduce `PumpStageMoved` events; optionally store in ledger table          |
-| **Sandbox Persistence Risk**  | 🟡 Medium | Relies on `isSandbox` flag check in adapter                                | Formalize via `SandboxManager` with explicit lock                            |
-| **Capacity Logic in Store**   | 🟡 Medium | `autoSchedule` embeds complex capacity logic                               | Extract to `SchedulingService` in domain                                     |
-| **Data Migration**            | 🟡 Medium | Existing `localStorage` JSON shape differs from new Entity Models          | Create a `MigrationAdapter` to map legacy JSON to new Domain Entities on load|
-| **Lead Time Lookup Coupling** | 🟠 Low    | `getModelLeadTimes` pulls from seed data directly                          | Inject Catalog repository; separate concerns                                 |
-| **UI State Persistence**      | 🟠 Low    | Filters, collapsed states persisted in Zustand                             | Fine for now; could separate if becomes complex                              |
+| Risk                          | Severity  | Evidence                                                                   | Mitigation                                                                    |
+| ----------------------------- | --------- | -------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **Monolithic Store**          | 🔴 High   | `store.ts` is 545 lines with mixed domain logic, persistence, and UI state | Extract domain logic into `domain/` modules; keep store thin                  |
+| **Implicit PO Model**         | 🟡 Medium | PO exists only as a string on Pump; no aggregate                           | Explicit `PurchaseOrder` entity enables PO-level analytics and drill-through  |
+| **No Event History**          | 🟡 Medium | Stage moves update in place; no audit trail                                | Introduce `PumpStageMoved` events; optionally store in ledger table           |
+| **Sandbox Persistence Risk**  | 🟡 Medium | Relies on `isSandbox` flag check in adapter                                | Formalize via `SandboxManager` with explicit lock                             |
+| **Capacity Logic in Store**   | 🟡 Medium | `autoSchedule` embeds complex capacity logic                               | Extract to `SchedulingService` in domain                                      |
+| **Data Migration**            | 🟡 Medium | Existing `localStorage` JSON shape differs from new Entity Models          | Create a `MigrationAdapter` to map legacy JSON to new Domain Entities on load |
+| **Lead Time Lookup Coupling** | 🟠 Low    | `getModelLeadTimes` pulls from seed data directly                          | Inject Catalog repository; separate concerns                                  |
+| **UI State Persistence**      | 🟠 Low    | Filters, collapsed states persisted in Zustand                             | Fine for now; could separate if becomes complex                               |
 
 ### F.2 Refactor Priorities (Ordered)
 
 1. **Domain Layer Extraction**
-
    - Create `domain/production/entities/Pump.ts` with stage transition methods
    - Create `domain/production/services/SchedulingService.ts`
    - Define repository interface `IPumpRepository`
 
 2. **Explicit PurchaseOrder Aggregate**
-
    - Model PO with line items
    - Enable PO-level queries for drill-down
 
 3. **Event Infrastructure**
-
    - Add `EventBus` for domain events
    - Emit events on stage moves, scheduling actions
    - Foundation for future Ledger/audit log
 
 4. **Read Model Services**
-
    - `WipQueryService` for WIP by stage/model/customer
    - `ValueQueryService` for value analytics
    - Decouples presentation from domain aggregates
@@ -711,7 +735,9 @@ This plan breaks down the migration into atomic, verifiable phases.
 
 | Question | Decision | Impact |
 |----------|----------|--------|
-| **Stage Transitions** | No skipping. Pumps must follow the full sequence: QUEUE → FABRICATION → POWDER COAT → ASSEMBLY → TESTING → SHIPPING → CLOSED | Enforced as invariant in Pump aggregate |
+| **Stage Transitions** | No skipping. Pumps must follow the full sequence: QUEUE → FABRICATION → STAGED_FOR_POWDER → POWDER_COAT → ASSEMBLY → SHIP → CLOSED | Enforced as invariant in Pump aggregate |
+| **Scheduling Model** | Calendar is **projection**, not truth. Only Kanban moves are truth events. scheduledStart/End are forecast hints. | ForecastHintUpdated replaces PumpScheduled |
+| **WIP Enforcement** | WORK stages (FABRICATION, ASSEMBLY, SHIP) have WIP limits. Pumps auto-pause when entering a full stage. | Enforced via PumpPaused events |
 | **Closed Pumps** | CLOSED is terminal. Cannot be re-opened. | Enforced as invariant |
 | **Multi-Tenancy** | Single organization only. Remove `org_id` from Milestone (unnecessary clutter). | Simplifies all entity models |
 | **Tech Stack** | Stay with **React SPA + Supabase**. Only migrate to Next.js if it solves problems that React cannot. | Modular monolith on current stack |
@@ -730,7 +756,7 @@ CREATE TABLE stage_moves (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   pump_id UUID NOT NULL REFERENCES pumps(id),
   from_stage TEXT,                    -- NULL for initial creation
-  to_stage TEXT NOT NULL,
+  to_stage TEXT NOT NULL,             -- Canonical: QUEUE/FABRICATION/STAGED_FOR_POWDER/POWDER_COAT/ASSEMBLY/SHIP/CLOSED
   moved_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   moved_by TEXT,                      -- Optional: user who made the move
 
@@ -739,7 +765,7 @@ CREATE TABLE stage_moves (
   pump_model TEXT NOT NULL,
   customer TEXT NOT NULL,
   po TEXT NOT NULL,
-  powder_coat_vendor TEXT             -- Populated when to_stage = 'POWDER COAT'
+  powder_coat_vendor TEXT             -- Populated when to_stage = 'POWDER_COAT'
 );
 
 CREATE INDEX idx_stage_moves_pump ON stage_moves(pump_id);
@@ -753,9 +779,9 @@ CREATE INDEX idx_stage_moves_model ON stage_moves(pump_model);
 
 | Question                                                      | SQL                                                                                                                                                                                                                        |
 | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| "How many DD6-SAFE did we ship to United Rentals in Q1 2025?" | `SELECT COUNT(DISTINCT pump_id) FROM stage_moves WHERE pump_model = 'DD6-SAFE' AND customer = 'United Rentals' AND to_stage = 'SHIPPING' AND moved_at BETWEEN '2025-01-01' AND '2025-03-31'`                               |
-| "Which powder coat vendor did the least work this year?"      | `SELECT powder_coat_vendor, COUNT(*) FROM stage_moves WHERE to_stage = 'POWDER COAT' AND moved_at >= '2025-01-01' GROUP BY powder_coat_vendor ORDER BY count ASC LIMIT 1`                                                  |
-| "When did serial #12345 pass through testing?"                | `SELECT moved_at FROM stage_moves WHERE pump_serial = 12345 AND to_stage = 'TESTING'`                                                                                                                                      |
+| "How many DD6-SAFE did we ship to United Rentals in Q1 2025?" | `SELECT COUNT(DISTINCT pump_id) FROM stage_moves WHERE pump_model = 'DD6-SAFE' AND customer = 'United Rentals' AND to_stage = 'SHIP' AND moved_at BETWEEN '2025-01-01' AND '2025-03-31'`                                   |
+| "Which powder coat vendor did the least work this year?"      | `SELECT powder_coat_vendor, COUNT(*) FROM stage_moves WHERE to_stage = 'POWDER_COAT' AND moved_at >= '2025-01-01' GROUP BY powder_coat_vendor ORDER BY count ASC LIMIT 1`                                                  |
+| "When did serial #12345 move to SHIP stage?"                  | `SELECT moved_at FROM stage_moves WHERE pump_serial = 12345 AND to_stage = 'SHIP'`                                                                                                                                         |
 | "Which model did Customer B purchase most last year?"         | `SELECT pump_model, COUNT(DISTINCT pump_id) as cnt FROM stage_moves WHERE customer = 'Customer B' AND from_stage IS NULL AND moved_at BETWEEN '2024-01-01' AND '2024-12-31' GROUP BY pump_model ORDER BY cnt DESC LIMIT 1` |
 
 ### Domain Event → Ledger Entry
@@ -769,7 +795,7 @@ async function recordStageMove(
   fromStage: Stage | null,
   toStage: Stage
 ) {
-  await supabase.from("stage_moves").insert({
+  await supabase.from('stage_moves').insert({
     pump_id: pump.id,
     from_stage: fromStage,
     to_stage: toStage,
@@ -778,8 +804,8 @@ async function recordStageMove(
     customer: pump.customer,
     po: pump.po,
     powder_coat_vendor:
-      toStage === "POWDER COAT" ? getAssignedVendor(pump) : null,
-  });
+      toStage === 'POWDER COAT' ? getAssignedVendor(pump) : null,
+  })
 }
 ```
 
@@ -820,13 +846,13 @@ graph LR
 
 ### H.1 Philosophy Alignment
 
-| Principle | Application |
-|-----------|-------------|
-| **Bricks & Studs** (modular-builder) | Each module is self-contained with clear public interface (`__all__`) |
-| **Ruthless Simplicity** (zen-architect) | Start minimal, no future-proofing, question every abstraction |
-| **Test Pyramid** (test-coverage) | 60% unit, 30% integration, 10% e2e |
-| **Vertical Slices** | Complete flows before expanding; get data flowing early |
-| **Regeneratable** | Modules can be rebuilt from spec without breaking connections |
+| Principle                               | Application                                                           |
+| --------------------------------------- | --------------------------------------------------------------------- |
+| **Bricks & Studs** (modular-builder)    | Each module is self-contained with clear public interface (`__all__`) |
+| **Ruthless Simplicity** (zen-architect) | Start minimal, no future-proofing, question every abstraction         |
+| **Test Pyramid** (test-coverage)        | 60% unit, 30% integration, 10% e2e                                    |
+| **Vertical Slices**                     | Complete flows before expanding; get data flowing early               |
+| **Regeneratable**                       | Modules can be rebuilt from spec without breaking connections         |
 
 ### H.2 Implementation Chunks
 
@@ -839,11 +865,13 @@ Each chunk follows the `code-planner` methodology: <500 lines, independently tes
 **Purpose**: Foundation types that all other modules depend on.
 
 **Files**:
+
 - `[NEW] src/domain/shared/Entity.ts` - Base class with id and equality
 - `[NEW] src/domain/production/value-objects/Stage.ts` - Stage enum with ordering
 - `[NEW] src/domain/production/value-objects/Priority.ts` - Priority enum
 
 **Contract**:
+
 ```typescript
 // Stage.ts - Public Interface
 export const STAGES = ['QUEUE', 'FABRICATION', 'POWDER_COAT', ...] as const;
@@ -855,6 +883,7 @@ export function canTransition(from: Stage, to: Stage): boolean;
 **Dependencies**: None (leaf module)
 
 **Test Requirements**:
+
 - `canTransition('QUEUE', 'FABRICATION')` → true
 - `canTransition('QUEUE', 'TESTING')` → false (no skip)
 - `canTransition('CLOSED', 'QUEUE')` → false (terminal)
@@ -868,29 +897,33 @@ export function canTransition(from: Stage, to: Stage): boolean;
 **Purpose**: Core domain entity with business logic.
 
 **Files**:
+
 - `[NEW] src/domain/production/entities/Pump.ts`
 - `[NEW] src/domain/production/entities/Pump.test.ts`
 
 **Contract**:
+
 ```typescript
 // Pump.ts - Public Interface
 export class Pump {
-  readonly id: string;
-  readonly serial: number;
-  moveToStage(stage: Stage): Result<PumpStageMoved | InvalidTransition>;
-  schedule(start: Date, end: Date): void;
-  clearSchedule(): void;
+  readonly id: string
+  readonly serial: number
+  moveToStage(stage: Stage): Result<PumpStageMoved | InvalidTransition>
+  schedule(start: Date, end: Date): void
+  clearSchedule(): void
 }
 ```
 
 **Dependencies**: Chunk 1 (Stage, Priority)
 
 **Invariants Enforced**:
+
 1. Stage transitions follow sequence
 2. CLOSED pumps cannot transition
 3. Serial is immutable
 
 **Test Requirements**:
+
 - Create pump → stage is QUEUE
 - Move QUEUE → FABRICATION → success
 - Move QUEUE → TESTING → InvalidTransition error
@@ -905,23 +938,25 @@ export class Pump {
 **Purpose**: Event definitions for domain operations.
 
 **Files**:
+
 - `[NEW] src/domain/production/events/PumpCreated.ts`
 - `[NEW] src/domain/production/events/PumpStageMoved.ts`
 - `[NEW] src/domain/production/events/PumpScheduled.ts`
 - `[NEW] src/domain/production/events/index.ts`
 
 **Contract**:
+
 ```typescript
 export interface DomainEvent {
-  readonly eventType: string;
-  readonly occurredAt: Date;
-  readonly aggregateId: string;
+  readonly eventType: string
+  readonly occurredAt: Date
+  readonly aggregateId: string
 }
 
 export interface PumpStageMoved extends DomainEvent {
-  readonly eventType: 'PumpStageMoved';
-  readonly fromStage: Stage | null;
-  readonly toStage: Stage;
+  readonly eventType: 'PumpStageMoved'
+  readonly fromStage: Stage | null
+  readonly toStage: Stage
 }
 ```
 
@@ -938,30 +973,34 @@ export interface PumpStageMoved extends DomainEvent {
 **Purpose**: Explicit PO modeling for drill-down analytics.
 
 **Files**:
+
 - `[NEW] src/domain/sales/entities/PurchaseOrder.ts`
 - `[NEW] src/domain/sales/entities/LineItem.ts`
 - `[NEW] src/domain/sales/events/OrderPlaced.ts`
 - `[NEW] src/domain/sales/entities/PurchaseOrder.test.ts`
 
 **Contract**:
+
 ```typescript
 export class PurchaseOrder {
-  readonly po: string;
-  readonly customer: string;
-  readonly lines: LineItem[];
-  totalValue(): number;
-  expandToPumps(): Pump[];
+  readonly po: string
+  readonly customer: string
+  readonly lines: LineItem[]
+  totalValue(): number
+  expandToPumps(): Pump[]
 }
 ```
 
 **Dependencies**: Chunks 1-3 (Pump, Events)
 
 **Invariants Enforced**:
+
 1. PO number unique
 2. At least one line item
 3. Total value = sum(quantity × valueEach)
 
 **Test Requirements**:
+
 - Create PO with 3 lines → `expandToPumps()` returns 3 pumps
 - Empty lines → throws error
 
@@ -974,29 +1013,32 @@ export class PurchaseOrder {
 **Purpose**: Infrastructure contracts (interfaces only, no implementation).
 
 **Files**:
+
 - `[NEW] src/domain/production/repository.ts` - IPumpRepository interface
 - `[NEW] src/domain/sales/repository.ts` - IOrderRepository interface
 - `[NEW] src/infrastructure/eventBus/EventBus.ts` - Simple pub/sub
 
 **Contract**:
+
 ```typescript
 // repository.ts
 export interface IPumpRepository {
-  findById(id: string): Promise<Pump | null>;
-  findByStage(stage: Stage): Promise<Pump[]>;
-  save(pump: Pump): Promise<void>;
+  findById(id: string): Promise<Pump | null>
+  findByStage(stage: Stage): Promise<Pump[]>
+  save(pump: Pump): Promise<void>
 }
 
 // EventBus.ts
 export class EventBus {
-  publish(event: DomainEvent): void;
-  subscribe<T extends DomainEvent>(type: string, handler: (e: T) => void): void;
+  publish(event: DomainEvent): void
+  subscribe<T extends DomainEvent>(type: string, handler: (e: T) => void): void
 }
 ```
 
 **Dependencies**: Chunks 1-3
 
 **Test Requirements**:
+
 - EventBus publishes → subscribers receive
 - Multiple subscribers receive same event
 
@@ -1009,6 +1051,7 @@ export class EventBus {
 **Purpose**: Use case orchestration layer.
 
 **Files**:
+
 - `[NEW] src/application/commands/MovePumpStageCommand.ts`
 - `[NEW] src/application/commands/SchedulePumpCommand.ts`
 - `[NEW] src/application/commands/PlaceOrderCommand.ts`
@@ -1016,21 +1059,23 @@ export class EventBus {
 - `[NEW] src/application/handlers/CommandHandlers.test.ts`
 
 **Contract**:
+
 ```typescript
 export interface MovePumpStageCommand {
-  pumpId: string;
-  toStage: Stage;
+  pumpId: string
+  toStage: Stage
 }
 
 export class MovePumpStageHandler {
-  constructor(repo: IPumpRepository, eventBus: EventBus);
-  execute(cmd: MovePumpStageCommand): Promise<Result<void>>;
+  constructor(repo: IPumpRepository, eventBus: EventBus)
+  execute(cmd: MovePumpStageCommand): Promise<Result<void>>
 }
 ```
 
 **Dependencies**: Chunks 1-5
 
 **Test Requirements** (with mock repo):
+
 - Execute MovePump → Pump.moveToStage called → Event published → Repo saved
 - Invalid transition → returns error, no save
 
@@ -1043,15 +1088,17 @@ export class MovePumpStageHandler {
 **Purpose**: Concrete persistence adapters.
 
 **Files**:
+
 - `[NEW] src/infrastructure/persistence/repositories/PumpRepository.ts`
 - `[NEW] src/infrastructure/persistence/adapters/LocalStorageAdapter.ts`
 - `[MODIFY] src/infrastructure/persistence/adapters/SupabaseAdapter.ts` (if exists)
 - `[NEW] src/infrastructure/persistence/MigrationAdapter.ts` - Legacy data mapping
 
 **Contract**:
+
 ```typescript
 export class PumpRepository implements IPumpRepository {
-  constructor(adapter: DataAdapter);
+  constructor(adapter: DataAdapter)
   // Implements all interface methods
 }
 ```
@@ -1059,10 +1106,12 @@ export class PumpRepository implements IPumpRepository {
 **Dependencies**: Chunks 5-6, existing adapters
 
 **Migration Logic**:
+
 - Map legacy `store.ts` JSON shape to new Pump entity
 - Handle "POWDER COAT" → "POWDER_COAT" normalization
 
 **Test Requirements**:
+
 - Save and retrieve pump → data intact
 - Migration adapter converts legacy format
 
@@ -1075,31 +1124,35 @@ export class PumpRepository implements IPumpRepository {
 **Purpose**: Wire new architecture to existing UI.
 
 **Files**:
+
 - `[MODIFY] src/store.ts` - Remove business logic, delegate to services
 - `[NEW] src/store/uiStore.ts` - UI-only state (filters, collapsed)
 - `[MODIFY] src/components/kanban/PumpCard.tsx` - Use new hooks
 - `[NEW] src/presentation/hooks/usePumpCommands.ts`
 
 **Contract**:
+
 ```typescript
 // usePumpCommands.ts
 export function usePumpCommands() {
   return {
     movePump: (id: string, stage: Stage) => Promise<void>,
     schedulePump: (id: string, date: string) => Promise<void>,
-  };
+  }
 }
 ```
 
 **Dependencies**: Chunks 6-7
 
 **Migration Strategy**:
+
 1. Create new hooks that delegate to command handlers
 2. Update components one at a time (Kanban first)
 3. Keep old store functions as fallbacks during transition
 4. Remove fallbacks once all components migrated
 
 **Test Requirements** (E2E):
+
 - Drag pump on Kanban → stage updates → page reload → persisted
 - Schedule pump → calendar shows event
 
@@ -1152,13 +1205,13 @@ Chunk 8 (UI Integration)
 
 ### H.5 Verification Gates
 
-| After Chunk | Gate | Pass Criteria |
-|-------------|------|---------------|
-| 2 | Unit Tests | 100% coverage on Pump entity |
-| 5 | Interface Compile | TypeScript builds with no errors |
-| 6 | Command Tests | All handler tests pass with mocks |
-| 7 | Integration Tests | Repository round-trips work |
-| 8 | E2E Tests | Existing Playwright tests pass |
+| After Chunk | Gate              | Pass Criteria                     |
+| ----------- | ----------------- | --------------------------------- |
+| 2           | Unit Tests        | 100% coverage on Pump entity      |
+| 5           | Interface Compile | TypeScript builds with no errors  |
+| 6           | Command Tests     | All handler tests pass with mocks |
+| 7           | Integration Tests | Repository round-trips work       |
+| 8           | E2E Tests         | Existing Playwright tests pass    |
 
 ### H.6 Rollback Strategy
 
@@ -1171,17 +1224,17 @@ Each chunk is independently reversible:
 
 ### H.7 Estimated Effort
 
-| Chunk | Lines | Complexity | Est. Hours |
-|-------|-------|------------|------------|
-| 1 | ~80 | Low | 1 |
-| 2 | ~150 | Medium | 2 |
-| 3 | ~60 | Low | 1 |
-| 4 | ~120 | Medium | 2 |
-| 5 | ~100 | Medium | 2 |
-| 6 | ~200 | High | 3 |
-| 7 | ~250 | High | 4 |
-| 8 | ~300 | High | 5 |
-| **Total** | **~1260** | | **~20 hours** |
+| Chunk     | Lines     | Complexity | Est. Hours    |
+| --------- | --------- | ---------- | ------------- |
+| 1         | ~80       | Low        | 1             |
+| 2         | ~150      | Medium     | 2             |
+| 3         | ~60       | Low        | 1             |
+| 4         | ~120      | Medium     | 2             |
+| 5         | ~100      | Medium     | 2             |
+| 6         | ~200      | High       | 3             |
+| 7         | ~250      | High       | 4             |
+| 8         | ~300      | High       | 5             |
+| **Total** | **~1260** |            | **~20 hours** |
 
 > [!NOTE]
 > Estimates assume familiarity with codebase. First-time contributors add 50%.
@@ -1190,15 +1243,15 @@ Each chunk is independently reversible:
 
 Following `zen-architect` delegation patterns:
 
-| Task | Primary Agent | Support Agents |
-|------|---------------|----------------|
-| Chunk specs finalization | zen-architect | - |
-| Domain entity implementation | modular-builder | - |
-| Test coverage analysis | test-coverage | - |
-| Bug investigation | bug-hunter | explorer |
-| Security review | security-guardian | - |
-| Integration testing | integration-specialist | test-coverage |
-| Final cleanup | post-task-cleanup | - |
+| Task                         | Primary Agent          | Support Agents |
+| ---------------------------- | ---------------------- | -------------- |
+| Chunk specs finalization     | zen-architect          | -              |
+| Domain entity implementation | modular-builder        | -              |
+| Test coverage analysis       | test-coverage          | -              |
+| Bug investigation            | bug-hunter             | explorer       |
+| Security review              | security-guardian      | -              |
+| Integration testing          | integration-specialist | test-coverage  |
+| Final cleanup                | post-task-cleanup      | -              |
 
 ### H.9 Pre-Implementation Checklist
 
@@ -1214,7 +1267,7 @@ Before starting Chunk 1:
 
 ## Document History
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | 2025-12-14 | Architect | Initial blueprint |
+| Version  | Date       | Author      | Changes                                                                                                                                       |
+| -------- | ---------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.0      | 2025-12-14 | Architect   | Initial blueprint                                                                                                                             |
 | OPUS 1.0 | 2025-12-15 | Antigravity | Added TOC, Assessment Findings, verified codebase claims, integrated master-agents philosophy, added Detailed Implementation Plan (Section H) |
