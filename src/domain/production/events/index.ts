@@ -15,6 +15,9 @@ export type { PumpPaused } from './PumpPaused'
 export { pumpPaused } from './PumpPaused'
 export type { PumpResumed } from './PumpResumed'
 export { pumpResumed } from './PumpResumed'
+// Constitution §7: Lock-date is forecast-only
+export type { LockDateChanged } from './LockDateChanged'
+export { lockDateChanged } from './LockDateChanged'
 
 /**
  * Union type of all production domain events.
@@ -26,3 +29,4 @@ export type ProductionEvent =
   | import('./PumpScheduled').PumpScheduleCleared
   | import('./PumpPaused').PumpPaused
   | import('./PumpResumed').PumpResumed
+  | import('./LockDateChanged').LockDateChanged

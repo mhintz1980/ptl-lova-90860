@@ -203,4 +203,58 @@ describe('Constitution Invariants', () => {
       )
     })
   })
+
+  describe('Section 7: Lock-Date affects forecast only', () => {
+    it('should emit LockDateChanged event when lock date changes', async () => {
+      const store = useApp.getState()
+
+      // Clear any existing lock date
+      store.setLockDate(null)
+      await eventStore.clear()
+
+      // Set a lock date
+      store.setLockDate('2025-01-15')
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      // Verify event was emitted with global aggregate ID
+      const events = await eventStore.getEvents('global')
+      expect(events.length).toBeGreaterThan(0)
+
+      const lockEvent = events.find(
+        (e: any) => e.eventType === 'LockDateChanged'
+      )
+      expect(lockEvent).toBeDefined()
+      expect((lockEvent as any).previousLockDate).toBeNull()
+      expect((lockEvent as any).newLockDate).toBe('2025-01-15')
+
+      // Clean up
+      store.setLockDate(null)
+    })
+
+    it('should NOT emit event when setting same lock date', async () => {
+      const store = useApp.getState()
+
+      // Set initial lock date
+      store.setLockDate('2025-02-01')
+      // Wait for the first event to be persisted
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      await eventStore.clear()
+
+      // Set same lock date again
+      store.setLockDate('2025-02-01')
+
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      // No new events should be created
+      const events = await eventStore.getEvents('global')
+      expect(
+        events.filter((e: any) => e.eventType === 'LockDateChanged').length
+      ).toBe(0)
+
+      // Clean up
+      store.setLockDate(null)
+    })
+  })
 })

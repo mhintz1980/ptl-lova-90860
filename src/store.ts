@@ -31,6 +31,7 @@ import { eventStore } from './infrastructure/events/EventStore'
 import { pumpStageMoved } from './domain/production/events/PumpStageMoved'
 import { pumpPaused } from './domain/production/events/PumpPaused'
 import { pumpResumed } from './domain/production/events/PumpResumed'
+import { lockDateChanged } from './domain/production/events/LockDateChanged'
 import { WORK_STAGES } from './lib/stage-constants'
 
 // --- Store Definition ---
@@ -578,7 +579,20 @@ export const useApp = create<AppState>()(
 
       clearSchedulingStageFilters: () => set({ schedulingStageFilters: [] }),
 
-      setLockDate: (date) => set({ lockDate: date }),
+      // Constitution §7: Lock date affects forecast only, never truth
+      setLockDate: (date) => {
+        const previousLockDate = get().lockDate
+        // Skip if no change
+        if (previousLockDate === date) return
+
+        // Emit domain event
+        const event = lockDateChanged(previousLockDate, date)
+        eventStore.append(event).catch((err) => {
+          console.error('Failed to persist lock date change event:', err)
+        })
+
+        set({ lockDate: date })
+      },
 
       // Capacity management actions
       updateDepartmentStaffing: (stage, config) =>
