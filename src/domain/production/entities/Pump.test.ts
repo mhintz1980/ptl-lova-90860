@@ -44,8 +44,8 @@ describe('Pump Entity', () => {
       expect(pump.stage).toBe('FABRICATION')
     })
 
-    // Blueprint-required test: QUEUE → TESTING fails (skip)
-    it('should NOT allow skipping stages (QUEUE to TESTING)', () => {
+    // Blueprint-required test: QUEUE → SHIP fails (skip intermediate stages)
+    it('should NOT allow skipping stages (QUEUE to SHIP)', () => {
       const pump = Pump.create(basePumpProps)
       const result = pump.moveToStage('SHIP')
 

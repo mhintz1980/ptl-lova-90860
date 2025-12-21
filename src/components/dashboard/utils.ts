@@ -41,7 +41,7 @@ export function applyDashboardFilters(
         Fabrication: ['FABRICATION'],
         'Powder Coat': ['STAGED_FOR_POWDER', 'POWDER_COAT'],
         Assembly: ['ASSEMBLY'],
-        Ship: ['SHIP'], // Constitution: TESTING+SHIPPING merged to SHIP
+        Ship: ['SHIP'], // Constitution v1.2: merged final stage
       }
       const allowedStages = deptStages[filters.department]
       if (allowedStages && !allowedStages.includes(pump.stage)) {
