@@ -4,20 +4,20 @@
 export interface SchedulePumpCommand {
     readonly type: 'SchedulePump';
     readonly pumpId: string;
-    readonly scheduledStart: string; // ISO string
-    readonly scheduledEnd: string; // ISO string
+    readonly forecastStart: string; // ISO string
+    readonly forecastEnd: string; // ISO string
 }
 
 export function schedulePumpCommand(
     pumpId: string,
-    scheduledStart: string,
-    scheduledEnd: string
+    forecastStart: string,
+    forecastEnd: string
 ): SchedulePumpCommand {
     return {
         type: 'SchedulePump',
         pumpId,
-        scheduledStart,
-        scheduledEnd,
+        forecastStart,
+        forecastEnd,
     };
 }
 

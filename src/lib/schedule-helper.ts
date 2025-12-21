@@ -9,14 +9,14 @@ export function buildCapacityAwareTimelines(
     const result: Record<string, StageBlock[]> = {};
 
     pumps.forEach(pump => {
-        if (!pump.scheduledStart) return;
+        if (!pump.forecastStart) return;
 
         const leadTimes = leadTimeLookup(pump.model);
         if (!leadTimes) return;
 
         // Use the centralized buildStageTimeline which now handles capacity and work hours
         const timeline = buildStageTimeline(pump, leadTimes, {
-            startDate: new Date(pump.scheduledStart),
+            startDate: new Date(pump.forecastStart),
             capacityConfig
         });
 

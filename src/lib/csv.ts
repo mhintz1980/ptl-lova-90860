@@ -40,7 +40,7 @@ interface RawPumpRow {
   color?: string
   last_update?: string | number
   value?: number
-  scheduledEnd?: string | number
+  forecastEnd?: string | number
   scheduled_end?: string | number
 }
 
@@ -85,7 +85,7 @@ function normalizeRow(r: RawPumpRow): Pump | null {
     powder_color: r.powder_color || r.color,
     last_update: toIso(r.last_update) || new Date().toISOString(),
     value: Number(r.value ?? 0),
-    scheduledEnd: toIso(r.scheduledEnd || r.scheduled_end),
+    forecastEnd: toIso(r.forecastEnd || r.scheduled_end),
   }
 }
 

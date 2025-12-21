@@ -72,11 +72,11 @@ export class SchedulePumpHandler {
             return { ok: false, error: `Pump not found: ${cmd.pumpId}` };
         }
 
-        pump.schedule(new Date(cmd.scheduledStart), new Date(cmd.scheduledEnd));
+        pump.schedule(new Date(cmd.forecastStart), new Date(cmd.forecastEnd));
         await this.pumpRepository.save(pump);
 
         await this.eventBus.publish(
-            pumpScheduled(cmd.pumpId, cmd.scheduledStart, cmd.scheduledEnd)
+            pumpScheduled(cmd.pumpId, cmd.forecastStart, cmd.forecastEnd)
         );
 
         return { ok: true, value: undefined };

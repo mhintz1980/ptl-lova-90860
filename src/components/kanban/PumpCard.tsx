@@ -159,17 +159,17 @@ export function PumpCard({
               {leadTimes?.total_days ?? 0} days
             </span>
           </div>
-          {pump.scheduledEnd && (
+          {pump.forecastEnd && (
             <div className="flex items-center justify-between">
               <span>Due</span>
               <span
                 className={
-                  new Date(pump.scheduledEnd) < new Date()
+                  new Date(pump.forecastEnd) < new Date()
                     ? "font-medium text-destructive"
                     : "font-medium text-emerald-500"
                 }
               >
-                {formatDate(pump.scheduledEnd)}
+                {formatDate(pump.forecastEnd)}
               </span>
             </div>
           )}

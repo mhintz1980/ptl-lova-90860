@@ -38,8 +38,8 @@ export interface PumpCommandsResult {
      */
     schedulePump: (
         id: string,
-        scheduledStart: string,
-        scheduledEnd: string
+        forecastStart: string,
+        forecastEnd: string
     ) => Promise<{ ok: boolean; error?: string }>;
 
     /**
@@ -95,7 +95,7 @@ export function usePumpCommands(): PumpCommandsResult {
     );
 
     const schedulePump = useCallback(
-        async (id: string, scheduledStart: string, scheduledEnd: string) => {
+        async (id: string, forecastStart: string, forecastEnd: string) => {
             if (!USE_NEW_DOMAIN) {
                 return { ok: false, error: 'New domain layer not active' };
             }
@@ -104,8 +104,8 @@ export function usePumpCommands(): PumpCommandsResult {
             const result = await handler.execute({
                 type: 'SchedulePump',
                 pumpId: id,
-                scheduledStart,
-                scheduledEnd,
+                forecastStart,
+                forecastEnd,
             });
 
             return result.ok

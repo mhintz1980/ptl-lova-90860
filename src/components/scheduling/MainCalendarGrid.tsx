@@ -225,7 +225,7 @@ export function MainCalendarGrid({
                               row: rowIdx,
                               startDate: segment.startDate,
                               endDate: segment.endDate,
-                              shipDate: pump.scheduledEnd ? new Date(pump.scheduledEnd) : undefined,
+                              shipDate: pump.forecastEnd ? new Date(pump.forecastEnd) : undefined,
                             };
 
                             return (

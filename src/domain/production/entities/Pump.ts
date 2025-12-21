@@ -43,8 +43,8 @@ export interface PumpProps {
     readonly powder_color?: string;
     readonly last_update: string; // ISO string
     readonly value: number;
-    readonly scheduledStart?: string; // ISO string
-    readonly scheduledEnd?: string; // ISO string
+    readonly forecastStart?: string; // ISO string
+    readonly forecastEnd?: string; // ISO string
     readonly promiseDate?: string; // ISO string
     readonly work_hours?: {
         fabrication: number;
@@ -57,8 +57,8 @@ export interface PumpProps {
 export class Pump extends Entity<string> {
     private _stage: Stage;
     private _priority: Priority;
-    private _scheduledStart?: string;
-    private _scheduledEnd?: string;
+    private _forecastStart?: string;
+    private _forecastEnd?: string;
     private _last_update: string;
     private _powder_color?: string;
 
@@ -88,8 +88,8 @@ export class Pump extends Entity<string> {
 
         this._stage = props.stage;
         this._priority = props.priority;
-        this._scheduledStart = props.scheduledStart;
-        this._scheduledEnd = props.scheduledEnd;
+        this._forecastStart = props.forecastStart;
+        this._forecastEnd = props.forecastEnd;
         this._last_update = props.last_update;
         this._powder_color = props.powder_color;
     }
@@ -103,12 +103,12 @@ export class Pump extends Entity<string> {
         return this._priority;
     }
 
-    get scheduledStart(): string | undefined {
-        return this._scheduledStart;
+    get forecastStart(): string | undefined {
+        return this._forecastStart;
     }
 
-    get scheduledEnd(): string | undefined {
-        return this._scheduledEnd;
+    get forecastEnd(): string | undefined {
+        return this._forecastEnd;
     }
 
     get last_update(): string {
@@ -193,8 +193,8 @@ export class Pump extends Entity<string> {
      * Assign a scheduled production window.
      */
     schedule(start: Date, end: Date): void {
-        this._scheduledStart = start.toISOString();
-        this._scheduledEnd = end.toISOString();
+        this._forecastStart = start.toISOString();
+        this._forecastEnd = end.toISOString();
         this._last_update = new Date().toISOString();
     }
 
@@ -202,8 +202,8 @@ export class Pump extends Entity<string> {
      * Remove scheduled dates (return to backlog).
      */
     clearSchedule(): void {
-        this._scheduledStart = undefined;
-        this._scheduledEnd = undefined;
+        this._forecastStart = undefined;
+        this._forecastEnd = undefined;
         this._last_update = new Date().toISOString();
     }
 
@@ -255,8 +255,8 @@ export class Pump extends Entity<string> {
             powder_color: this._powder_color,
             last_update: this._last_update,
             value: this.value,
-            scheduledStart: this._scheduledStart,
-            scheduledEnd: this._scheduledEnd,
+            forecastStart: this._forecastStart,
+            forecastEnd: this._forecastEnd,
             promiseDate: this.promiseDate,
             work_hours: this.work_hours,
         };

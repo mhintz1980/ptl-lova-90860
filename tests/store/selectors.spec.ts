@@ -143,7 +143,7 @@ describe('store selectors', () => {
     })
   })
 
-  describe('schedulePump', () => {
+  describe('setForecastHint', () => {
     const scheduledPump: Pump = {
       id: 'schedule-me',
       serial: 2001,
@@ -175,20 +175,20 @@ describe('store selectors', () => {
         ship: 4,
       })
 
-      useApp.getState().schedulePump('schedule-me', '2025-02-10')
+      useApp.getState().setForecastHint('schedule-me', '2025-02-10')
       const pump = useApp.getState().pumps[0]
 
-      expect(pump?.scheduledStart).toContain('2025-02-10')
-      expect(pump?.scheduledEnd).toBeDefined()
+      expect(pump?.forecastStart).toContain('2025-02-10')
+      expect(pump?.forecastEnd).toBeDefined()
       expect(pump?.stage).toBe('QUEUE')
       expect(pump?.last_update).toBeTruthy()
     })
 
     it('does nothing if lead times are missing', () => {
       mockGetModelLeadTimes.mockReturnValue(undefined)
-      useApp.getState().schedulePump('schedule-me', '2025-02-10')
+      useApp.getState().setForecastHint('schedule-me', '2025-02-10')
       const pump = useApp.getState().pumps[0]
-      expect(pump?.scheduledStart).toBeUndefined()
+      expect(pump?.forecastStart).toBeUndefined()
       expect(pump?.stage).toBe('QUEUE')
     })
 
@@ -205,12 +205,12 @@ describe('store selectors', () => {
         assembly: 8,
         ship: 2,
       })
-      useApp.getState().schedulePump('missing-id', '2025-02-10')
+      useApp.getState().setForecastHint('missing-id', '2025-02-10')
       expect(useApp.getState().pumps[0]?.stage).toBe('QUEUE')
     })
   })
 
-  describe('clearSchedule', () => {
+  describe('clearForecastHint', () => {
     const pumpWithSchedule: Pump = {
       id: 'clear-me',
       serial: 3010,
@@ -221,8 +221,8 @@ describe('store selectors', () => {
       priority: 'Rush',
       last_update: '2025-01-01T00:00:00.000Z',
       value: 30000,
-      scheduledStart: '2025-02-01',
-      scheduledEnd: '2025-02-06',
+      forecastStart: '2025-02-01',
+      forecastEnd: '2025-02-06',
     }
 
     beforeEach(() => {
@@ -231,17 +231,17 @@ describe('store selectors', () => {
     })
 
     it('resets scheduling fields and stage', () => {
-      useApp.getState().clearSchedule('clear-me')
+      useApp.getState().clearForecastHint('clear-me')
       const pump = useApp.getState().pumps[0]
 
-      expect(pump?.scheduledStart).toBeUndefined()
-      expect(pump?.scheduledEnd).toBeUndefined()
+      expect(pump?.forecastStart).toBeUndefined()
+      expect(pump?.forecastEnd).toBeUndefined()
       expect(pump?.stage).toBe('QUEUE')
       expect(pump?.last_update).toBeTruthy()
     })
 
     it('ignores unknown ids', () => {
-      useApp.getState().clearSchedule('unknown')
+      useApp.getState().clearForecastHint('unknown')
       expect(useApp.getState().pumps[0]?.stage).toBe('FABRICATION')
     })
   })

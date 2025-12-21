@@ -70,7 +70,7 @@ export const PumpTable: React.FC<PumpTableProps> = ({ pumps, onSelectPump }) => 
           id: key,
           displayId: key,
           customer: pump.customer,
-          promiseDate: pump.promiseDate || pump.scheduledEnd,
+          promiseDate: pump.promiseDate || pump.forecastEnd,
           totalValue: pump.value,
           pumps: [pump],
         });
@@ -86,8 +86,8 @@ export const PumpTable: React.FC<PumpTableProps> = ({ pumps, onSelectPump }) => 
         if (!existing.promiseDate || new Date(pump.promiseDate) < new Date(existing.promiseDate)) {
           existing.promiseDate = pump.promiseDate;
         }
-      } else if (!existing.promiseDate && pump.scheduledEnd) {
-        existing.promiseDate = pump.scheduledEnd;
+      } else if (!existing.promiseDate && pump.forecastEnd) {
+        existing.promiseDate = pump.forecastEnd;
       }
     });
 

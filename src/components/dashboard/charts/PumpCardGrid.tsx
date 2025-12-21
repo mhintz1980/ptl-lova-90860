@@ -20,8 +20,8 @@ export const PumpCardGrid: React.FC<ChartProps> = ({ filters }) => {
     }
 
     const isLate = (pump: Pump) => {
-        if (!pump.scheduledEnd) return false;
-        return new Date(pump.scheduledEnd) < new Date() && pump.stage !== 'CLOSED' && pump.stage !== 'SHIP';
+        if (!pump.forecastEnd) return false;
+        return new Date(pump.forecastEnd) < new Date() && pump.stage !== 'CLOSED' && pump.stage !== 'SHIP';
     };
 
     return (
@@ -89,12 +89,12 @@ export const PumpCardGrid: React.FC<ChartProps> = ({ filters }) => {
                                     </span>
                                 </div>
 
-                                {pump.scheduledEnd && (
+                                {pump.forecastEnd && (
                                     <div className="flex items-center gap-2 text-sm pt-2 border-t border-border">
                                         <Calendar className="h-3 w-3 text-muted-foreground" />
                                         <span className="text-muted-foreground">Due:</span>
                                         <span className={`font-medium ${late ? 'text-rose-600 dark:text-rose-400' : 'text-foreground'}`}>
-                                            {format(parseISO(pump.scheduledEnd), 'MMM d, yyyy')}
+                                            {format(parseISO(pump.forecastEnd), 'MMM d, yyyy')}
                                         </span>
                                     </div>
                                 )}

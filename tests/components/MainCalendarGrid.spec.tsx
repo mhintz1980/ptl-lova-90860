@@ -14,8 +14,8 @@ const pumps: Pump[] = [
     priority: "Normal",
     last_update: "2025-10-31T00:00:00.000Z",
     value: 30000,
-    scheduledStart: "2025-11-10T00:00:00.000Z",
-    scheduledEnd: "2025-11-20T00:00:00.000Z",
+    forecastStart: "2025-11-10T00:00:00.000Z",
+    forecastEnd: "2025-11-20T00:00:00.000Z",
   },
 ];
 

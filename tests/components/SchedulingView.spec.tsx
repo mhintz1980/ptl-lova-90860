@@ -48,8 +48,8 @@ describe("SchedulingView", () => {
         priority: "Normal",
         last_update: "2025-01-01T00:00:00.000Z",
         value: 12345,
-        scheduledStart: "2025-01-10T00:00:00.000Z",
-        scheduledEnd: "2025-01-15T00:00:00.000Z",
+        forecastStart: "2025-01-10T00:00:00.000Z",
+        forecastEnd: "2025-01-15T00:00:00.000Z",
       },
       {
         id: "pump-b",
@@ -61,8 +61,8 @@ describe("SchedulingView", () => {
         priority: "High",
         last_update: "2025-01-02T00:00:00.000Z",
         value: 54321,
-        scheduledStart: "2025-01-11T00:00:00.000Z",
-        scheduledEnd: "2025-01-16T00:00:00.000Z",
+        forecastStart: "2025-01-11T00:00:00.000Z",
+        forecastEnd: "2025-01-16T00:00:00.000Z",
       },
     ];
 

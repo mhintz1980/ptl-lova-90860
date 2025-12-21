@@ -20,8 +20,8 @@ const pump: Pump = {
   priority: 'Normal',
   last_update: '2025-11-01T00:00:00.000Z',
   value: 28000,
-  scheduledStart: '2025-11-10T00:00:00.000Z',
-  scheduledEnd: '2025-11-20T00:00:00.000Z',
+  forecastStart: '2025-11-10T00:00:00.000Z',
+  forecastEnd: '2025-11-20T00:00:00.000Z',
 }
 
 // Constitution §2.1: Canonical StageDurations
@@ -43,7 +43,7 @@ describe('schedule utilities', () => {
       'ASSEMBLY',
       'SHIP',
     ])
-    const expectedStart = startOfDay(new Date(pump.scheduledStart!))
+    const expectedStart = startOfDay(new Date(pump.forecastStart!))
     expect(blocks[0].start.getTime()).toBe(expectedStart.getTime())
     expect(blocks[0].end > blocks[0].start).toBe(true)
     expect(blocks.at(-1)?.end.toISOString()).toBeDefined()

@@ -23,7 +23,7 @@ export function BacklogDock({ pumps, collapsed }: BacklogDockProps) {
   });
 
   const unscheduledPumps = useMemo(
-    () => pumps.filter((pump) => pump.stage === "QUEUE" && !pump.scheduledStart),
+    () => pumps.filter((pump) => pump.stage === "QUEUE" && !pump.forecastStart),
     [pumps]
   );
   const sortedPumps = useMemo(

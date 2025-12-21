@@ -68,11 +68,13 @@ export interface AppState {
   updatePump: (id: string, patch: Partial<Pump>) => void
   pausePump: (id: string) => void
   resumePump: (id: string) => void
-  schedulePump: (id: string, dropDate: string) => void
-  clearSchedule: (id: string) => void
-  clearQueueSchedules: () => number
-  levelNotStartedSchedules: () => number // Deprecated, kept for compatibility if needed, but logic should move to autoSchedule
-  autoSchedule: () => number
+  // Constitution §7: Forecast hint operations (projection only, not truth)
+  setForecastHint: (id: string, dropDate: string) => void
+  clearForecastHint: (id: string) => void
+  clearQueueForecastHints: () => number
+  /** @deprecated Use autoSetForecastHints instead */
+  levelNotStartedSchedules: () => number
+  autoSetForecastHints: () => number
   replaceDataset: (rows: Pump[]) => void
   toggleStageCollapse: (stage: Stage) => void
   toggleCollapsedCards: () => void
@@ -344,9 +346,10 @@ export const useApp = create<AppState>()(
         get().updatePump(id, patch)
       },
 
-      schedulePump: (id, dropDate) => {
+      // Constitution §7: Set forecast hint (projection only)
+      setForecastHint: (id, dropDate) => {
         // When dropping on calendar, we set stage to QUEUE (conceptually "Scheduled Queue")
-        // The distinction is purely whether scheduledStart is set.
+        // The distinction is purely whether forecastStart is set.
         const pump = get().pumps.find((p) => p.id === id)
         if (!pump) return
 
@@ -374,41 +377,43 @@ export const useApp = create<AppState>()(
 
         const patch: Partial<Pump> = {
           stage: 'QUEUE', // Ensure it's in QUEUE
-          scheduledStart: start.toISOString(),
-          scheduledEnd: end.toISOString(),
+          forecastStart: start.toISOString(),
+          forecastEnd: end.toISOString(),
           last_update: new Date().toISOString(),
         }
 
         get().updatePump(id, patch)
       },
 
-      clearSchedule: (id) => {
+      // Constitution §7: Clear forecast hint
+      clearForecastHint: (id) => {
         const patch: Partial<Pump> = {
           stage: 'QUEUE',
-          scheduledStart: undefined,
-          scheduledEnd: undefined,
+          forecastStart: undefined,
+          forecastEnd: undefined,
           last_update: new Date().toISOString(),
         }
         get().updatePump(id, patch)
       },
 
-      clearQueueSchedules: () => {
+      // Constitution §7: Clear queue forecast hints
+      clearQueueForecastHints: () => {
         const { pumps, lockDate, updatePump } = get()
         let count = 0
 
         pumps.forEach((p) => {
-          if (p.stage === 'QUEUE' && p.scheduledStart) {
+          if (p.stage === 'QUEUE' && p.forecastStart) {
             // Check lock date
             if (
               lockDate &&
-              !isAfter(parseISO(p.scheduledStart), parseISO(lockDate))
+              !isAfter(parseISO(p.forecastStart), parseISO(lockDate))
             ) {
               return // Skip locked items
             }
 
             updatePump(p.id, {
-              scheduledStart: undefined,
-              scheduledEnd: undefined,
+              forecastStart: undefined,
+              forecastEnd: undefined,
               last_update: new Date().toISOString(),
             })
             count++
@@ -417,12 +422,13 @@ export const useApp = create<AppState>()(
         return count
       },
 
-      // Deprecated alias for compatibility
+      /** @deprecated Use autoSetForecastHints instead */
       levelNotStartedSchedules: () => {
-        return get().autoSchedule()
+        return get().autoSetForecastHints()
       },
 
-      autoSchedule: () => {
+      // Constitution §7: Auto-set forecast hints for unscheduled queue items
+      autoSetForecastHints: () => {
         const {
           pumps,
           updatePump,
@@ -433,7 +439,7 @@ export const useApp = create<AppState>()(
 
         // 1. Get un-scheduled pumps
         const unscheduled = pumps.filter(
-          (p) => p.stage === 'QUEUE' && !p.scheduledStart
+          (p) => p.stage === 'QUEUE' && !p.forecastStart
         )
         if (unscheduled.length === 0) return 0
 
@@ -475,8 +481,8 @@ export const useApp = create<AppState>()(
         const dailyStarts: Record<string, number> = {}
 
         pumps.forEach((p) => {
-          if (p.scheduledStart) {
-            const dateKey = p.scheduledStart.split('T')[0]
+          if (p.forecastStart) {
+            const dateKey = p.forecastStart.split('T')[0]
             dailyStarts[dateKey] = (dailyStarts[dateKey] || 0) + 1
           }
         })
@@ -533,8 +539,8 @@ export const useApp = create<AppState>()(
                 : addDays(start, 1)
 
             updatePump(pump.id, {
-              scheduledStart: start.toISOString(),
-              scheduledEnd: end.toISOString(),
+              forecastStart: start.toISOString(),
+              forecastEnd: end.toISOString(),
               last_update: new Date().toISOString(),
             })
             scheduledCount++
@@ -743,7 +749,7 @@ export const useApp = create<AppState>()(
 
       getStageSegments: (id) => {
         const pump = get().pumps.find((p) => p.id === id)
-        if (!pump || !pump.scheduledStart) return undefined
+        if (!pump || !pump.forecastStart) return undefined
 
         const leadTimes = get().getModelLeadTimes(pump.model)
         if (!leadTimes) return undefined
@@ -761,21 +767,21 @@ export const useApp = create<AppState>()(
         if (!pump) return false
 
         // A pump is locked if:
-        // 1. It has a scheduledStart on or before the lock date, OR
+        // 1. It has a forecastStart on or before the lock date, OR
         // 2. It's past QUEUE stage (actively in production)
         if (pump.stage !== 'QUEUE' && pump.stage !== 'CLOSED') {
           // Check if it started on/before lock date
-          if (pump.scheduledStart) {
-            const startDate = pump.scheduledStart.split('T')[0]
+          if (pump.forecastStart) {
+            const startDate = pump.forecastStart.split('T')[0]
             return startDate <= lockDate
           }
-          // In production without schedule = always locked if lock date is set
+          // In production without forecast = always locked if lock date is set
           return true
         }
 
         // QUEUE pumps are locked only if scheduled on/before lock date
-        if (pump.scheduledStart) {
-          const startDate = pump.scheduledStart.split('T')[0]
+        if (pump.forecastStart) {
+          const startDate = pump.forecastStart.split('T')[0]
           return startDate <= lockDate
         }
 

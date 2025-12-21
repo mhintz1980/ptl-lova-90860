@@ -35,9 +35,9 @@ function getWeekNumber(date: Date): string {
 }
 
 function diffDays(pump: Pump): number {
-  if (!pump.scheduledEnd) return 0;
+  if (!pump.forecastEnd) return 0;
   const start = new Date(pump.last_update);
-  const end = new Date(pump.scheduledEnd);
+  const end = new Date(pump.forecastEnd);
   return Math.abs((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
@@ -49,7 +49,7 @@ interface ChartClickData {
 
 export const TrendChart: React.FC<TrendChartProps> = ({ pumps, headless, onDrilldown }) => {
   const weeklyData = React.useMemo(() => {
-    const closed = pumps.filter(p => p.stage === "CLOSED" && p.scheduledEnd);
+    const closed = pumps.filter(p => p.stage === "CLOSED" && p.forecastEnd);
 
     const weeklyStats = closed.reduce((acc, pump) => {
       const week = getWeekNumber(new Date(pump.last_update));

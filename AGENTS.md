@@ -36,13 +36,16 @@
 
 ## Commit & Pull Request Guidelines
 - Follow Conventional Commits style seen in history: `feat:`, `test:`, `fix:`, `docs:` (include scope when useful).
-- Keep PRs small and tightly scoped; prefer modular changes that can stand alone.
+- Keep PRs small and tightly scoped; one Constitution phase per PR.
 - PR description must link an issue/plan item when applicable, or state “no issue”.
 - UI changes require before/after screenshots or a short GIF.
-- Confirm Constitution compliance: Kanban truth is not mutated by calendar/projection, canonical stages enforced, and no legacy stage strings.
+- PR description must confirm Constitution compliance: Kanban is truth, calendar is projection-only, forecast hints only.
+- Must pass: `pnpm test` and `scripts/constitution-gate.sh`.
 - Include test results in the PR; add/update tests for behavior changes (Vitest, Playwright for UI workflow changes).
 - If localStorage/data shapes change, include migration notes and fixture updates.
-- Update docs when rules/architecture change (Constitution + relevant implementation plan).
+- Legacy stage strings allowed only in `src/lib/stage-constants.ts` and `src/infrastructure/persistence/MigrationAdapter.ts`
+  (and optionally `src/test-fixtures`).
+- Update docs when rules/architecture change (Constitution + implementation plan).
 
 ## Agent-Specific Notes
 - Key references: `docs/development.md`, `docs/testing.md`, `DDD_BLUEPRINT-OPUS.md`,

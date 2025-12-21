@@ -177,7 +177,7 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
     // but the instructions say "Shows all data that is generated". 
     // Let's check the Pump type definition again. 
     // The seed.ts generates them, but are they on the Pump interface?
-    // Looking at types.ts: Pump has: id, serial, po, customer, model, stage, priority, powder_color, last_update, value, scheduledEnd, scheduledStart.
+    // Looking at types.ts: Pump has: id, serial, po, customer, model, stage, priority, powder_color, last_update, value, forecastEnd, forecastStart.
     // It DOES NOT have engine_model, gearbox_model, etc. explicitly in the interface I saw earlier.
     // However, the seed.ts casts it: `as Pump & { engine_model?: string ... }`.
     // So they are likely stored but not strictly typed in the main interface.
@@ -548,13 +548,13 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                                         {isEditing ? (
                                             <Input
                                                 type="date"
-                                                value={formatDateForInput(formData.scheduledStart)}
-                                                onChange={(e) => handleDateChange('scheduledStart', e.target.value)}
+                                                value={formatDateForInput(formData.forecastStart)}
+                                                onChange={(e) => handleDateChange('forecastStart', e.target.value)}
                                                 className="bg-background/40 h-8 text-right border-emerald-500/20 text-sm"
                                             />
                                         ) : (
                                             <p className="font-bold text-foreground tracking-tight text-base">
-                                                {formData.scheduledStart ? format(parseISO(formData.scheduledStart), "MMM d, yyyy") : '-'}
+                                                {formData.forecastStart ? format(parseISO(formData.forecastStart), "MMM d, yyyy") : '-'}
                                             </p>
                                         )}
                                     </div>
@@ -566,13 +566,13 @@ export function PumpDetailModal({ pump, onClose }: PumpDetailModalProps) {
                                         {isEditing ? (
                                             <Input
                                                 type="date"
-                                                value={formatDateForInput(formData.scheduledEnd)}
-                                                onChange={(e) => handleDateChange('scheduledEnd', e.target.value)}
+                                                value={formatDateForInput(formData.forecastEnd)}
+                                                onChange={(e) => handleDateChange('forecastEnd', e.target.value)}
                                                 className="bg-background/40 h-8 text-right border-emerald-500/20 text-sm"
                                             />
                                         ) : (
                                             <p className="font-bold text-foreground tracking-tight text-base">
-                                                {formData.scheduledEnd ? format(parseISO(formData.scheduledEnd), "MMM d, yyyy") : '-'}
+                                                {formData.forecastEnd ? format(parseISO(formData.forecastEnd), "MMM d, yyyy") : '-'}
                                             </p>
                                         )}
                                     </div>

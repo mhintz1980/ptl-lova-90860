@@ -75,8 +75,8 @@ describe('Domain Events', () => {
 
             expect(event.eventType).toBe('PumpScheduled');
             expect(event.pumpId).toBe('pump-001');
-            expect(event.scheduledStart).toBe('2025-01-15T00:00:00.000Z');
-            expect(event.scheduledEnd).toBe('2025-01-20T00:00:00.000Z');
+            expect(event.forecastStart).toBe('2025-01-15T00:00:00.000Z');
+            expect(event.forecastEnd).toBe('2025-01-20T00:00:00.000Z');
         });
     });
 

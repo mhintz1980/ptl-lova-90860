@@ -165,12 +165,12 @@ describe('SchedulePumpHandler', () => {
         const result = await handler.execute({
             type: 'SchedulePump',
             pumpId: 'pump-001',
-            scheduledStart: '2025-01-15T00:00:00.000Z',
-            scheduledEnd: '2025-01-20T00:00:00.000Z',
+            forecastStart: '2025-01-15T00:00:00.000Z',
+            forecastEnd: '2025-01-20T00:00:00.000Z',
         });
 
         expect(result.ok).toBe(true);
-        expect(testPump.scheduledStart).toBe('2025-01-15T00:00:00.000Z');
+        expect(testPump.forecastStart).toBe('2025-01-15T00:00:00.000Z');
         expect(events.length).toBe(1);
     });
 });

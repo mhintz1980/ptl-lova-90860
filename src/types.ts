@@ -26,8 +26,9 @@ export interface Pump {
   powder_color?: string
   last_update: string // ISO
   value: number // numeric
-  scheduledEnd?: string // ISO
-  scheduledStart?: string // ISO
+  // Constitution §7: Forecast hints (projection only, not truth)
+  forecastEnd?: string // ISO - projected completion date
+  forecastStart?: string // ISO - projected start date
   // Pause state
   isPaused?: boolean // true if job is in limbo
   pausedAt?: string // ISO timestamp when paused

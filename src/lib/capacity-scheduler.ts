@@ -109,13 +109,13 @@ export const seedCapacityWithExistingJobs = (
   getModelLeadTimes: (model: string) => StageDurations | undefined
 ): void => {
   pumps.forEach((pump) => {
-    if (pump.stage !== 'FABRICATION' || !pump.scheduledStart) return
+    if (pump.stage !== 'FABRICATION' || !pump.forecastStart) return
 
     const leadTimes = getModelLeadTimes(pump.model)
     if (!leadTimes) return
 
     const { fabricationDays } = computeDurationSummary(leadTimes)
-    tracker.reserveDays(pump.scheduledStart, fabricationDays)
+    tracker.reserveDays(pump.forecastStart, fabricationDays)
   })
 }
 
@@ -128,18 +128,18 @@ export const scheduleJobsWithCapacity = (
   capacityTracker: CapacityTracker,
   minDateISO: string,
   getModelLeadTimes: (model: string) => StageDurations | undefined
-): Array<{ id: string; scheduledStart: string; scheduledEnd: string }> => {
+): Array<{ id: string; forecastStart: string; forecastEnd: string }> => {
   // Sort jobs by their scheduled start date (earliest first)
   const sorted = [...notStartedPumps].sort((a, b) => {
-    const aTime = fromISODate(a.scheduledStart!).getTime()
-    const bTime = fromISODate(b.scheduledStart!).getTime()
+    const aTime = fromISODate(a.forecastStart!).getTime()
+    const bTime = fromISODate(b.forecastStart!).getTime()
     return aTime - bTime
   })
 
   const patches: Array<{
     id: string
-    scheduledStart: string
-    scheduledEnd: string
+    forecastStart: string
+    forecastEnd: string
   }> = []
 
   sorted.forEach((pump) => {
@@ -149,7 +149,7 @@ export const scheduleJobsWithCapacity = (
     const { fabricationDays, totalDays } = computeDurationSummary(leadTimes)
 
     // Ensure target start is at least the minimum date
-    let targetStart = pump.scheduledStart!
+    let targetStart = pump.forecastStart!
     if (!targetStart || targetStart < minDateISO) {
       targetStart = minDateISO
     }
@@ -165,17 +165,17 @@ export const scheduleJobsWithCapacity = (
     capacityTracker.reserveDays(earliestStart, fabricationDays)
 
     // Calculate end date
-    const scheduledEnd = addDaysToISODate(earliestStart, totalDays)
+    const forecastEnd = addDaysToISODate(earliestStart, totalDays)
 
     // Only create a patch if dates actually changed
     if (
-      earliestStart !== pump.scheduledStart ||
-      scheduledEnd !== pump.scheduledEnd
+      earliestStart !== pump.forecastStart ||
+      forecastEnd !== pump.forecastEnd
     ) {
       patches.push({
         id: pump.id,
-        scheduledStart: earliestStart,
-        scheduledEnd: scheduledEnd,
+        forecastStart: earliestStart,
+        forecastEnd: forecastEnd,
       })
     }
   })

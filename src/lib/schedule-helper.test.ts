@@ -16,7 +16,7 @@ describe('Schedule Helper - Dynamic Durations', () => {
   const mockPump: Pump = {
     id: 'p1',
     model: 'TEST-MODEL',
-    scheduledStart: '2025-01-01T09:00:00.000Z', // Wednesday
+    forecastStart: '2025-01-01T09:00:00.000Z', // Wednesday
     serial: 1,
     po: 'PO1',
     customer: 'C1',

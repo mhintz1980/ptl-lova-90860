@@ -225,7 +225,7 @@ function generatePumpFromCatalog(
     // Determine current stage based on dates
     let currentStage: Stage = 'QUEUE'
     let lastUpdate = poDate.toISOString()
-    const scheduledEnd = testingEnd.toISOString()
+    const forecastEnd = testingEnd.toISOString()
 
     const nowTime = now.getTime()
     if (nowTime >= testingEnd.getTime()) {
@@ -261,7 +261,7 @@ function generatePumpFromCatalog(
         : undefined,
       last_update: lastUpdate,
       value: basePrice,
-      scheduledEnd,
+      forecastEnd,
       promiseDate: promiseDate.toISOString(),
       // BOM details (for future UI visibility)
       engine_model: getBomComponent(model.bom.engine, 'engine'),
@@ -344,9 +344,9 @@ export function seed(count: number = 80): Pump[] {
   // Ensure we have exactly the requested count
   const finalPumps = pumps.slice(0, count)
 
-  // POST-PROCESSING: Ensure some unscheduled QUEUE pumps (without scheduledStart)
+  // POST-PROCESSING: Ensure some unscheduled QUEUE pumps (without forecastStart)
   const unscheduledCount = finalPumps.filter(
-    (p) => p.stage === 'QUEUE' && !p.scheduledStart
+    (p) => p.stage === 'QUEUE' && !p.forecastStart
   ).length
   if (unscheduledCount < 5) {
     // Force at least 5 unscheduled QUEUE pumps
@@ -356,8 +356,8 @@ export function seed(count: number = 80): Pump[] {
     for (let i = 0; i < needed; i++) {
       const pump = queuePumps[i]
       if (pump) {
-        pump.scheduledStart = undefined
-        pump.scheduledEnd = undefined
+        pump.forecastStart = undefined
+        pump.forecastEnd = undefined
       }
     }
   }

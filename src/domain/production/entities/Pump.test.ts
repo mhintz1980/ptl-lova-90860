@@ -157,8 +157,8 @@ describe('Pump Entity', () => {
 
       pump.schedule(start, end)
 
-      expect(pump.scheduledStart).toBe(start.toISOString())
-      expect(pump.scheduledEnd).toBe(end.toISOString())
+      expect(pump.forecastStart).toBe(start.toISOString())
+      expect(pump.forecastEnd).toBe(end.toISOString())
     })
 
     it('should clear scheduled dates', () => {
@@ -167,8 +167,8 @@ describe('Pump Entity', () => {
 
       pump.clearSchedule()
 
-      expect(pump.scheduledStart).toBeUndefined()
-      expect(pump.scheduledEnd).toBeUndefined()
+      expect(pump.forecastStart).toBeUndefined()
+      expect(pump.forecastEnd).toBeUndefined()
     })
   })
 

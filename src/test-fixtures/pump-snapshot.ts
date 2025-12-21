@@ -22,7 +22,7 @@ export interface PumpSnapshot {
   stage: Stage;
   priority: Priority;
   promiseDate: string;    // ISO date
-  scheduledEnd?: string;  // ISO date (projected completion)
+  forecastEnd?: string;  // ISO date (projected completion)
   lastUpdate: string;     // ISO timestamp
   value: number;
 }
@@ -64,7 +64,7 @@ export function toPumpSnapshot(pump: Pump): PumpSnapshot {
     stage: pump.stage,
     priority: pump.priority,
     promiseDate: pump.promiseDate ?? "",
-    scheduledEnd: pump.scheduledEnd,
+    forecastEnd: pump.forecastEnd,
     lastUpdate: pump.last_update,
     value: pump.value,
   };
@@ -93,7 +93,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "QUEUE",
     priority: "Normal",
     promiseDate: "2025-01-15",
-    scheduledEnd: undefined,
+    forecastEnd: undefined,
     lastUpdate: "2024-12-20T10:00:00.000Z",
     value: 20000,
   },
@@ -107,7 +107,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "QUEUE",
     priority: "High",
     promiseDate: "2025-01-10",
-    scheduledEnd: undefined,
+    forecastEnd: undefined,
     lastUpdate: "2024-12-19T08:00:00.000Z",
     value: 45000,
   },
@@ -123,7 +123,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "FABRICATION",
     priority: "Rush",
     promiseDate: "2025-01-05",
-    scheduledEnd: "2025-01-08T17:00:00.000Z",
+    forecastEnd: "2025-01-08T17:00:00.000Z",
     lastUpdate: "2024-12-18T14:00:00.000Z",
     value: 30000,
   },
@@ -137,7 +137,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "FABRICATION",
     priority: "Normal",
     promiseDate: "2025-01-20",
-    scheduledEnd: "2025-01-18T17:00:00.000Z",
+    forecastEnd: "2025-01-18T17:00:00.000Z",
     lastUpdate: "2024-12-17T09:00:00.000Z",
     value: 38000,
   },
@@ -153,7 +153,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "POWDER_COAT",
     priority: "Urgent",
     promiseDate: "2024-12-28",
-    scheduledEnd: "2024-12-27T17:00:00.000Z",
+    forecastEnd: "2024-12-27T17:00:00.000Z",
     lastUpdate: "2024-12-15T16:00:00.000Z",
     value: 50000,
   },
@@ -167,7 +167,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "POWDER_COAT",
     priority: "High",
     promiseDate: "2025-01-02",
-    scheduledEnd: "2025-01-03T17:00:00.000Z",
+    forecastEnd: "2025-01-03T17:00:00.000Z",
     lastUpdate: "2024-12-14T11:00:00.000Z",
     value: 36000,
   },
@@ -183,7 +183,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "ASSEMBLY",
     priority: "Normal",
     promiseDate: "2024-12-30",
-    scheduledEnd: "2024-12-28T17:00:00.000Z",
+    forecastEnd: "2024-12-28T17:00:00.000Z",
     lastUpdate: "2024-12-20T08:00:00.000Z",
     value: 29000,
   },
@@ -199,7 +199,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "SHIP",
     priority: "Normal",
     promiseDate: "2024-12-24",
-    scheduledEnd: "2024-12-23T17:00:00.000Z",
+    forecastEnd: "2024-12-23T17:00:00.000Z",
     lastUpdate: "2024-12-20T07:00:00.000Z",
     value: 25000,
   },
@@ -215,7 +215,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "SHIP",
     priority: "Normal",
     promiseDate: "2024-12-22",
-    scheduledEnd: "2024-12-21T17:00:00.000Z",
+    forecastEnd: "2024-12-21T17:00:00.000Z",
     lastUpdate: "2024-12-20T06:00:00.000Z",
     value: 30000,
   },
@@ -231,7 +231,7 @@ export const FROZEN_SNAPSHOT: PumpSnapshot[] = [
     stage: "CLOSED",
     priority: "Normal",
     promiseDate: "2024-12-15",
-    scheduledEnd: "2024-12-14T17:00:00.000Z",
+    forecastEnd: "2024-12-14T17:00:00.000Z",
     lastUpdate: "2024-12-14T17:30:00.000Z",
     value: 25000,
   },

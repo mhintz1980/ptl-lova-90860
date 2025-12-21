@@ -45,7 +45,7 @@ describe("DragAndDropContext", () => {
   });
 
   it("updates the pump when an unscheduled card is dropped on a date", () => {
-    const schedulePumpSpy = vi.spyOn(useApp.getState(), "schedulePump");
+    const setForecastHintSpy = vi.spyOn(useApp.getState(), "setForecastHint");
 
     render(
       <DragAndDropContext pumps={[pump]}>
@@ -61,6 +61,6 @@ describe("DragAndDropContext", () => {
       over: { id: "2024-01-10" },
     } as unknown as DragEndEvent);
 
-    expect(schedulePumpSpy).toHaveBeenCalledWith(pump.id, "2024-01-10");
+    expect(setForecastHintSpy).toHaveBeenCalledWith(pump.id, "2024-01-10");
   });
 });

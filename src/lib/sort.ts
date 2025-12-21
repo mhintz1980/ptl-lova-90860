@@ -28,7 +28,7 @@ const STAGE_WEIGHT: Record<Stage, number> = STAGE_SEQUENCE.reduce(
   {} as Record<Stage, number>
 );
 
-const getPromiseDate = (pump: Pump) => pump.promiseDate ?? pump.scheduledEnd ?? "";
+const getPromiseDate = (pump: Pump) => pump.promiseDate ?? pump.forecastEnd ?? "";
 
 const toTimestamp = (value?: string) => {
   if (!value) return 0;

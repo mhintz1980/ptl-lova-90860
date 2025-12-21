@@ -22,8 +22,8 @@ export interface LegacyPump {
     powder_color?: string;
     last_update: string;
     value: number;
-    scheduledStart?: string;
-    scheduledEnd?: string;
+    forecastStart?: string;
+    forecastEnd?: string;
     promiseDate?: string;
     work_hours?: {
         fabrication: number;
@@ -87,8 +87,8 @@ export function migrateLegacyPump(legacy: LegacyPump): PumpProps {
         powder_color: legacy.powder_color,
         last_update: legacy.last_update,
         value: legacy.value,
-        scheduledStart: legacy.scheduledStart,
-        scheduledEnd: legacy.scheduledEnd,
+        forecastStart: legacy.forecastStart,
+        forecastEnd: legacy.forecastEnd,
         promiseDate: legacy.promiseDate,
         work_hours: legacy.work_hours,
     };

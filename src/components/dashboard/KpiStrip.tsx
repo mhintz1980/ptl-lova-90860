@@ -11,9 +11,9 @@ interface KpiStripProps {
 }
 
 function diffDays(pump: Pump): number {
-  if (!pump.scheduledEnd) return 0;
+  if (!pump.forecastEnd) return 0;
   const start = new Date(pump.last_update);
-  const end = new Date(pump.scheduledEnd);
+  const end = new Date(pump.forecastEnd);
   return Math.abs((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
 }
 
@@ -22,8 +22,8 @@ export function KpiStrip({ pumps, compact = false }: KpiStripProps) {
   const isLight = mode === "light";
 
   const closed = pumps.filter(p => p.stage === "CLOSED");
-  const onTime = closed.filter(p => !p.scheduledEnd || new Date(p.last_update) <= new Date(p.scheduledEnd));
-  const lateOpen = pumps.filter(p => p.scheduledEnd && new Date() > new Date(p.scheduledEnd) && p.stage !== "CLOSED");
+  const onTime = closed.filter(p => !p.forecastEnd || new Date(p.last_update) <= new Date(p.forecastEnd));
+  const lateOpen = pumps.filter(p => p.forecastEnd && new Date() > new Date(p.forecastEnd) && p.stage !== "CLOSED");
 
   const avgBuildDays = closed.length > 0
     ? closed.reduce((sum, p) => sum + diffDays(p), 0) / closed.length

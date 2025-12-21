@@ -98,12 +98,12 @@ function sanitizeDurations(raw: StageDurations) {
 }
 
 function resolveScheduleStart(pump: Pump, totalDays: number): Date {
-  if (pump.scheduledStart) {
-    return startOfDay(new Date(pump.scheduledStart))
+  if (pump.forecastStart) {
+    return startOfDay(new Date(pump.forecastStart))
   }
 
-  if (pump.scheduledEnd) {
-    return startOfDay(addBusinessDays(new Date(pump.scheduledEnd), -totalDays))
+  if (pump.forecastEnd) {
+    return startOfDay(addBusinessDays(new Date(pump.forecastEnd), -totalDays))
   }
 
   return startOfDay(new Date())

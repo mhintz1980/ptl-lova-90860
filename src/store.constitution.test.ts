@@ -126,7 +126,7 @@ describe('Constitution Invariants', () => {
         priority: 'Normal',
         last_update: new Date().toISOString(),
         value: 1000,
-        scheduledStart: '2025-01-01T00:00:00.000Z',
+        forecastStart: '2025-01-01T00:00:00.000Z',
       }
 
       store.replaceDataset([testPump])
